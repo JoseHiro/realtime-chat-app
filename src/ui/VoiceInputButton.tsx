@@ -13,9 +13,20 @@ type SpeechRecognition = typeof window.SpeechRecognition extends undefined
   ? any
   : InstanceType<typeof window.SpeechRecognition>;
 
-export const VoiceInput = () => {
+export const VoiceInput = ({
+  history,
+  audioList,
+  setHistory,
+  setAudioList,
+  sendToAPI,
+}: {
+  history: any;
+  audioList: any;
+  setHistory: (history: any) => void;
+  setAudioList: (audioList: any) => void;
+  sendToAPI: (text: string) => Promise<void>;
+}) => {
   const [isRecording, setIsRecording] = useState(false);
-  const [transcript, setTranscript] = useState("");
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const [isAITalking] = useState(false);
 
@@ -32,9 +43,14 @@ export const VoiceInput = () => {
     recognition.interimResults = true;
 
     recognition.onresult = (event: any) => {
-      const result = event.results[event.results.length - 1][0].transcript;
-      console.log("Transcript:", result);
-      setTranscript(result);
+      const lastResult = event.results[event.results.length - 1];
+      const transcriptText = lastResult[0].transcript;
+
+      // 確定したときだけ送信
+      if (lastResult.isFinal) {
+        console.log("Transcript:", transcriptText);
+        handleSubmitAudio(transcriptText);
+      }
     };
 
     recognition.onend = () => {
@@ -48,7 +64,6 @@ export const VoiceInput = () => {
     if (!recognitionRef.current) return;
     if (isRecording) return;
     setIsRecording(true);
-    setTranscript("");
     recognitionRef.current.start();
   };
 
@@ -57,10 +72,19 @@ export const VoiceInput = () => {
     recognitionRef.current.stop();
   };
 
+  const handleSubmitAudio = async (text) => {
+    setHistory((prev) => {
+      const newMessages = [...prev, { role: "user", content: text }];
+      sendToAPI(newMessages);
+      return newMessages;
+    });
+    // console.log(history, data.reply);
+  };
+
   return (
     <button
       onMouseDown={startRecording}
-      onMouseUp={startRecording}
+      onMouseUp={stopRecording}
       onTouchStart={startRecording}
       onTouchEnd={stopRecording}
       className={`w-20 h-20 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg cursor-pointer ${

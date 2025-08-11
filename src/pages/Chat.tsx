@@ -1,14 +1,12 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import {
   Volume2,
   VolumeX,
   Bot,
-  User,
   Sparkles,
   Plus,
   Settings,
   Menu,
-
 } from "lucide-react";
 import { VoiceInput } from "@/ui/VoiceInputButton";
 import { Messages } from "@/ui/Messages";
@@ -58,32 +56,35 @@ const Chat = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [isAITalking, setIsAITalking] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
-  const [recordingTime, setRecordingTime] = useState(0);
-  const [audioLevels, setAudioLevels] = useState(Array(20).fill(0));
-  const [currentPlayingId, setCurrentPlayingId] = useState(null);
+
   const [text, setText] = useState("");
   const [history, setHistory] = useState<{ role: string; content: string }[]>(
     []
   );
 
-
-
   const handleSubmitChat = async () => {
     console.log(text);
-    const newMessages = [...history, { role: "user", content: text }];
-    setHistory(newMessages);
 
+    // ここで履歴を追加してから API を呼び出す
+    setHistory((prev) => {
+      const newMessages = [...prev, { role: "user", content: text }];
+      sendToAPI(newMessages);
+      return newMessages;
+    });
+  };
+
+  const sendToAPI = async (messages) => {
     const res = await fetch("/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ messages: newMessages }),
+      body: JSON.stringify({ messages }),
     });
 
     const data = await res.json();
     console.log(data.reply);
-    setHistory((prev) => [...prev, { role: "assistant", content: data.reply }]);
 
-    console.log(newMessages, data.reply);
+    // アシスタントの返事を追加
+    setHistory((prev) => [...prev, { role: "assistant", content: data.reply }]);
 
     if (data.audio) {
       const audioBuffer = Uint8Array.from(atob(data.audio), (c) =>
@@ -93,11 +94,8 @@ const Chat = () => {
       const audioUrl = URL.createObjectURL(blob);
       const audio = new Audio(audioUrl);
       audio.play();
-      console.log(audioUrl);
-      setAudioList([...audioList, audioUrl]);
+      setAudioList((prev) => [...prev, audioUrl]);
     }
-
-    console.log(history, data.reply);
   };
 
   return (
@@ -185,7 +183,7 @@ const Chat = () => {
         </div>
 
         {/* 音声可視化エリア */}
-        {(isRecording || isAITalking) && (
+        {/* {(isRecording || isAITalking) && (
           <div className="bg-gray-50 p-6 border-b border-gray-200">
             <div className="flex items-center justify-center gap-1">
               {audioLevels.map((level, i) => (
@@ -210,10 +208,10 @@ const Chat = () => {
               </p>
             </div>
           </div>
-        )}
+        )} */}
 
         {/* メッセージエリア */}
-        <Messages history={history} audioList={audioList}/>
+        <Messages history={history} audioList={audioList} />
 
         <input
           type="text"
@@ -234,7 +232,13 @@ const Chat = () => {
         <div className="p-4 lg:p-6 bg-white border-t border-gray-200">
           <div className="max-w-4xl mx-auto flex items-center justify-center">
             <div className="relative">
-              <VoiceInput />
+              <VoiceInput
+                history={history}
+                audioList={audioList}
+                setHistory={setHistory}
+                setAudioList={setAudioList}
+                sendToAPI={sendToAPI}
+              />
               {isRecording && (
                 <div className="absolute inset-0 rounded-full border-4 border-red-400 animate-ping"></div>
               )}
