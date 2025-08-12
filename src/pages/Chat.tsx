@@ -98,6 +98,16 @@ const Chat = () => {
     }
   };
 
+  const handleCreateSummary = async () => {
+    const res = await fetch("/api/create-summary", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: history }),
+    });
+
+    console.log(res);
+  };
+
   return (
     <div className="flex h-screen bg-gray-50">
       {/* サイドバー */}
@@ -155,6 +165,7 @@ const Chat = () => {
                 <Menu className="w-5 h-5" />
               </button>
               <div className="flex items-center gap-3">
+                <div></div>
                 <div className="relative">
                   <div
                     className={`w-12 h-12 bg-green-500 rounded-full flex items-center justify-center ${
@@ -177,6 +188,13 @@ const Chat = () => {
                     {isAITalking ? "話しています..." : "オンライン"}
                   </p>
                 </div>
+
+                <button
+                  className="border rounded p-2 text-black cursor-pointer"
+                  onClick={() => handleCreateSummary()}
+                >
+                  Finish
+                </button>
               </div>
             </div>
           </div>
