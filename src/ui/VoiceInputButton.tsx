@@ -85,23 +85,30 @@ export const VoiceInput = ({
   };
 
   return (
-    <button
-      onMouseDown={startRecording}
-      onMouseUp={stopRecording}
-      onTouchStart={startRecording}
-      onTouchEnd={stopRecording}
-      className={`w-20 h-20 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg cursor-pointer ${
-        isRecording
-          ? "bg-red-500 scale-110 shadow-red-500/30"
-          : "bg-green-500 hover:bg-green-600 shadow-green-500/30"
-      } ${isAITalking ? "opacity-50 cursor-not-allowed" : ""}`}
-      disabled={isAITalking}
-    >
-      {isRecording ? (
-        <Square className="w-8 h-8 text-white" />
-      ) : (
-        <Mic className="w-8 h-8 text-white" />
-      )}
-    </button>
+    <div className="p-4 lg:p-6 bg-white border-t border-gray-200">
+      <div className="max-w-4xl mx-auto flex items-center justify-center flex-col space-y-4">
+        <button
+          onMouseDown={startRecording}
+          onMouseUp={stopRecording}
+          onTouchStart={startRecording}
+          onTouchEnd={stopRecording}
+          className={`w-20 h-20 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg cursor-pointer ${
+            isRecording
+              ? "bg-red-500 scale-110 shadow-red-500/30"
+              : "bg-green-500 hover:bg-green-600 shadow-green-500/30"
+          } ${isAITalking ? "opacity-50 cursor-not-allowed" : ""}`}
+          disabled={isAITalking}
+        >
+          {isRecording ? (
+            <Square className="w-8 h-8 text-white" />
+          ) : (
+            <Mic className="w-8 h-8 text-white" />
+          )}
+        </button>
+        <p className="text-sm text-gray-500">
+          Please speak while pressing the button. Release to stop.
+        </p>
+      </div>
+    </div>
   );
 };

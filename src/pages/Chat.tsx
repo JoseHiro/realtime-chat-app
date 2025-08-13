@@ -1,17 +1,12 @@
 import { useState } from "react";
-import {
-  Volume2,
-  VolumeX,
-  Bot,
-  Sparkles,
-  Plus,
-  Settings,
-  Menu,
-} from "lucide-react";
+import { Bot, Menu } from "lucide-react";
 import { VoiceInput } from "@/ui/VoiceInputButton";
 import { Messages } from "@/ui/Messages";
 import { Overlay } from "@/component/overlay";
 import { Summary } from "@/ui/Summar";
+import { Sidebar } from "@/ui/Sidebar";
+import { Header } from "@/ui/Header";
+import { ModeSelectScreen } from "@/ui/ModeSelectScreen";
 
 const Chat = () => {
   // const handleSpeak = async () => {
@@ -55,7 +50,7 @@ const Chat = () => {
   // };
 
   const [audioList, setAudioList] = useState<string[]>([]);
-  const [isMuted, setIsMuted] = useState(false);
+  // const [text, setText] = useState("");
   const [openOverlay, setOpenOverlay] = useState(false);
   const [summary, setSummary] = useState({
     summary:
@@ -70,24 +65,22 @@ const Chat = () => {
     improvementPoints: ["文の構造を整理する。", "助詞の使い方を注意する。"],
   });
 
-  const [text, setText] = useState("");
   const [history, setHistory] = useState<{ role: string; content: string }[]>(
     []
   );
 
-  const handleSubmitChat = async () => {
-    if (!text.trim()) {
-      return;
-    }
+  // const handleSubmitChat = async () => {
+  //   if (!text.trim()) {
+  //     return;
+  //   }
 
-
-    // ここで履歴を追加してから API を呼び出す
-    setHistory((prev) => {
-      const newMessages = [...prev, { role: "user", content: text }];
-      sendToAPI(newMessages);
-      return newMessages;
-    });
-  };
+  //   // ここで履歴を追加してから API を呼び出す
+  //   setHistory((prev) => {
+  //     const newMessages = [...prev, { role: "user", content: text }];
+  //     sendToAPI(newMessages);
+  //     return newMessages;
+  //   });
+  // };
 
   const sendToAPI = async (messages) => {
     const res = await fetch("/api/chat", {
@@ -133,123 +126,10 @@ const Chat = () => {
   return (
     <div className="flex h-screen bg-gray-50">
       {/* サイドバー */}
-      <div className="hidden lg:flex w-80 bg-white border-r border-gray-200 shadow-sm">
-        <div className="flex flex-col w-full p-6">
-          <div className="flex items-center gap-3 mb-8">
-            <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-white" />
-            </div>
-            <h1 className="text-xl font-bold text-gray-900">Voice AI</h1>
-          </div>
+      <Sidebar />
 
-          <button className="flex items-center gap-3 p-4 rounded-xl bg-green-500 text-white mb-4 hover:bg-green-600 transition-all duration-200 shadow-sm">
-            <Plus className="w-5 h-5" />
-            新しい会話
-          </button>
-
-          <div className="flex-1 space-y-2">
-            <div className="p-3 rounded-lg bg-gray-50 border border-gray-200 text-gray-600 text-sm">
-              音声会話履歴
-            </div>
-          </div>
-
-          <div className="mt-auto space-y-2">
-            <button
-              onClick={() => setIsMuted(!isMuted)}
-              className={`flex items-center gap-3 p-3 rounded-lg w-full transition-colors ${
-                isMuted
-                  ? "text-red-600 bg-red-50 border border-red-200"
-                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-              }`}
-            >
-              {isMuted ? (
-                <VolumeX className="w-5 h-5" />
-              ) : (
-                <Volume2 className="w-5 h-5" />
-              )}
-              {isMuted ? "ミュート中" : "音声オン"}
-            </button>
-            <button className="flex items-center gap-3 p-3 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-50 w-full transition-colors">
-              <Settings className="w-5 h-5" />
-              設定
-            </button>
-          </div>
-        </div>
-      </div>
-
+      <ModeSelectScreen />
       {/* メインチャットエリア */}
-      <div className="flex-1 flex flex-col bg-white">
-        {/* ヘッダー */}
-        <div className="bg-white border-b border-gray-200 p-4 lg:p-6 shadow-sm ">
-          <div className="flex items-center ">
-            <div className="flex justify-between gap-4 w-full">
-              <div className="flex items-center gap-4">
-                <button className="lg:hidden p-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200">
-                  <Menu className="w-5 h-5" />
-                </button>
-                <div className="flex items-center gap-3 ">
-                  <div className="relative">
-                    <div
-                      className={`w-12 h-12 bg-green-500 rounded-full flex items-center justify-center`}
-                    >
-                      <Bot className="w-6 h-6 text-white" />
-                    </div>
-                    <div
-                      className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white`}
-                    ></div>
-                  </div>
-                  <div>
-                    <h2 className="text-lg font-semibold text-gray-900">
-                      音声AI
-                    </h2>
-                  </div>
-                </div>
-              </div>
-              <button
-                className="border rounded p-2 text-black cursor-pointer"
-                onClick={() => {
-                  summary ? setOpenOverlay(true) : handleCreateSummary();
-                }}
-              >
-                {summary ? "Check Summary" : "Finish"}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* メッセージエリア */}
-        <Messages history={history} audioList={audioList} />
-
-        <input
-          type="text"
-          className="border rounded border-gray-400 p-4 m-3 text-black "
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-        />
-        <button
-          className="border rounded border-gray-300 text-black "
-          onClick={() => {
-            handleSubmitChat();
-          }}
-        >
-          Submit
-        </button>
-
-        {/* 音声入力エリア */}
-        <div className="p-4 lg:p-6 bg-white border-t border-gray-200">
-          <div className="max-w-4xl mx-auto flex items-center justify-center">
-            <div className="relative">
-              <VoiceInput
-                history={history}
-                audioList={audioList}
-                setHistory={setHistory}
-                setAudioList={setAudioList}
-                sendToAPI={sendToAPI}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
       {openOverlay && (
         <Overlay onClose={() => setOpenOverlay(false)}>
           <Summary summary={summary} />
