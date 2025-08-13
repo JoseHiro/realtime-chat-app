@@ -73,6 +73,9 @@ export const VoiceInput = ({
   };
 
   const handleSubmitAudio = async (text) => {
+    if (!text.trim()) {
+      return;
+    }
     setHistory((prev) => {
       const newMessages = [...prev, { role: "user", content: text }];
       sendToAPI(newMessages);

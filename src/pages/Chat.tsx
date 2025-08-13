@@ -10,6 +10,8 @@ import {
 } from "lucide-react";
 import { VoiceInput } from "@/ui/VoiceInputButton";
 import { Messages } from "@/ui/Messages";
+import { Overlay } from "@/component/overlay";
+import { Summary } from "@/ui/Summar";
 
 const Chat = () => {
   // const handleSpeak = async () => {
@@ -53,9 +55,20 @@ const Chat = () => {
   // };
 
   const [audioList, setAudioList] = useState<string[]>([]);
-  const [isRecording, setIsRecording] = useState(false);
-  const [isAITalking, setIsAITalking] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
+  const [openOverlay, setOpenOverlay] = useState(false);
+  const [summary, setSummary] = useState({
+    summary:
+      "ユーザーは友達と映画を見たが、ストーリーが分からなかったため少しつまらなかったと話しています。映画はサスペンスで、主人公が逃げる途中に事故で亡くなりますが、有名な俳優が出ていなかったため違和感を感じたそうです。",
+    mistakes: ["主人公が最後死んだです。", "有名じゃないだから"],
+    corrections: ["主人公が最後に死にました。", "有名じゃないので"],
+    goodPoints: [
+      "会話がスムーズに進んでいる。",
+      "自分の意見をはっきり述べている。",
+    ],
+    difficultyLevel: "N4",
+    improvementPoints: ["文の構造を整理する。", "助詞の使い方を注意する。"],
+  });
 
   const [text, setText] = useState("");
   const [history, setHistory] = useState<{ role: string; content: string }[]>(
@@ -63,7 +76,10 @@ const Chat = () => {
   );
 
   const handleSubmitChat = async () => {
-    console.log(text);
+    if (!text.trim()) {
+      return;
+    }
+
 
     // ここで履歴を追加してから API を呼び出す
     setHistory((prev) => {
@@ -99,13 +115,19 @@ const Chat = () => {
   };
 
   const handleCreateSummary = async () => {
-    const res = await fetch("/api/create-summary", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text: history }),
-    });
+    try {
+      const res = await fetch("/api/summary-tts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: "hello" }),
+      });
 
-    console.log(res);
+      const data = await res.json();
+      console.log("Summary response:", data);
+      setSummary(data);
+    } catch (error) {
+      console.error("Error creating summary:", error);
+    }
   };
 
   return (
@@ -158,75 +180,42 @@ const Chat = () => {
       {/* メインチャットエリア */}
       <div className="flex-1 flex flex-col bg-white">
         {/* ヘッダー */}
-        <div className="bg-white border-b border-gray-200 p-4 lg:p-6 shadow-sm">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <button className="lg:hidden p-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200">
-                <Menu className="w-5 h-5" />
-              </button>
-              <div className="flex items-center gap-3">
-                <div></div>
-                <div className="relative">
-                  <div
-                    className={`w-12 h-12 bg-green-500 rounded-full flex items-center justify-center ${
-                      isAITalking ? "animate-pulse" : ""
-                    }`}
-                  >
-                    <Bot className="w-6 h-6 text-white" />
-                  </div>
-                  <div
-                    className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white ${
-                      isAITalking ? "bg-red-500 animate-pulse" : "bg-green-400"
-                    }`}
-                  ></div>
-                </div>
-                <div>
-                  <h2 className="text-lg font-semibold text-gray-900">
-                    音声AI
-                  </h2>
-                  <p className="text-sm text-gray-500">
-                    {isAITalking ? "話しています..." : "オンライン"}
-                  </p>
-                </div>
-
-                <button
-                  className="border rounded p-2 text-black cursor-pointer"
-                  onClick={() => handleCreateSummary()}
-                >
-                  Finish
+        <div className="bg-white border-b border-gray-200 p-4 lg:p-6 shadow-sm ">
+          <div className="flex items-center ">
+            <div className="flex justify-between gap-4 w-full">
+              <div className="flex items-center gap-4">
+                <button className="lg:hidden p-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200">
+                  <Menu className="w-5 h-5" />
                 </button>
+                <div className="flex items-center gap-3 ">
+                  <div className="relative">
+                    <div
+                      className={`w-12 h-12 bg-green-500 rounded-full flex items-center justify-center`}
+                    >
+                      <Bot className="w-6 h-6 text-white" />
+                    </div>
+                    <div
+                      className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white`}
+                    ></div>
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-semibold text-gray-900">
+                      音声AI
+                    </h2>
+                  </div>
+                </div>
               </div>
+              <button
+                className="border rounded p-2 text-black cursor-pointer"
+                onClick={() => {
+                  summary ? setOpenOverlay(true) : handleCreateSummary();
+                }}
+              >
+                {summary ? "Check Summary" : "Finish"}
+              </button>
             </div>
           </div>
         </div>
-
-        {/* 音声可視化エリア */}
-        {/* {(isRecording || isAITalking) && (
-          <div className="bg-gray-50 p-6 border-b border-gray-200">
-            <div className="flex items-center justify-center gap-1">
-              {audioLevels.map((level, i) => (
-                <div
-                  key={i}
-                  className={`w-1 transition-all duration-100 rounded-full ${
-                    isRecording ? "bg-red-500" : "bg-green-500"
-                  }`}
-                  style={{ height: `${Math.max(4, level / 2)}px` }}
-                />
-              ))}
-            </div>
-            <div className="text-center mt-4">
-              <p
-                className={`text-sm font-medium ${
-                  isRecording ? "text-red-600" : "text-green-600"
-                }`}
-              >
-                {isRecording
-                  ? `録音中... ${formatTime(recordingTime)}`
-                  : "AIが話しています..."}
-              </p>
-            </div>
-          </div>
-        )} */}
 
         {/* メッセージエリア */}
         <Messages history={history} audioList={audioList} />
@@ -257,49 +246,16 @@ const Chat = () => {
                 setAudioList={setAudioList}
                 sendToAPI={sendToAPI}
               />
-              {isRecording && (
-                <div className="absolute inset-0 rounded-full border-4 border-red-400 animate-ping"></div>
-              )}
             </div>
-          </div>
-
-          <div className="text-center mt-4">
-            <p className="text-sm text-gray-500">
-              {isRecording
-                ? "マイクボタンを離して送信"
-                : isAITalking
-                ? "AIが応答中です..."
-                : "マイクボタンを押しながら話してください"}
-            </p>
           </div>
         </div>
       </div>
+      {openOverlay && (
+        <Overlay onClose={() => setOpenOverlay(false)}>
+          <Summary summary={summary} />
+        </Overlay>
+      )}
     </div>
-
-    // <div className="text-black" style={{ padding: 20 }}>
-    //   <h1>GPT TTS デモ</h1>
-    //   <textarea
-    //     className="border border-gray-300 rounded p-2"
-    //     rows={3}
-    //     style={{ width: "100%" }}
-    //     value={text}
-    //     onChange={(e) => setText(e.target.value)}
-    //   />
-    //   <button
-    //     className="border rounded p-2"
-    //     onClick={() => handleSpeak()}
-    //     style={{ marginTop: 10 }}
-    //   >
-    //     音声にする
-    //   </button>
-    //   <button
-    //     className="border rounded p-2"
-    //     onClick={() => azureSpeech()}
-    //     style={{ marginTop: 10 }}
-    //   >
-    //     Azure 音声にする
-    //   </button>
-    // </div>
   );
 };
 
