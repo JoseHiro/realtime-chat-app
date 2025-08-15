@@ -14,10 +14,10 @@ type SpeechRecognition = typeof window.SpeechRecognition extends undefined
   : InstanceType<typeof window.SpeechRecognition>;
 
 export const VoiceInput = ({
-  history,
-  audioList,
+  // history,
+  // audioList,
+  // setAudioList,
   setHistory,
-  setAudioList,
   sendToAPI,
 }: {
   history: any;
@@ -81,11 +81,36 @@ export const VoiceInput = ({
       sendToAPI(newMessages);
       return newMessages;
     });
-    // console.log(history, data.reply);
   };
 
+  const handleDemoSubmit = (text) => {
+    setHistory((prev) => {
+      const newMessages = [...prev, { role: "user", content: text }];
+      sendToAPI(newMessages);
+      return newMessages;
+    });
+  };
+
+  const [text, setText] = useState("");
   return (
     <div className="p-4 lg:p-6 bg-white border-t border-gray-200">
+      <input
+        type="text"
+        className="border border-gray-300 rounded-lg p-2 w-full mb-4 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        placeholder="音声入力はボタンを押して開始"
+        onChange={(e) => setText(e.target.value)}
+        onFocus={() => {
+          if (isRecording) {
+            stopRecording();
+          }
+        }}
+      />
+      <button
+        onClick={() => handleDemoSubmit(text)}
+        className="border rounded-lg p-2 text-black"
+      >
+        Submit
+      </button>
       <div className="max-w-4xl mx-auto flex items-center justify-center flex-col space-y-4">
         <button
           onMouseDown={startRecording}

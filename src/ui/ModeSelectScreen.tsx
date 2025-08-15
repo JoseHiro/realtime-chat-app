@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   ChevronRight,
   MessageCircle,
@@ -8,12 +7,30 @@ import {
   BookOpen,
   Users,
   Plus,
+  User,
+  UserCheck,
 } from "lucide-react";
+import { useSpeech } from "../context/SpeechContext";
 
-export const ModeSelectScreen = () => {
-  const [selectedLevel, setSelectedLevel] = useState(null);
-  const [selectedTheme, setSelectedTheme] = useState(null);
-  const [customTheme, setCustomTheme] = useState("");
+export const ModeSelectScreen = ({
+  setHistory,
+  setAudioList,
+  setChartStart,
+}: {
+  setHistory: (history: any) => void;
+  setAudioList: (audioList: any) => void;
+  setChartStart: (start: boolean) => void;
+}) => {
+  const {
+    selectedPoliteness,
+    setSelectedPoliteness,
+    selectedLevel,
+    setSelectedLevel,
+    selectedTheme,
+    setSelectedTheme,
+    customTheme,
+    setCustomTheme,
+  } = useSpeech();
 
   const levels = [
     {
@@ -69,14 +86,66 @@ export const ModeSelectScreen = () => {
     },
   ];
 
-  const canProceed = selectedLevel && (selectedTheme || customTheme.trim());
+  const politenessOptions = [
+    {
+      id: "casual",
+      label: "Casual Form",
+      description: "For friends and close relationships",
+      icon: User,
+      example: "そうだね、面白い",
+      color: "from-blue-400 to-blue-500",
+    },
+    {
+      id: "polite",
+      label: "Formal Form",
+      description: "Polite speech for formal situations",
+      icon: UserCheck,
+      example: "そうですね、面白いです",
+      color: "from-purple-400 to-purple-500",
+    },
+  ];
 
-  const handleBeginConversation = () => {
-    console.log(selectedLevel, selectedTheme, customTheme);
+  const canProceed =
+    selectedLevel &&
+    (selectedTheme || customTheme.trim()) &&
+    selectedPoliteness;
+
+  const handleBeginConversation = async () => {
+    console.log(
+      selectedLevel,
+      selectedTheme || customTheme.trim(),
+      selectedPoliteness
+    );
+    const res = await fetch("/api/start-conversation-tts", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        level: selectedLevel,
+        theme: selectedTheme || customTheme.trim(),
+        politeness: selectedPoliteness || "polite",
+      }),
+    });
+
+    const data = await res.json();
+
+    setHistory((prev) => [...prev, { role: "assistant", content: data.reply }]);
+    if (data.audio) {
+      const audioBuffer = Uint8Array.from(atob(data.audio), (c) =>
+        c.charCodeAt(0)
+      );
+      const blob = new Blob([audioBuffer], { type: "audio/mpeg" });
+      const audioUrl = URL.createObjectURL(blob);
+      const audio = new Audio(audioUrl);
+      audio.play();
+      setAudioList((prev) => [...prev, audioUrl]);
+      setChartStart(true);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-green-50 p-4 overflow-auto">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-green-50 p-4 overflow-auto w-full">
       <div className="max-w-4xl mx-auto py-8">
         {/* Header */}
         <div className="text-center mb-12">
@@ -87,7 +156,8 @@ export const ModeSelectScreen = () => {
             Japanese Conversation Practice
           </h1>
           <p className="text-gray-600">
-            Choose your level and conversation theme to get started
+            Choose your level, conversation theme, and speaking style to get
+            started
           </p>
         </div>
 
@@ -123,6 +193,58 @@ export const ModeSelectScreen = () => {
                 )}
               </button>
             ))}
+          </div>
+        </div>
+
+        {/* Politeness Selection */}
+        <div className="mb-12">
+          <h2 className="text-xl font-semibold text-gray-900 mb-6 text-center">
+            Choose Speaking Style
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+            {politenessOptions.map((option) => {
+              const IconComponent = option.icon;
+              return (
+                <button
+                  key={option.id}
+                  onClick={() => setSelectedPoliteness(option.id)}
+                  className={`cursor-pointer relative group p-6 rounded-2xl bg-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border-2 ${
+                    selectedPoliteness === option.id
+                      ? "border-green-500 shadow-green-200"
+                      : "border-transparent hover:border-green-200"
+                  }`}
+                >
+                  <div
+                    className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${option.color} opacity-10 group-hover:opacity-20 transition-opacity duration-300`}
+                  ></div>
+                  <div className="relative z-10 text-center">
+                    <div
+                      className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 mx-auto transition-colors duration-300 ${
+                        selectedPoliteness === option.id
+                          ? "bg-green-500 text-white"
+                          : "bg-gray-100 text-gray-600 group-hover:bg-green-100 group-hover:text-green-600"
+                      }`}
+                    >
+                      <IconComponent className="w-6 h-6" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      {option.label}
+                    </h3>
+                    <p className="text-gray-600 text-sm mb-2">
+                      {option.description}
+                    </p>
+                    <p className="text-xs text-gray-500 italic">
+                      {option.example}
+                    </p>
+                  </div>
+                  {selectedPoliteness === option.id && (
+                    <div className="absolute top-3 right-3 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                      <div className="w-2 h-2 bg-white rounded-full"></div>
+                    </div>
+                  )}
+                </button>
+              );
+            })}
           </div>
         </div>
 
@@ -207,7 +329,7 @@ export const ModeSelectScreen = () => {
           <button
             disabled={!canProceed}
             onClick={() => handleBeginConversation()}
-            className={`inline-flex items-center gap-2 px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform ${
+            className={`cursor-pointer inline-flex items-center gap-2 px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform ${
               canProceed
                 ? "bg-green-500 hover:bg-green-600 text-white shadow-lg shadow-green-200 hover:shadow-xl hover:-translate-y-1"
                 : "bg-gray-200 text-gray-400 cursor-not-allowed"

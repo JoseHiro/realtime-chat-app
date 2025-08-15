@@ -1,6 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { OpenAI } from "openai";
-// import fetch from "node-fetch";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 const speechKey = process.env.AZURE_API_KEY || "";
@@ -16,14 +15,25 @@ export default async function handler(
   }
 
   try {
-    const { messages } = req.body;
+    const { messages, politeness, level, history } = req.body;
+
     const systemMessage = {
-      role: "assistant",
-      content:
-        "あなたは親しみやすく、簡潔で自然な日本語で返答してください。返事は長くなりすぎず、会話が続きやすいようにしてください。",
+      role: "system",
+      content: `
+あなたは日本語会話の練習相手です。
+- 学習者の日本語レベル: ${level}
+- 丁寧さ: ${politeness}
+- 返答は1〜2文程度で簡潔に。
+- 会話が続くようにオープンエンドの質問を入れる。
+- これまでの会話の文脈を踏まえて回答する。
+`,
     };
 
-    const messagesWithInstruction = [systemMessage, ...messages];
+    const messagesWithInstruction = [
+      systemMessage,
+      ...(history || []), // これまでの会話
+      ...(messages || []), // 今回のやり取り
+    ];
 
     // 1. GPTからテキスト生成
     const completion = await openai.chat.completions.create({

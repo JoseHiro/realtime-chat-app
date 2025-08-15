@@ -251,7 +251,7 @@ export const Summary = ({ summary }: { summary: SummaryData }) => {
                             </span>
                           </div>
                           <p className="text-gray-900 font-semibold text-lg">
-                            {mistake}
+                            {summary.corrections[index]}
                           </p>
                         </div>
                       </div>

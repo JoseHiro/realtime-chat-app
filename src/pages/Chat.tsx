@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Bot, Menu } from "lucide-react";
 import { VoiceInput } from "@/ui/VoiceInputButton";
 import { Messages } from "@/ui/Messages";
 import { Overlay } from "@/component/overlay";
@@ -7,50 +6,17 @@ import { Summary } from "@/ui/Summar";
 import { Sidebar } from "@/ui/Sidebar";
 import { Header } from "@/ui/Header";
 import { ModeSelectScreen } from "@/ui/ModeSelectScreen";
+import { useSpeech } from "../context/SpeechContext";
+
+// notes : common mistakes, tendencies,
+// vocabulary, natural word selection,
 
 const Chat = () => {
-  // const handleSpeak = async () => {
-  //   console.log(text);
-
-  //   const res = await fetch("/api/tts", {
-  //     method: "POST",
-  //     headers: { "Content-Type": "application/json" },
-  //     body: JSON.stringify({ text }),
-  //   });
-
-  //   if (!res.ok) {
-  //     console.error("TTS request failed");
-  //     return;
-  //   }
-
-  //   const audioBlob = await res.blob();
-  //   const audioUrl = URL.createObjectURL(audioBlob);
-  //   const audio = new Audio(audioUrl);
-  //   audio.play();
-  // };
-
-  // const azureSpeech = async () => {
-  //   console.log(text);
-
-  //   const res = await fetch("/api/azure-tts", {
-  //     method: "POST",
-  //     headers: { "Content-Type": "application/json" },
-  //     body: JSON.stringify({ text }),
-  //   });
-
-  //   if (!res.ok) {
-  //     console.error("Azure TTS request failed");
-  //     return;
-  //   }
-
-  //   const audioBlob = await res.blob();
-  //   const audioUrl = URL.createObjectURL(audioBlob);
-  //   const audio = new Audio(audioUrl);
-  //   audio.play();
-  // };
+  const { selectedPoliteness, selectedLevel, selectedTheme, customTheme } =
+    useSpeech();
 
   const [audioList, setAudioList] = useState<string[]>([]);
-  // const [text, setText] = useState("");
+  const [chatStart, setChartStart] = useState(false);
   const [openOverlay, setOpenOverlay] = useState(false);
   const [summary, setSummary] = useState({
     summary:
@@ -69,24 +35,17 @@ const Chat = () => {
     []
   );
 
-  // const handleSubmitChat = async () => {
-  //   if (!text.trim()) {
-  //     return;
-  //   }
-
-  //   // ここで履歴を追加してから API を呼び出す
-  //   setHistory((prev) => {
-  //     const newMessages = [...prev, { role: "user", content: text }];
-  //     sendToAPI(newMessages);
-  //     return newMessages;
-  //   });
-  // };
-
-  const sendToAPI = async (messages) => {
+  // Send messages to the API and get the response and audio
+  const sendToAPI = async (messages: any) => {
     const res = await fetch("/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ messages }),
+      body: JSON.stringify({
+        messages,
+        selectedPoliteness,
+        selectedLevel,
+        history,
+      }),
     });
 
     const data = await res.json();
@@ -128,7 +87,32 @@ const Chat = () => {
       {/* サイドバー */}
       <Sidebar />
 
-      <ModeSelectScreen />
+      {!chatStart ? (
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-green-50 overflow-auto w-full">
+          <ModeSelectScreen
+            setHistory={setHistory}
+            setAudioList={setAudioList}
+            setChartStart={setChartStart}
+          />
+        </div>
+      ) : (
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-green-50 w-full flex flex-col justify-between">
+          <Header
+            summary={summary}
+            setOpenOverlay={setOpenOverlay}
+            handleCreateSummary={handleCreateSummary}
+          />
+          <Messages history={history} audioList={audioList} />
+          <VoiceInput
+            setHistory={setHistory}
+            setAudioList={setAudioList}
+            audioList={audioList}
+            sendToAPI={sendToAPI}
+            history={history}
+          />
+        </div>
+      )}
+
       {/* メインチャットエリア */}
       {openOverlay && (
         <Overlay onClose={() => setOpenOverlay(false)}>
