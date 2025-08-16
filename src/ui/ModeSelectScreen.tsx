@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import {
   ChevronRight,
   MessageCircle,
@@ -31,6 +32,8 @@ export const ModeSelectScreen = ({
     customTheme,
     setCustomTheme,
   } = useSpeech();
+
+  const [isStarting, setIsStarting] = useState(false);
 
   const levels = [
     {
@@ -111,6 +114,8 @@ export const ModeSelectScreen = ({
     selectedPoliteness;
 
   const handleBeginConversation = async () => {
+    if (isStarting) return;
+    setIsStarting(true);
     console.log(
       selectedLevel,
       selectedTheme || customTheme.trim(),

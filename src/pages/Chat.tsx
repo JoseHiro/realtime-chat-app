@@ -7,36 +7,31 @@ import { Sidebar } from "@/ui/Sidebar";
 import { Header } from "@/ui/Header";
 import { ModeSelectScreen } from "@/ui/ModeSelectScreen";
 import { useSpeech } from "../context/SpeechContext";
+import { Clock } from "lucide-react";
 
 // notes : common mistakes, tendencies,
 // vocabulary, natural word selection,
+// UI while the chat is thinking
+// when chat appears, scroll to bottom
+// fix your grammar during the conversation
 
-const Chat = () => {
+export const Chat = () => {
   const { selectedPoliteness, selectedLevel, selectedTheme, customTheme } =
     useSpeech();
 
   const [audioList, setAudioList] = useState<string[]>([]);
   const [chatStart, setChartStart] = useState(false);
-  const [openOverlay, setOpenOverlay] = useState(false);
-  const [summary, setSummary] = useState({
-    summary:
-      "ユーザーは友達と映画を見たが、ストーリーが分からなかったため少しつまらなかったと話しています。映画はサスペンスで、主人公が逃げる途中に事故で亡くなりますが、有名な俳優が出ていなかったため違和感を感じたそうです。",
-    mistakes: ["主人公が最後死んだです。", "有名じゃないだから"],
-    corrections: ["主人公が最後に死にました。", "有名じゃないので"],
-    goodPoints: [
-      "会話がスムーズに進んでいる。",
-      "自分の意見をはっきり述べている。",
-    ],
-    difficultyLevel: "N4",
-    improvementPoints: ["文の構造を整理する。", "助詞の使い方を注意する。"],
-  });
-
+  const [overlayOpened, setOverlayOpened] = useState(false);
+  const [summary, setSummary] = useState();
+  const [summaryOpened, setSummaryOpened] = useState(false);
+  const [chatLoading, setChatLoading] = useState(false);
   const [history, setHistory] = useState<{ role: string; content: string }[]>(
     []
   );
 
   // Send messages to the API and get the response and audio
   const sendToAPI = async (messages: any) => {
+    setChatLoading(true);
     const res = await fetch("/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -49,8 +44,8 @@ const Chat = () => {
     });
 
     const data = await res.json();
-    console.log(data.reply);
 
+    setChatLoading(false);
     // アシスタントの返事を追加
     setHistory((prev) => [...prev, { role: "assistant", content: data.reply }]);
 
@@ -71,7 +66,7 @@ const Chat = () => {
       const res = await fetch("/api/summary-tts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: "hello" }),
+        body: JSON.stringify({ history: history }),
       });
 
       const data = await res.json();
@@ -98,25 +93,55 @@ const Chat = () => {
       ) : (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-green-50 w-full flex flex-col justify-between">
           <Header
+            overlayOpened={overlayOpened}
+            setOverlayOpened={setOverlayOpened}
             summary={summary}
-            setOpenOverlay={setOpenOverlay}
             handleCreateSummary={handleCreateSummary}
           />
-          <Messages history={history} audioList={audioList} />
+          <Messages
+            history={history}
+            audioList={audioList}
+            chatLoading={chatLoading}
+          />
           <VoiceInput
             setHistory={setHistory}
             setAudioList={setAudioList}
             audioList={audioList}
             sendToAPI={sendToAPI}
             history={history}
+            setChatLoading={setChatLoading}
+            chatLoading={chatLoading}
           />
         </div>
       )}
 
-      {/* メインチャットエリア */}
-      {openOverlay && (
-        <Overlay onClose={() => setOpenOverlay(false)}>
-          <Summary summary={summary} />
+      {/* 時間切れ時のオーバーレイ */}
+      {overlayOpened && (
+        <Overlay onClose={() => setOverlayOpened(false)}>
+          {!summaryOpened ? (
+            <div className="text-center p-6">
+              <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Clock className="w-8 h-8 text-white" />
+              </div>
+              <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                会話が終了しました
+              </h2>
+              <p className="text-gray-600 mb-6">
+                お疲れさまでした！会話の要約をご確認ください。
+              </p>
+              <button
+                onClick={() => {
+                  // setChatEnded(false);
+                  setSummaryOpened(true);
+                }}
+                className="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+              >
+                要約を確認する
+              </button>
+            </div>
+          ) : (
+            <Summary summary={summary} />
+          )}
         </Overlay>
       )}
     </div>

@@ -14,14 +14,15 @@ type SpeechRecognition = typeof window.SpeechRecognition extends undefined
   : InstanceType<typeof window.SpeechRecognition>;
 
 export const VoiceInput = ({
-  // history,
-  // audioList,
-  // setAudioList,
+  chatLoading,
+  setChatLoading,
   setHistory,
   sendToAPI,
 }: {
   history: any;
+  chatLoading: boolean;
   audioList: any;
+  setChatLoading: (loading: boolean) => void;
   setHistory: (history: any) => void;
   setAudioList: (audioList: any) => void;
   sendToAPI: (text: string) => Promise<void>;
@@ -84,11 +85,13 @@ export const VoiceInput = ({
   };
 
   const handleDemoSubmit = (text) => {
+    if (!text.trim()) return;
     setHistory((prev) => {
       const newMessages = [...prev, { role: "user", content: text }];
       sendToAPI(newMessages);
       return newMessages;
     });
+    setText("");
   };
 
   const [text, setText] = useState("");
@@ -96,6 +99,7 @@ export const VoiceInput = ({
     <div className="p-4 lg:p-6 bg-white border-t border-gray-200">
       <input
         type="text"
+        value={text}
         className="border border-gray-300 rounded-lg p-2 w-full mb-4 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
         placeholder="音声入力はボタンを押して開始"
         onChange={(e) => setText(e.target.value)}

@@ -8,7 +8,7 @@ type OverlayProps = {
 export const Overlay: React.FC<OverlayProps> = ({ children, onClose }) => {
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-opacity-20 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-opacity-10 backdrop-blur-sm border border-gray-400"
       onClick={onClose} // 背景クリックで閉じる
     >
       <div

@@ -1,17 +1,34 @@
 import React, { useState, useEffect } from "react";
-import { Bot, Menu, Clock, User, UserCheck, Coffee, Briefcase, Plane, BookOpen, Users, Settings } from "lucide-react";
+import {
+  Bot,
+  Menu,
+  Clock,
+  User,
+  UserCheck,
+  Coffee,
+  Briefcase,
+  Plane,
+  BookOpen,
+  Users,
+  Settings,
+} from "lucide-react";
 import { useSpeech } from "../context/SpeechContext";
 
 export const Header = ({
   summary,
-  setOpenOverlay,
+  // overlayOpened,
+  setOverlayOpened,
   handleCreateSummary,
-}: {
+}: // setChatEnded,/.
+{
   summary: any;
-  setOpenOverlay: (open: boolean) => void;
+  // overlayOpened: boolean;
+  setOverlayOpened: (open: boolean) => void;
   handleCreateSummary: () => void;
+  setChatEnded: (ended: boolean) => void;
+  // chatEnded: boolean;
 }) => {
-  const [timeLeft, setTimeLeft] = useState(5 * 60); // 5分 = 300秒
+  const [timeLeft, setTimeLeft] = useState(1 * 60);
   const [isActive, setIsActive] = useState(true);
 
   const { selectedPoliteness, selectedLevel, selectedTheme, customTheme } =
@@ -26,6 +43,7 @@ export const Header = ({
           if (prev <= 1) {
             setIsActive(false);
             // 時間切れ時の処理（自動で会話終了）
+            setOverlayOpened(true);
             handleCreateSummary();
             return 0;
           }
@@ -120,15 +138,22 @@ export const Header = ({
                     会話 AI
                   </h2>
                   {/* 設定表示 */}
-                  {(selectedLevel || selectedTheme || customTheme || selectedPoliteness) && (
+                  {(selectedLevel ||
+                    selectedTheme ||
+                    customTheme ||
+                    selectedPoliteness) && (
                     <div className="flex flex-wrap items-center gap-1 sm:gap-2 mt-1 text-xs">
                       {/* レベル表示 */}
                       {selectedLevel && (
-                        <span className={`px-1.5 sm:px-2 py-0.5 rounded-full font-medium text-xs ${
-                          selectedLevel === "easy" ? "bg-green-100 text-green-700" :
-                          selectedLevel === "medium" ? "bg-yellow-100 text-yellow-700" :
-                          "bg-red-100 text-red-700"
-                        }`}>
+                        <span
+                          className={`px-1.5 sm:px-2 py-0.5 rounded-full font-medium text-xs ${
+                            selectedLevel === "easy"
+                              ? "bg-green-100 text-green-700"
+                              : selectedLevel === "medium"
+                              ? "bg-yellow-100 text-yellow-700"
+                              : "bg-red-100 text-red-700"
+                          }`}
+                        >
                           {getLevelLabel()}
                         </span>
                       )}
@@ -137,8 +162,12 @@ export const Header = ({
                       {selectedPoliteness && (
                         <div className="flex items-center gap-1 px-1.5 sm:px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
                           <PolitenessIcon className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
-                          <span className="font-medium text-xs hidden sm:inline">{politenessInfo.label}</span>
-                          <span className="font-medium text-xs sm:hidden">{politenessInfo.label.charAt(0)}</span>
+                          <span className="font-medium text-xs hidden sm:inline">
+                            {politenessInfo.label}
+                          </span>
+                          <span className="font-medium text-xs sm:hidden">
+                            {politenessInfo.label.charAt(0)}
+                          </span>
                         </div>
                       )}
 
@@ -176,12 +205,14 @@ export const Header = ({
                     ? "!bg-gray-300 cursor-not-allowed"
                     : "bg-green-500 cursor-pointer "
                 }`}
-                disabled={timeLeft >= 0}
+                // disabled={timeLeft >= 0}
                 onClick={() => {
-                  summary ? setOpenOverlay(true) : handleCreateSummary();
+                  summary ? setOverlayOpened(true) : handleCreateSummary();
+                  console.log(summary);
+                  console.log("Summary button clicked");
                 }}
               >
-                {summary ? "Check Summary" : "Finish"}
+                {summary ? "Summary" : "Finish"}
               </button>
             </div>
           </div>
