@@ -13,6 +13,10 @@ import {
 } from "lucide-react";
 import { useSpeech } from "../context/SpeechContext";
 import { ChatType } from "@/type/types";
+import { SelectModeButton } from "@/component/button";
+import { levels } from "../data/levels.json";
+import themes from "../data/themes.json";
+import politenesses from "../data/politenesses.json";
 
 export const ModeSelectScreen = ({
   setHistory,
@@ -34,80 +38,19 @@ export const ModeSelectScreen = ({
     setCustomTheme,
   } = useSpeech();
 
+  const iconMap: Record<string, React.ElementType> = {
+    ChevronRight,
+    MessageCircle,
+    Coffee,
+    Briefcase,
+    Plane,
+    BookOpen,
+    Users,
+    Plus,
+    User,
+    UserCheck,
+  };
   const [isStarting, setIsStarting] = useState(false);
-
-  const levels = [
-    {
-      id: "easy",
-      label: "Easy",
-      description: "Basic vocabulary and simple sentences",
-      color: "from-green-300 to-green-400",
-    },
-    {
-      id: "medium",
-      label: "Medium",
-      description: "Everyday conversations and expressions",
-      color: "from-green-400 to-green-500",
-    },
-    {
-      id: "hard",
-      label: "Hard",
-      description: "Complex topics and advanced grammar",
-      color: "from-green-500 to-green-600",
-    },
-  ];
-
-  const themes = [
-    {
-      id: "daily",
-      label: "Daily Life",
-      icon: Coffee,
-      description: "Everyday conversations and activities",
-    },
-    {
-      id: "business",
-      label: "Business",
-      icon: Briefcase,
-      description: "Professional and workplace discussions",
-    },
-    {
-      id: "travel",
-      label: "Travel",
-      icon: Plane,
-      description: "Tourism and cultural experiences",
-    },
-    {
-      id: "culture",
-      label: "Culture",
-      icon: BookOpen,
-      description: "Japanese traditions and society",
-    },
-    {
-      id: "social",
-      label: "Social",
-      icon: Users,
-      description: "Making friends and social interactions",
-    },
-  ];
-
-  const politenessOptions = [
-    {
-      id: "casual",
-      label: "Casual Form",
-      description: "For friends and close relationships",
-      icon: User,
-      example: "そうだね、面白い",
-      color: "from-blue-400 to-blue-500",
-    },
-    {
-      id: "polite",
-      label: "Formal Form",
-      description: "Polite speech for formal situations",
-      icon: UserCheck,
-      example: "そうですね、面白いです",
-      color: "from-purple-400 to-purple-500",
-    },
-  ];
 
   const canProceed =
     selectedLevel &&
@@ -174,7 +117,7 @@ export const ModeSelectScreen = ({
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {levels.map((level) => (
-              <button
+              <SelectModeButton
                 key={level.id}
                 onClick={() => setSelectedLevel(level.id)}
                 className={`cursor-pointer relative group p-6 rounded-2xl bg-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border-2 ${
@@ -183,21 +126,13 @@ export const ModeSelectScreen = ({
                     : "border-transparent hover:border-green-200"
                 }`}
               >
-                <div
-                  className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${level.color} opacity-10 group-hover:opacity-20 transition-opacity duration-300`}
-                ></div>
-                <div className="relative z-10">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    {level.label}
-                  </h3>
-                  <p className="text-gray-600 text-sm">{level.description}</p>
-                </div>
-                {selectedLevel === level.id && (
-                  <div className="absolute top-3 right-3 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-                    <div className="w-2 h-2 bg-white rounded-full"></div>
-                  </div>
-                )}
-              </button>
+                <ButtonContents
+                  color={level.color}
+                  label={level.label}
+                  description={level.description}
+                  selected={selectedLevel === level.id}
+                />
+              </SelectModeButton>
             ))}
           </div>
         </div>
@@ -208,10 +143,10 @@ export const ModeSelectScreen = ({
             Choose Speaking Style
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
-            {politenessOptions.map((option) => {
-              const IconComponent = option.icon;
+            {politenesses.map((option) => {
+              const IconComponent = iconMap[option.icon] ?? User;
               return (
-                <button
+                <SelectModeButton
                   key={option.id}
                   onClick={() => setSelectedPoliteness(option.id)}
                   className={`cursor-pointer relative group p-6 rounded-2xl bg-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border-2 ${
@@ -233,22 +168,14 @@ export const ModeSelectScreen = ({
                     >
                       <IconComponent className="w-6 h-6" />
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      {option.label}
-                    </h3>
-                    <p className="text-gray-600 text-sm mb-2">
-                      {option.description}
-                    </p>
-                    <p className="text-xs text-gray-500 italic">
-                      {option.example}
-                    </p>
+                    <ButtonContents
+                      label={option.label}
+                      description={option.description}
+                      example={option.example}
+                      selected={selectedPoliteness === option.id}
+                    />
                   </div>
-                  {selectedPoliteness === option.id && (
-                    <div className="absolute top-3 right-3 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-                      <div className="w-2 h-2 bg-white rounded-full"></div>
-                    </div>
-                  )}
-                </button>
+                </SelectModeButton>
               );
             })}
           </div>
@@ -261,9 +188,9 @@ export const ModeSelectScreen = ({
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
             {themes.map((theme) => {
-              const IconComponent = theme.icon;
+              const IconComponent = iconMap[theme.icon] ?? User; // fallback
               return (
-                <button
+                <SelectModeButton
                   key={theme.id}
                   onClick={() => {
                     setSelectedTheme(theme.id);
@@ -290,14 +217,14 @@ export const ModeSelectScreen = ({
                     </h3>
                     <p className="text-xs text-gray-500">{theme.description}</p>
                   </div>
-                </button>
+                </SelectModeButton>
               );
             })}
           </div>
 
           {/* Custom Theme */}
           <div className="max-w-md mx-auto">
-            <button
+            <SelectModeButton
               onClick={() => {
                 setSelectedTheme("");
                 const input = document.getElementById("custom-theme");
@@ -315,7 +242,7 @@ export const ModeSelectScreen = ({
                 </div>
                 <span className="font-medium text-gray-700">Custom Theme</span>
               </div>
-            </button>
+            </SelectModeButton>
 
             <input
               id="custom-theme"
@@ -348,5 +275,39 @@ export const ModeSelectScreen = ({
         </div>
       </div>
     </div>
+  );
+};
+
+type ButtonContentsProps = {
+  color?: string;
+  label: string;
+  description: string;
+  example?: string;
+  selected?: boolean;
+};
+
+const ButtonContents = ({
+  color,
+  label,
+  description,
+  example,
+  selected,
+}: ButtonContentsProps) => {
+  return (
+    <>
+      <div
+        className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${color} opacity-10 group-hover:opacity-20 transition-opacity duration-300`}
+      ></div>
+      <div className="relative z-10">
+        <h3 className="text-lg font-semibold text-gray-900 mb-2">{label}</h3>
+        <p className="text-gray-600 text-sm">{description}</p>
+        <p className="text-xs text-gray-500 italic">{example}</p>
+      </div>
+      {selected && (
+        <div className="absolute top-3 right-3 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+          <div className="w-2 h-2 bg-white rounded-full"></div>
+        </div>
+      )}
+    </>
   );
 };

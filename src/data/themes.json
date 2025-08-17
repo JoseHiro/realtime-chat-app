@@ -1,0 +1,32 @@
+[
+  {
+    "id": "daily",
+    "label": "Daily Life",
+    "icon": "Coffee",
+    "description": "Everyday conversations and activities"
+  },
+  {
+    "id": "business",
+    "label": "Business",
+    "icon": "Briefcase",
+    "description": "Professional and workplace discussions"
+  },
+  {
+    "id": "travel",
+    "label": "Travel",
+    "icon": "Plane",
+    "description": "Tourism and cultural experiences"
+  },
+  {
+    "id": "culture",
+    "label": "Culture",
+    "icon": "BookOpen",
+    "description": "Japanese traditions and society"
+  },
+  {
+    "id": "social",
+    "label": "Social",
+    "icon": "Users",
+    "description": "Making friends and social interactions"
+  }
+]

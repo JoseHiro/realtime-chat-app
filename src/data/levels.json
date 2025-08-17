@@ -1,0 +1,22 @@
+{
+  "levels": [
+    {
+      "id": "easy",
+      "label": "Easy",
+      "description": "Basic vocabulary and simple sentences",
+      "color": "from-green-300 to-green-400"
+    },
+    {
+      "id": "medium",
+      "label": "Medium",
+      "description": "Everyday conversations and expressions",
+      "color": "from-green-400 to-green-500"
+    },
+    {
+      "id": "hard",
+      "label": "Hard",
+      "description": "Complex topics and advanced grammar",
+      "color": "from-green-500 to-green-600"
+    }
+  ]
+}
