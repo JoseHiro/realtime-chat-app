@@ -1,3 +1,4 @@
+// Generate response for a chat application using OpenAI and Azure TTS
 import type { NextApiRequest, NextApiResponse } from "next";
 import { OpenAI } from "openai";
 
@@ -17,6 +18,12 @@ export default async function handler(
   try {
     const { messages, politeness, level, history } = req.body;
 
+    const formality =
+      politeness === "casual"
+        ? "話し方はカジュアルで、です・ます調は使わない。"
+        : "話し方は丁寧で、です・ます調を使う。";
+    console.log(politeness);
+
     const systemMessage = {
       role: "system",
       content: `
@@ -26,6 +33,7 @@ export default async function handler(
 - 返答は1〜2文程度で簡潔に。
 - 会話が続くようにオープンエンドの質問を入れる。
 - これまでの会話の文脈を踏まえて回答する。
+- ${formality}
 `,
     };
 
@@ -41,7 +49,7 @@ export default async function handler(
       messages: messagesWithInstruction,
     });
 
-    console.log(completion.choices[0].message);
+    // console.log(completion.choices[0].message);
     const reply = completion.choices[0].message?.content ?? "";
 
     // 2. Azure TTS用アクセストークン取得

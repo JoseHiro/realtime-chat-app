@@ -13,20 +13,18 @@ import {
   Settings,
 } from "lucide-react";
 import { useSpeech } from "../context/SpeechContext";
+import { SummaryData } from "@/type/types";
 
 export const Header = ({
   summary,
-  // overlayOpened,
   setOverlayOpened,
   handleCreateSummary,
-}: // setChatEnded,/.
+}:
 {
-  summary: any;
-  // overlayOpened: boolean;
+  summary: SummaryData | null;
   setOverlayOpened: (open: boolean) => void;
   handleCreateSummary: () => void;
-  setChatEnded: (ended: boolean) => void;
-  // chatEnded: boolean;
+  // setChatEnded: (ended: boolean) => void;
 }) => {
   const [timeLeft, setTimeLeft] = useState(1 * 60);
   const [isActive, setIsActive] = useState(true);
@@ -91,7 +89,12 @@ export const Header = ({
       social: { label: "Social", icon: Users },
     };
 
-    return themeMap[selectedTheme] || { label: selectedTheme, icon: Settings };
+    type ThemeKey = keyof typeof themeMap;
+
+    if (selectedTheme in themeMap) {
+      return themeMap[selectedTheme as ThemeKey];
+    }
+    return { label: selectedTheme, icon: Settings };
   };
 
   // レベルの表示名を取得
@@ -101,7 +104,10 @@ export const Header = ({
       medium: "Medium",
       hard: "Hard",
     };
-    return levelMap[selectedLevel] || selectedLevel;
+    if (selectedLevel in levelMap) {
+      return levelMap[selectedLevel as keyof typeof levelMap];
+    }
+    return selectedLevel;
   };
 
   // 丁寧語の表示名とアイコンを取得
@@ -135,7 +141,7 @@ export const Header = ({
                 </div>
                 <div>
                   <h2 className="text-lg font-semibold text-gray-900">
-                    会話 AI
+                    Kaiwa Kun
                   </h2>
                   {/* 設定表示 */}
                   {(selectedLevel ||
@@ -208,8 +214,6 @@ export const Header = ({
                 // disabled={timeLeft >= 0}
                 onClick={() => {
                   summary ? setOverlayOpened(true) : handleCreateSummary();
-                  console.log(summary);
-                  console.log("Summary button clicked");
                 }}
               >
                 {summary ? "Summary" : "Finish"}

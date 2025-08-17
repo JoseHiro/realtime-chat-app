@@ -14,6 +14,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(400).json({ error: "Text is required" });
   }
 
+  console.log(politeness);
+
   const prompt = `あなたは日本語会話の練習相手です。
 以下の条件で会話を始めてください。
 
@@ -27,6 +29,10 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 - 初級: 語彙は日常的な単語だけを使用し、文は短く。
 - 中級: 語彙は日常的＋少し抽象的な単語を使用し、文はやや長く。
 - 上級: 難しい語彙や敬語も含め、複雑な構文を使ってもよい。
+
+会話スタイルの指定:
+- "casual" の場合: 「〜だ」「〜する」などカジュアルな口調を使い、「です・ます調」は使わない。
+- "polite" の場合: 「〜です」「〜ます」などの丁寧語を使う。
 
 必ずレベルの条件を反映してください。
 `;

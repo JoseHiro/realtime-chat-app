@@ -1,8 +1,6 @@
 // SpeechContext.tsx
 import React, { createContext, useContext, useState } from "react";
 
-type SpeechLevel = "polite" | "casual";
-
 interface SpeechContextType {
   selectedLevel: string;
   setSelectedLevel: React.Dispatch<React.SetStateAction<string>>;

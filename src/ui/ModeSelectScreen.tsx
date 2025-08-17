@@ -12,14 +12,15 @@ import {
   UserCheck,
 } from "lucide-react";
 import { useSpeech } from "../context/SpeechContext";
+import { ChatType } from "@/type/types";
 
 export const ModeSelectScreen = ({
   setHistory,
   setAudioList,
   setChartStart,
 }: {
-  setHistory: (history: any) => void;
-  setAudioList: (audioList: any) => void;
+  setHistory: React.Dispatch<React.SetStateAction<ChatType>>;
+  setAudioList: React.Dispatch<React.SetStateAction<string[]>>;
   setChartStart: (start: boolean) => void;
 }) => {
   const {
@@ -298,8 +299,9 @@ export const ModeSelectScreen = ({
           <div className="max-w-md mx-auto">
             <button
               onClick={() => {
-                setSelectedTheme(null);
-                document.getElementById("custom-theme").focus();
+                setSelectedTheme("");
+                const input = document.getElementById("custom-theme");
+                if (input) input.focus();
               }}
               className={`cursor-pointer w-full p-4 rounded-xl bg-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border-2 mb-4 ${
                 customTheme.trim()
@@ -322,7 +324,7 @@ export const ModeSelectScreen = ({
               value={customTheme}
               onChange={(e) => {
                 setCustomTheme(e.target.value);
-                setSelectedTheme(null);
+                setSelectedTheme("");
               }}
               className="text-black w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-500 focus:outline-none transition-colors duration-300 bg-white shadow-lg"
             />

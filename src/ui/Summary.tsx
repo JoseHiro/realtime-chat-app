@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 
 import {
   CheckCircle,
@@ -11,25 +11,15 @@ import {
   AlertCircle,
   ArrowRight,
   Zap,
-  Globe,
   RotateCcw,
   Lightbulb,
 } from "lucide-react";
 import { SummaryData } from "@/type/types";
 
-export const Summary = ({ summary }: { summary: SummaryData }) => {
-  // const summary = {
-  //   summary:
-  //     "ユーザーは友達と映画を見たが、少しつまらなかったと感じた。映画はサスペンスで、主人公が最後に死んでしまう話だった。ユーザーは俳優が有名ではないため、違和感を感じた。",
-  //   mistakes: ["死んだです", "滑って事故になった", "有名じゃないだから"],
-  //   corrections: ["死にました", "滑って事故になりました", "有名ではないので"],
-  //   goodPoints: ["会話が続いている", "感情を表現している"],
-  //   difficultyLevel: "N4",
-  //   improvementPoints: ["文法の正確性を向上させる", "表現を豊かにする"],
-  // };
-
+export const Summary = ({ summary }: { summary: SummaryData | null }) => {
   console.log(summary);
-  const scorePercentage = 78;
+
+  const scorePercentage = summary?.score || 0;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
@@ -127,7 +117,7 @@ export const Summary = ({ summary }: { summary: SummaryData }) => {
             {[
               {
                 label: "Corrections",
-                value: summary?.mistakes?.length,
+                value: summary?.mistakes?.length || 0,
                 color: "from-rose-500 to-red-500",
                 bg: "bg-rose-50",
                 border: "border-rose-100",
@@ -135,7 +125,7 @@ export const Summary = ({ summary }: { summary: SummaryData }) => {
               },
               {
                 label: "Strengths",
-                value: summary?.goodPoints?.length,
+                value: summary?.goodPoints?.length || 0,
                 color: "from-emerald-500 to-green-500",
                 bg: "bg-emerald-50",
                 border: "border-emerald-100",
@@ -143,7 +133,7 @@ export const Summary = ({ summary }: { summary: SummaryData }) => {
               },
               {
                 label: "Level",
-                value: summary?.difficultyLevel,
+                value: summary?.difficultyLevel || "N/A",
                 color: "from-blue-500 to-indigo-500",
                 bg: "bg-blue-50",
                 border: "border-blue-100",
@@ -151,7 +141,7 @@ export const Summary = ({ summary }: { summary: SummaryData }) => {
               },
               {
                 label: "Tips",
-                value: summary?.improvementPoints?.length,
+                value: summary?.improvementPoints?.length || 0,
                 color: "from-violet-500 to-purple-500",
                 bg: "bg-violet-50",
                 border: "border-violet-100",
@@ -215,7 +205,7 @@ export const Summary = ({ summary }: { summary: SummaryData }) => {
                     Corrections
                   </h2>
                   <div className="ml-auto bg-rose-100 text-rose-700 px-3 py-1 rounded-full text-sm font-semibold border border-rose-200">
-                    {summary?.mistakes?.length} items
+                    {summary?.mistakes?.length || 0} items
                   </div>
                 </div>
 
@@ -235,9 +225,14 @@ export const Summary = ({ summary }: { summary: SummaryData }) => {
                               Incorrect
                             </span>
                           </div>
-                          <p className="text-gray-900 font-semibold text-lg">
-                            {mistake}
-                          </p>
+                          <div className="space-y-1">
+                            <p className="text-gray-900 font-semibold text-lg">
+                              {mistake.kanji}
+                            </p>
+                            <p className="text-gray-600 text-sm font-medium">
+                              {mistake.kana}
+                            </p>
+                          </div>
                         </div>
                       </div>
 
@@ -254,9 +249,14 @@ export const Summary = ({ summary }: { summary: SummaryData }) => {
                               Correct
                             </span>
                           </div>
-                          <p className="text-gray-900 font-semibold text-lg">
-                            {summary.corrections[index]}
-                          </p>
+                          <div className="space-y-1">
+                            <p className="text-gray-900 font-semibold text-lg">
+                              {summary.corrections[index]?.kanji}
+                            </p>
+                            <p className="text-gray-600 text-sm font-medium">
+                              {summary.corrections[index]?.kana}
+                            </p>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -275,49 +275,59 @@ export const Summary = ({ summary }: { summary: SummaryData }) => {
                   </h2>
                 </div>
 
-                <div className="space-y-4">
-                  {summary?.sentenceUpgrades?.map((upgrade, index) => (
+                <div className="space-y-6">
+                  {summary?.sentenceUpgrades?.map((item, index) => (
                     <div
                       key={index}
-                      className="bg-gradient-to-r from-amber-50 to-transparent border-2 border-amber-100 rounded-2xl p-6"
+                      className="p-6 bg-gradient-to-r from-violet-50 to-transparent border-2 border-violet-100 rounded-xl"
                     >
-                      <div className="space-y-4">
-                        <div>
-                          <div className="flex items-center gap-2 mb-2">
-                            <div className="w-5 h-5 bg-amber-500 rounded-full flex items-center justify-center">
-                              <span className="text-white text-xs font-bold">
-                                原
-                              </span>
-                            </div>
-                            <span className="text-amber-600 text-sm font-bold uppercase tracking-wider">
-                              Original
+                      <div className="flex items-center gap-4 mb-4">
+                        <div className="w-6 h-6 bg-gradient-to-r from-violet-500 to-purple-500 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0 shadow-sm">
+                          {index + 1}
+                        </div>
+                        <h4 className="text-lg font-semibold text-gray-800">
+                          改善例 {index + 1}
+                        </h4>
+                      </div>
+
+                      <div className="grid md:grid-cols-2 gap-6">
+                        {/* Original Sentence */}
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-2">
+                            <span className="px-3 py-1 bg-red-100 text-red-700 text-sm font-medium rounded-full">
+                              改善前
                             </span>
                           </div>
-                          <p className="text-gray-900 font-medium text-lg bg-white/60 p-3 rounded-lg">
-                            {upgrade.original}
-                          </p>
-                        </div>
-
-                        <div className="flex items-center justify-center">
-                          <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                            <ArrowRight className="w-5 h-5 text-gray-600" />
+                          <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                            <p className="text-lg font-medium text-gray-900 mb-2">
+                              {item.original.kanji}
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              {item.original.kana}
+                            </p>
                           </div>
                         </div>
 
-                        <div>
-                          <div className="flex items-center gap-2 mb-2">
-                            <div className="w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center">
-                              <span className="text-white text-xs font-bold">
-                                改
-                              </span>
-                            </div>
-                            <span className="text-emerald-600 text-sm font-bold uppercase tracking-wider">
-                              Improved
+                        {/* Arrow */}
+                        <div className="flex items-center justify-center md:justify-start">
+                          <ArrowRight className="w-6 h-6 text-violet-500" />
+                        </div>
+
+                        {/* Improved Sentence */}
+                        <div className="space-y-3 md:col-start-2">
+                          <div className="flex items-center gap-2">
+                            <span className="px-3 py-1 bg-green-100 text-green-700 text-sm font-medium rounded-full">
+                              改善後
                             </span>
                           </div>
-                          <p className="text-gray-900 font-semibold text-lg bg-emerald-50/80 p-3 rounded-lg border border-emerald-100">
-                            {upgrade.upgraded}
-                          </p>
+                          <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                            <p className="text-lg font-medium text-gray-900 mb-2">
+                              {item.upgraded.kanji}
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              {item.upgraded.kana}
+                            </p>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -439,36 +449,6 @@ export const Summary = ({ summary }: { summary: SummaryData }) => {
                       <span className="text-gray-800 font-medium text-lg">
                         {word}
                       </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Cultural Notes */}
-              <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-8 h-8 bg-gradient-to-r from-indigo-500 to-blue-500 rounded-lg flex items-center justify-center shadow-sm">
-                    <Globe className="w-5 h-5 text-white" />
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900">
-                    Cultural Context
-                  </h3>
-                </div>
-
-                <div className="space-y-4">
-                  {summary?.culturalNotes?.map((note, index) => (
-                    <div
-                      key={index}
-                      className="p-4 bg-gradient-to-r from-indigo-50 to-transparent border-2 border-indigo-100 rounded-xl"
-                    >
-                      <div className="flex items-start gap-3">
-                        <div className="w-5 h-5 bg-indigo-500 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0">
-                          <Globe className="w-3 h-3 text-white" />
-                        </div>
-                        <p className="text-gray-700 font-medium leading-relaxed">
-                          {note}
-                        </p>
-                      </div>
                     </div>
                   ))}
                 </div>

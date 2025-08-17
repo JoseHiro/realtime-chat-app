@@ -2,12 +2,13 @@ import { useState } from "react";
 import { VoiceInput } from "@/ui/VoiceInputButton";
 import { Messages } from "@/ui/Messages";
 import { Overlay } from "@/component/overlay";
-import { Summary } from "@/ui/Summar";
+import { Summary } from "@/ui/Summary";
 import { Sidebar } from "@/ui/Sidebar";
 import { Header } from "@/ui/Header";
 import { ModeSelectScreen } from "@/ui/ModeSelectScreen";
 import { useSpeech } from "../context/SpeechContext";
 import { Clock } from "lucide-react";
+import { SummaryData, ChatType } from "@/type/types";
 
 // notes : common mistakes, tendencies,
 // vocabulary, natural word selection,
@@ -16,29 +17,31 @@ import { Clock } from "lucide-react";
 // fix your grammar during the conversation
 
 export const Chat = () => {
-  const { selectedPoliteness, selectedLevel, selectedTheme, customTheme } =
-    useSpeech();
-
+  const { selectedPoliteness, selectedLevel } = useSpeech();
   const [audioList, setAudioList] = useState<string[]>([]);
-  const [chatStart, setChartStart] = useState(false);
-  const [overlayOpened, setOverlayOpened] = useState(false);
-  const [summary, setSummary] = useState();
-  const [summaryOpened, setSummaryOpened] = useState(false);
-  const [chatLoading, setChatLoading] = useState(false);
+  const [chatStart, setChartStart] = useState<boolean>(false);
+  const [overlayOpened, setOverlayOpened] = useState<boolean>(false);
+  const [summary, setSummary] = useState<SummaryData | null>(null);
+  const [summaryOpened, setSummaryOpened] = useState<boolean>(false);
+  const [chatLoading, setChatLoading] = useState<boolean>(false);
   const [history, setHistory] = useState<{ role: string; content: string }[]>(
     []
   );
 
+  console.log(summary);
+  console.log(history);
+
   // Send messages to the API and get the response and audio
-  const sendToAPI = async (messages: any) => {
+  const sendToAPI = async (messages: ChatType) => {
     setChatLoading(true);
-    const res = await fetch("/api/chat", {
+
+    const res = await fetch("/api/generate-response", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         messages,
-        selectedPoliteness,
-        selectedLevel,
+        politeness: selectedPoliteness,
+        level: selectedLevel,
         history,
       }),
     });
@@ -61,16 +64,17 @@ export const Chat = () => {
     }
   };
 
+  // Create a summary of the conversation history
   const handleCreateSummary = async () => {
     try {
-      const res = await fetch("/api/summary-tts", {
+      const res = await fetch("/api/generate-summary", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ history: history }),
       });
 
       const data = await res.json();
-      console.log("Summary response:", data);
+      // console.log("Summary response:", data);
       setSummary(data);
     } catch (error) {
       console.error("Error creating summary:", error);
@@ -93,7 +97,7 @@ export const Chat = () => {
       ) : (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-green-50 w-full flex flex-col justify-between">
           <Header
-            overlayOpened={overlayOpened}
+            // overlayOpened={overlayOpened}
             setOverlayOpened={setOverlayOpened}
             summary={summary}
             handleCreateSummary={handleCreateSummary}
@@ -103,15 +107,7 @@ export const Chat = () => {
             audioList={audioList}
             chatLoading={chatLoading}
           />
-          <VoiceInput
-            setHistory={setHistory}
-            setAudioList={setAudioList}
-            audioList={audioList}
-            sendToAPI={sendToAPI}
-            history={history}
-            setChatLoading={setChatLoading}
-            chatLoading={chatLoading}
-          />
+          <VoiceInput setHistory={setHistory} sendToAPI={sendToAPI} />
         </div>
       )}
 

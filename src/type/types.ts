@@ -9,14 +9,31 @@ export type SentenceUpgrade = {
 
 // 拡張サマリー型（新しいタイプ）
 export type SummaryData = {
-  summary: string; // English summary
-  mistakes: string[]; // 日本語の誤り
-  corrections: string[]; // 対応する訂正（mistakes と同じ順序）
-  goodPoints: string[]; // English
-  difficultyLevel: JLPTLevel;
-  improvementPoints: string[]; // English
-  commonMistakes: string[]; // 学習者がよくする傾向
-  sentenceUpgrades: SentenceUpgrade[]; // {original, upgraded}
-  vocabularySuggestions: string[]; // 単語提案（日本語 or 英語どちらでもOK運用に合わせて）
-  culturalNotes: string[]; // 文化ノート（English推奨）
+  summary: string;
+  mistakes: Array<{
+    kanji: string;
+    kana: string;
+  }>;
+  corrections: Array<{
+    kanji: string;
+    kana: string;
+  }>;
+  goodPoints: string[];
+  difficultyLevel: string;
+  improvementPoints: string[];
+  commonMistakes: string[];
+  sentenceUpgrades: Array<{
+    original: {
+      kanji: string;
+      kana: string;
+    };
+    upgraded: {
+      kanji: string;
+      kana: string;
+    };
+  }>;
+  vocabularySuggestions: string[];
+  score: number;
 };
+
+export type ChatType = { role: string; content: string }[];

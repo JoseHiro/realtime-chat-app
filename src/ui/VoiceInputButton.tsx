@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Mic, Square } from "lucide-react";
+import { ChatType } from "@/type/types";
 
 // Type declarations for SpeechRecognition
 declare global {
   interface Window {
-    SpeechRecognition: typeof SpeechRecognition;
-    webkitSpeechRecognition: typeof SpeechRecognition;
+    SpeechRecognition: any;
+    webkitSpeechRecognition: any;
   }
 }
 
@@ -14,18 +15,11 @@ type SpeechRecognition = typeof window.SpeechRecognition extends undefined
   : InstanceType<typeof window.SpeechRecognition>;
 
 export const VoiceInput = ({
-  chatLoading,
-  setChatLoading,
   setHistory,
   sendToAPI,
 }: {
-  history: any;
-  chatLoading: boolean;
-  audioList: any;
-  setChatLoading: (loading: boolean) => void;
-  setHistory: (history: any) => void;
-  setAudioList: (audioList: any) => void;
-  sendToAPI: (text: string) => Promise<void>;
+  setHistory: React.Dispatch<React.SetStateAction<ChatType>>;
+  sendToAPI: (text: ChatType) => Promise<void>;
 }) => {
   const [isRecording, setIsRecording] = useState(false);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
@@ -73,20 +67,20 @@ export const VoiceInput = ({
     recognitionRef.current.stop();
   };
 
-  const handleSubmitAudio = async (text) => {
+  const handleSubmitAudio = async (text: string) => {
     if (!text.trim()) {
       return;
     }
-    setHistory((prev) => {
+    setHistory((prev: ChatType) => {
       const newMessages = [...prev, { role: "user", content: text }];
       sendToAPI(newMessages);
       return newMessages;
     });
   };
 
-  const handleDemoSubmit = (text) => {
+  const handleDemoSubmit = (text: string) => {
     if (!text.trim()) return;
-    setHistory((prev) => {
+    setHistory((prev: ChatType) => {
       const newMessages = [...prev, { role: "user", content: text }];
       sendToAPI(newMessages);
       return newMessages;
