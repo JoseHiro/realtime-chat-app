@@ -16,13 +16,17 @@ export default async function handler(
   }
 
   try {
-    const { messages, politeness, level, history } = req.body;
+    const { messages, politeness, level, history, checkGrammarMode } = req.body;
 
     const formality =
       politeness === "casual"
         ? "話し方はカジュアルで、です・ます調は使わない。"
         : "話し方は丁寧で、です・ます調を使う。";
     console.log(politeness);
+
+    const fixGrammar = checkGrammarMode
+      ? "- あなたは学習者の発話に文法の誤りがあれば、友達のように自然に訂正して正しい文を提示してください。訂正後も会話は自然に続けてください。"
+      : "";
 
     const systemMessage = {
       role: "system",
@@ -34,6 +38,7 @@ export default async function handler(
 - 会話が続くようにオープンエンドの質問を入れる。
 - これまでの会話の文脈を踏まえて回答する。
 - ${formality}
+${fixGrammar}
 `,
     };
 

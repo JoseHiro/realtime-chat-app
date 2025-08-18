@@ -15,9 +15,12 @@ import { SummaryData, ChatType } from "@/type/types";
 // UI while the chat is thinking
 // when chat appears, scroll to bottom
 // fix your grammar during the conversation
+// formal learning explanation
+// casual form if its natural, streets corrects
+// simulation roleplay
 
 export const Chat = () => {
-  const { selectedPoliteness, selectedLevel } = useSpeech();
+  const { selectedPoliteness, selectedLevel, checkGrammarMode } = useSpeech();
   const [audioList, setAudioList] = useState<string[]>([]);
   const [chatStart, setChartStart] = useState<boolean>(false);
   const [overlayOpened, setOverlayOpened] = useState<boolean>(false);
@@ -43,13 +46,13 @@ export const Chat = () => {
         politeness: selectedPoliteness,
         level: selectedLevel,
         history,
+        checkGrammarMode,
       }),
     });
 
     const data = await res.json();
 
     setChatLoading(false);
-    // アシスタントの返事を追加
     setHistory((prev) => [...prev, { role: "assistant", content: data.reply }]);
 
     if (data.audio) {
@@ -74,7 +77,6 @@ export const Chat = () => {
       });
 
       const data = await res.json();
-      // console.log("Summary response:", data);
       setSummary(data);
     } catch (error) {
       console.error("Error creating summary:", error);
@@ -97,7 +99,6 @@ export const Chat = () => {
       ) : (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-green-50 w-full flex flex-col justify-between">
           <Header
-            // overlayOpened={overlayOpened}
             setOverlayOpened={setOverlayOpened}
             summary={summary}
             handleCreateSummary={handleCreateSummary}
@@ -120,19 +121,16 @@ export const Chat = () => {
                 <Clock className="w-8 h-8 text-white" />
               </div>
               <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                会話が終了しました
+                Conversation Finished
               </h2>
               <p className="text-gray-600 mb-6">
-                お疲れさまでした！会話の要約をご確認ください。
+                Good job! Please check the summary of your conversation.
               </p>
               <button
-                onClick={() => {
-                  // setChatEnded(false);
-                  setSummaryOpened(true);
-                }}
+                onClick={() => setSummaryOpened(true)}
                 className="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
               >
-                要約を確認する
+                View Summary
               </button>
             </div>
           ) : (

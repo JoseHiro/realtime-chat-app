@@ -26,7 +26,7 @@ export const Header = ({
   handleCreateSummary: () => void;
   // setChatEnded: (ended: boolean) => void;
 }) => {
-  const [timeLeft, setTimeLeft] = useState(1 * 60);
+  const [timeLeft, setTimeLeft] = useState(1);
   const [isActive, setIsActive] = useState(true);
 
   const { selectedPoliteness, selectedLevel, selectedTheme, customTheme } =

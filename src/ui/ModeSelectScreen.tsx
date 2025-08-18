@@ -15,8 +15,38 @@ import { useSpeech } from "../context/SpeechContext";
 import { ChatType } from "@/type/types";
 import { SelectModeButton } from "@/component/button";
 import { levels } from "../data/levels.json";
+import corrections from "../data/corrections.json";
 import themes from "../data/themes.json";
 import politenesses from "../data/politenesses.json";
+
+// background: linear-gradient(125deg, rgb(126, 194, 176), rgb(231, 247, 239), rgb(39, 132, 88));
+
+        //  .btn-grad {background-image: linear-gradient(to right, #2b5876 0%, #4e4376  51%, #2b5876  100%)}
+        //  .btn-grad {
+        //     margin: 10px;
+        //     padding: 15px 45px;
+        //     text-align: center;
+        //     text-transform: uppercase;
+        //     transition: 0.5s;
+        //     background-size: 200% auto;
+        //     color: white;
+        //     box-shadow: 0 0 20px #eee;
+        //     border-radius: 10px;
+        //     display: block;
+        //   }
+
+        //   .btn-grad:hover {
+        //     background-position: right center; /* change the direction of the change here */
+        //     color: #fff;
+        //     text-decoration: none;
+        //   }
+
+          // .btn-grad:hover {
+          //   background-position: right center; /* change the direction of the change here */
+          //   color: #fff;
+          //   text-decoration: none;
+          // }
+
 
 export const ModeSelectScreen = ({
   setHistory,
@@ -36,6 +66,8 @@ export const ModeSelectScreen = ({
     setSelectedTheme,
     customTheme,
     setCustomTheme,
+    checkGrammarMode,
+    setCheckGrammarMode,
   } = useSpeech();
 
   const iconMap: Record<string, React.ElementType> = {
@@ -63,7 +95,8 @@ export const ModeSelectScreen = ({
     console.log(
       selectedLevel,
       selectedTheme || customTheme.trim(),
-      selectedPoliteness
+      selectedPoliteness,
+      checkGrammarMode
     );
     const res = await fetch("/api/start-conversation-tts", {
       method: "POST",
@@ -74,6 +107,7 @@ export const ModeSelectScreen = ({
         level: selectedLevel,
         theme: selectedTheme || customTheme.trim(),
         politeness: selectedPoliteness || "polite",
+        // checkGrammarMode,
       }),
     });
 
@@ -94,7 +128,7 @@ export const ModeSelectScreen = ({
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-green-50 p-4 overflow-auto w-full">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-green-50 p-4 overflow-auto w-full ">
       <div className="max-w-4xl mx-auto py-8">
         {/* Header */}
         <div className="text-center mb-12">
@@ -212,10 +246,10 @@ export const ModeSelectScreen = ({
                     >
                       <IconComponent className="w-6 h-6" />
                     </div>
-                    <h3 className="font-semibold text-gray-900 mb-1">
-                      {theme.label}
-                    </h3>
-                    <p className="text-xs text-gray-500">{theme.description}</p>
+                    <ButtonContents
+                      label={theme.label}
+                      description={theme.description}
+                    />
                   </div>
                 </SelectModeButton>
               );
@@ -255,6 +289,50 @@ export const ModeSelectScreen = ({
               }}
               className="text-black w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-500 focus:outline-none transition-colors duration-300 bg-white shadow-lg"
             />
+          </div>
+        </div>
+
+        {/* fix grammar during conversation */}
+        <div className="mb-12">
+          <h2 className="text-xl font-semibold text-gray-900 mb-6 text-center">
+            Fix Grammar During Conversation
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+            {corrections.map((option) => {
+              const IconComponent = iconMap[option.icon] ?? User;
+              return (
+                <SelectModeButton
+                  key={option.id}
+                  onClick={() => setCheckGrammarMode(option.value)}
+                  className={`cursor-pointer relative group p-6 rounded-2xl bg-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border-2 ${
+                    checkGrammarMode === option.value
+                      ? "border-green-500 shadow-green-200"
+                      : "border-transparent hover:border-green-200"
+                  }`}
+                >
+                  <div
+                    className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${option.color} opacity-10 group-hover:opacity-20 transition-opacity duration-300`}
+                  ></div>
+                  <div className="relative z-10 text-center">
+                    <div
+                      className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 mx-auto transition-colors duration-300 ${
+                        checkGrammarMode === option.value
+                          ? "bg-green-500 text-white"
+                          : "bg-gray-100 text-gray-600 group-hover:bg-green-100 group-hover:text-green-600"
+                      }`}
+                    >
+                      <IconComponent className="w-6 h-6" />
+                    </div>
+                    <ButtonContents
+                      label={option.label}
+                      description={option.description}
+                      example={option.example}
+                      selected={checkGrammarMode === option.value}
+                    />
+                  </div>
+                </SelectModeButton>
+              );
+            })}
           </div>
         </div>
 

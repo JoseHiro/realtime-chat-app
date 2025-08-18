@@ -8,12 +8,12 @@ type OverlayProps = {
 export const Overlay: React.FC<OverlayProps> = ({ children, onClose }) => {
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-opacity-10 backdrop-blur-sm border border-gray-400"
-      onClick={onClose} // 背景クリックで閉じる
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40  bg-opacity-20 backdrop-blur-sm bg-trans"
+      onClick={onClose}
     >
       <div
-        className="bg-white bg-opacity-90 rounded-xl shadow-lg max-w-[80%]w-full max-h-[80vh] p-6 overflow-y-auto"
-        onClick={(e) => e.stopPropagation()} // 中身クリックで閉じないようにする
+        className="bg-white rounded-xl shadow-xl border border-gray-200 max-w-[80%] w-full max-h-[80vh] p-6 overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
       >
         <button
           onClick={onClose}
