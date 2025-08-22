@@ -4,7 +4,7 @@ import { Volume2, VolumeX, Sparkles, Plus, Settings } from "lucide-react";
 export const Sidebar = () => {
   const [isMuted, setIsMuted] = useState(false);
   return (
-    <div className="hidden lg:flex w-80 bg-white border-r border-gray-200 shadow-sm">
+    <div className="hidden lg:flex w-80 border-r h-full border-gray-200 shadow-sm bg-white/15 backdrop-blur-xl">
       <div className="flex flex-col w-full p-6">
         <div className="flex items-center gap-3 mb-8">
           <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">

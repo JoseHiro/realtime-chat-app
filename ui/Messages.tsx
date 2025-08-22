@@ -8,16 +8,20 @@ export const Messages = ({
   audioList,
   chatLoading,
   hiraganaReadingList,
+  handleSetReading,
 }: {
   chatLoading: boolean;
   history: ChatType;
   audioList: string[];
-  hiraganaReadingList: ChatType;
+  hiraganaReadingList: string[];
+  handleSetReading: any;
 }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [currentPlayingId, setCurrentPlayingId] = useState<number | null>(null);
   const [displayMode, setDisplayMode] = useState<"audio" | "text">("audio");
+
+  console.log(hiraganaReadingList, audioList);
 
   // Auto-scroll when new messages arrive
   useEffect(() => {
@@ -172,14 +176,20 @@ export const Messages = ({
                 </div>
               ) : (
                 // Text display mode
-                <>
+                <div>
                   <p className="text-sm lg:text-base leading-relaxed">
                     {message.content}
                   </p>
-                  <p className="text-[10px] text-gray-400 leading-snug mt-1">
-                    おはようございます
-                  </p>
-                </>
+
+                  {/* 読み仮名表示（assistantのメッセージのみ） */}
+                  {message.role === "assistant" && hiraganaReadingList[id] && (
+                    <div className="mt-2 pt-2 border-t border-gray-100">
+                      <p className="text-[10px] text-gray-400 leading-relaxed font-light tracking-wide">
+                        {hiraganaReadingList[id]}
+                      </p>
+                    </div>
+                  )}
+                </div>
               )}
             </div>
 

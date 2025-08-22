@@ -23,9 +23,8 @@ export const Header = ({
   summary: SummaryData | null;
   setOverlayOpened: (open: boolean) => void;
   handleCreateSummary: () => void;
-  // setChatEnded: (ended: boolean) => void;
 }) => {
-  const [timeLeft, setTimeLeft] = useState(1);
+  const [timeLeft, setTimeLeft] = useState(600);
   const [isActive, setIsActive] = useState(true);
 
   const { selectedPoliteness, selectedLevel, selectedTheme, customTheme } =

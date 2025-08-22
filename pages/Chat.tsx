@@ -9,6 +9,7 @@ import { ModeSelectScreen } from "../ui/ModeSelectScreen";
 import { useSpeech } from "../context/SpeechContext";
 import { Clock } from "lucide-react";
 import { SummaryData, ChatType } from "../type/types";
+import Image from "next/image";
 
 // notes : common mistakes, tendencies,
 // vocabulary, natural word selection,
@@ -27,8 +28,7 @@ export const Chat = () => {
   const [summary, setSummary] = useState<SummaryData | null>(null);
   const [summaryOpened, setSummaryOpened] = useState<boolean>(false);
   const [chatLoading, setChatLoading] = useState<boolean>(false);
-  const [hiraganaReadingList, setHiraganaReadingList] =
-    useState<SummaryData | null>(null);
+  const [hiraganaReadingList, setHiraganaReadingList] = useState<string[]>([]);
   const [history, setHistory] = useState<{ role: string; content: string }[]>(
     []
   );
@@ -44,11 +44,8 @@ export const Chat = () => {
     });
 
     const data = await response.json();
-    console.log(data.hiragana); // "さいこう"
-    setHiraganaReadingList((prev) => [
-      ...prev,
-      { role: "assistant", content: data.hiragana },
-    ]);
+    console.log(data.hiragana);
+    setHiraganaReadingList((prev) => [...prev, data.hiragana]);
   };
 
   // Send messages to the API and get the response and audio
@@ -71,6 +68,7 @@ export const Chat = () => {
 
     setChatLoading(false);
     setHistory((prev) => [...prev, { role: "assistant", content: data.reply }]);
+    handleSetReading(data.reply);
 
     if (data.audio) {
       const audioBuffer = Uint8Array.from(atob(data.audio), (c) =>
@@ -101,16 +99,16 @@ export const Chat = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="relative w-full h-screen flex">
       {/* サイドバー */}
-      <Sidebar />
 
-      {!chatStart ? (
+      {/* {!chatStart ? (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-green-50 overflow-auto w-full">
           <ModeSelectScreen
             setHistory={setHistory}
             setAudioList={setAudioList}
             setChartStart={setChartStart}
+            handleSetReading={handleSetReading}
           />
         </div>
       ) : (
@@ -125,13 +123,15 @@ export const Chat = () => {
             audioList={audioList}
             chatLoading={chatLoading}
             hiraganaReadingList={hiraganaReadingList}
+            handleSetReading={handleSetReading}
+
           />
           <VoiceInput setHistory={setHistory} sendToAPI={sendToAPI} />
         </div>
-      )}
+      )} */}
 
       {/* 時間切れ時のオーバーレイ */}
-      {overlayOpened && (
+      {/* {overlayOpened && (
         <Overlay onClose={() => setOverlayOpened(false)}>
           {!summaryOpened ? (
             <div className="text-center p-6">
@@ -155,8 +155,72 @@ export const Chat = () => {
             <Summary summary={summary} />
           )}
         </Overlay>
+      )} */}
+      {/* bg-gradient-to-br from-orange-400 via-pink-400 to-blue-500 */}
+      {/* <div
+        className="relative w-full h-screen flex
+      "
+      > */}
+      {/* 背景画像 */}
+      <Image
+        alt="background"
+        src="https://images.squarespace-cdn.com/content/v1/6683b1f0c2de43611580eee6/a2e980a9-0a96-4008-ba49-3502afbcce82/mt-fuji-japan-7081138_1280-pixabay-202408300-yoshitaka2.jpg"
+        fill
+        className="object-cover"
+      />
+
+      {/* オーバーレイ（背景の上にかける） */}
+      <div className="absolute inset-0 bg-blue/20 backdrop-blur-lg" />
+      {/* サイドバー */}
+      <Sidebar />
+
+      {!chatStart ? (
+        <ModeSelectScreen
+          setHistory={setHistory}
+          setAudioList={setAudioList}
+          setChartStart={setChartStart}
+          handleSetReading={handleSetReading}
+        />
+      ) : (
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-green-50 w-full flex flex-col justify-between">
+          <Header
+            setOverlayOpened={setOverlayOpened}
+            summary={summary}
+            handleCreateSummary={handleCreateSummary}
+          />
+          <Messages
+            history={history}
+            audioList={audioList}
+            chatLoading={chatLoading}
+            hiraganaReadingList={hiraganaReadingList}
+            handleSetReading={handleSetReading}
+          />
+          <VoiceInput setHistory={setHistory} sendToAPI={sendToAPI} />
+        </div>
       )}
+
+      {/* カード（オーバーレイの上に出す） */}
+      {/* <div className="z-10 flex items-center justify-center bg-white/15 backdrop-blur-xl h-full">
+          <div className="border border-white rounded-xl p-6 bg-white/20 backdrop-blur-md">
+            <h3 className="text-white text-xl">Card Name</h3>
+          </div>
+        </div> */}
+
+      {/* カード */}
+      {/* <div className="relative z-10 flex items-center justify-center h-full">
+          <div className="bg-white/70 backdrop-blur-md p-6 rounded-2xl shadow-xl w-96">
+            <h2 className="text-xl font-semibold mb-2">Eagle Ridge Loop</h2>
+            <p className="text-gray-700">7.4 miles • 3hr 15min • 1000ft</p>
+            <button className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg">
+              Book a tour
+            </button>
+          </div>
+        </div> */}
+      {/* <div className="absolute top-20 left-20 w-32 h-32 bg-white/10 rounded-full blur-xl" />
+        <div className="absolute bottom-32 right-32 w-24 h-24 bg-pink-300/20 rounded-full blur-2xl" />
+        <div className="absolute top-1/2 left-10 w-16 h-16 bg-blue-300/15 rounded-full blur-xl" /> */}
     </div>
+    // </div>
   );
 };
 
