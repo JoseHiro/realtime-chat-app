@@ -114,7 +114,7 @@ export const ModeSelectScreen = ({
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
               Japanese Conversation Practice
             </h1>
-            <p className="text-white">
+            <p className="text-gray-600">
               Choose your level, conversation theme, and speaking style to get
               started
             </p>
@@ -130,15 +130,12 @@ export const ModeSelectScreen = ({
                 <SelectModeButton
                   key={level.id}
                   onClick={() => setSelectedLevel(level.id)}
-                  className={`cursor-pointer relative group p-6 rounded-2xl relative backdrop-blur-xl bg-white/15 border border-white/25 rounded-3xl p-8 shadow-2xl hover:shadow-xl hover:-translate-y-2 border-2
-                    ${
-                      selectedLevel === level.id
-                        ? "border-green-500 shadow-green-200"
-                        : "border-transparent hover:border-green-200"
-                    }`}
+                  className={`cursor-pointer relative group p-6 rounded-2xl bg-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border-2 ${
+                    selectedLevel === level.id
+                      ? "border-green-500 shadow-green-200"
+                      : "border-transparent hover:border-green-200"
+                  }`}
                 >
-                  <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-white/20 to-transparent pointer-events-none" />
-
                   <ButtonContents
                     color={level.color}
                     label={level.label}
@@ -162,7 +159,7 @@ export const ModeSelectScreen = ({
                   <SelectModeButton
                     key={option.id}
                     onClick={() => setSelectedPoliteness(option.id)}
-                    className={`cursor-pointer relative group p-6 rounded-2xl relative backdrop-blur-xl bg-white/15 border border-white/25 rounded-3xl p-8 shadow-2xl hover:shadow-xl hover:-translate-y-2 border-2 ${
+                    className={`cursor-pointer relative group p-6 rounded-2xl bg-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border-2 ${
                       selectedPoliteness === option.id
                         ? "border-green-500 shadow-green-200"
                         : "border-transparent hover:border-green-200"
@@ -209,7 +206,7 @@ export const ModeSelectScreen = ({
                       setSelectedTheme(theme.id);
                       setCustomTheme("");
                     }}
-                    className={`cursor-pointer relative group p-6 rounded-2xl relative backdrop-blur-xl bg-white/15 border border-white/25 rounded-3xl p-8 shadow-2xl hover:shadow-xl hover:-translate-y-2 border-2 ${
+                    className={`cursor-pointer relative group p-6 rounded-xl bg-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border-2 ${
                       selectedTheme === theme.id
                         ? "border-green-500 shadow-green-200"
                         : "border-transparent hover:border-green-200"
@@ -285,7 +282,7 @@ export const ModeSelectScreen = ({
                   <SelectModeButton
                     key={option.id}
                     onClick={() => setCheckGrammarMode(option.value)}
-                    className={`cursor-pointer relative group p-6 rounded-2xl relative backdrop-blur-xl bg-white/15 border border-white/25 rounded-3xl p-8 shadow-2xl hover:shadow-xl hover:-translate-y-2 border-2 ${
+                    className={`cursor-pointer relative group p-6 rounded-2xl bg-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border-2 ${
                       checkGrammarMode === option.value
                         ? "border-green-500 shadow-green-200"
                         : "border-transparent hover:border-green-200"
@@ -355,9 +352,9 @@ const ButtonContents = ({
 }: ButtonContentsProps) => {
   return (
     <>
-      {/* <div
+      <div
         className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${color} opacity-10 group-hover:opacity-20 transition-opacity duration-300`}
-      ></div> */}
+      ></div>
       <div className="relative z-10">
         <h3 className="text-lg font-semibold text-gray-900 mb-2">{label}</h3>
         <p className="text-gray-600 text-sm">{description}</p>

@@ -101,8 +101,9 @@ export const Chat = () => {
   return (
     <div className="relative w-full h-screen flex">
       {/* サイドバー */}
+      <Sidebar />
 
-      {/* {!chatStart ? (
+      {!chatStart ? (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-green-50 overflow-auto w-full">
           <ModeSelectScreen
             setHistory={setHistory}
@@ -124,11 +125,10 @@ export const Chat = () => {
             chatLoading={chatLoading}
             hiraganaReadingList={hiraganaReadingList}
             handleSetReading={handleSetReading}
-
           />
           <VoiceInput setHistory={setHistory} sendToAPI={sendToAPI} />
         </div>
-      )} */}
+      )}
 
       {/* 時間切れ時のオーバーレイ */}
       {/* {overlayOpened && (
@@ -162,19 +162,19 @@ export const Chat = () => {
       "
       > */}
       {/* 背景画像 */}
-      <Image
+      {/* <Image
         alt="background"
         src="https://images.squarespace-cdn.com/content/v1/6683b1f0c2de43611580eee6/a2e980a9-0a96-4008-ba49-3502afbcce82/mt-fuji-japan-7081138_1280-pixabay-202408300-yoshitaka2.jpg"
         fill
         className="object-cover"
-      />
+      /> */}
 
       {/* オーバーレイ（背景の上にかける） */}
-      <div className="absolute inset-0 bg-blue/20 backdrop-blur-lg" />
+      {/* <div className="absolute inset-0 bg-blue/20 backdrop-blur-lg" /> */}
       {/* サイドバー */}
-      <Sidebar />
+      {/* <Sidebar /> */}
 
-      {!chatStart ? (
+      {/* {!chatStart ? (
         <ModeSelectScreen
           setHistory={setHistory}
           setAudioList={setAudioList}
@@ -197,7 +197,7 @@ export const Chat = () => {
           />
           <VoiceInput setHistory={setHistory} sendToAPI={sendToAPI} />
         </div>
-      )}
+      )} */}
 
       {/* カード（オーバーレイの上に出す） */}
       {/* <div className="z-10 flex items-center justify-center bg-white/15 backdrop-blur-xl h-full">
