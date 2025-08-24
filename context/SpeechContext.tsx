@@ -12,6 +12,8 @@ interface SpeechContextType {
   setCustomTheme: React.Dispatch<React.SetStateAction<string>>;
   checkGrammarMode: boolean;
   setCheckGrammarMode: React.Dispatch<React.SetStateAction<boolean>>;
+  chatId: string;
+  setChatId: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const SpeechContext = createContext<SpeechContextType>({
@@ -24,7 +26,9 @@ const SpeechContext = createContext<SpeechContextType>({
   customTheme: "",
   setCustomTheme: () => {},
   checkGrammarMode: false,
-  setCheckGrammarMode: () => {}
+  setCheckGrammarMode: () => {},
+  chatId: "",
+  setChatId: () => {},
 });
 
 export const SpeechProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -34,7 +38,8 @@ export const SpeechProvider: React.FC<{ children: React.ReactNode }> = ({
   const [selectedPoliteness, setSelectedPoliteness] = useState<string>("");
   const [selectedTheme, setSelectedTheme] = useState<string>("");
   const [customTheme, setCustomTheme] = useState<string>("");
-  const [checkGrammarMode, setCheckGrammarMode] = useState<boolean>(false)
+  const [checkGrammarMode, setCheckGrammarMode] = useState<boolean>(false);
+  const [chatId, setChatId] = useState<string>("");
   return (
     <SpeechContext.Provider
       value={{
@@ -47,7 +52,9 @@ export const SpeechProvider: React.FC<{ children: React.ReactNode }> = ({
         customTheme,
         setCustomTheme,
         checkGrammarMode,
-        setCheckGrammarMode
+        setCheckGrammarMode,
+        chatId,
+        setChatId,
       }}
     >
       {children}

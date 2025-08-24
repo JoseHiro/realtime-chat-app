@@ -17,7 +17,7 @@ import {
 import { SummaryData } from "../type/types";
 
 export const Summary = ({ summary }: { summary: SummaryData | null }) => {
-  console.log(summary);
+  // console.log(summary);
 
   const scorePercentage = summary?.score || 0;
 

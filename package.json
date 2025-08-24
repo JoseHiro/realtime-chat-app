@@ -17,6 +17,7 @@
     "openai": "^5.12.2",
     "react": "19.1.0",
     "react-dom": "19.1.0",
+    "uuid": "^11.1.0",
     "wanakana": "^5.3.1"
   },
   "devDependencies": {

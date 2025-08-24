@@ -43,7 +43,7 @@ export const VoiceInput = ({
 
       // 確定したときだけ送信
       if (lastResult.isFinal) {
-        console.log("Transcript:", transcriptText);
+        // console.log("Transcript:", transcriptText);
         handleSubmitAudio(transcriptText);
       }
     };

@@ -8,7 +8,7 @@ export const Messages = ({
   audioList,
   chatLoading,
   hiraganaReadingList,
-  handleSetReading,
+  // handleSetReading,
 }: {
   chatLoading: boolean;
   history: ChatType;
@@ -20,8 +20,6 @@ export const Messages = ({
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [currentPlayingId, setCurrentPlayingId] = useState<number | null>(null);
   const [displayMode, setDisplayMode] = useState<"audio" | "text">("audio");
-
-  console.log(hiraganaReadingList, audioList);
 
   // Auto-scroll when new messages arrive
   useEffect(() => {

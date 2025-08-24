@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import OpenAI from "openai";
+import { logUsage } from "../../lib/logger";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 
@@ -11,38 +12,8 @@ export default async function handler(
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { history } = req.body;
+  const { history, chatId } = req.body;
   try {
-    // モックのhistory（実際はreq.body.historyなどを使う）
-    // const history = [
-    //   {
-    //     role: "user",
-    //     content:
-    //       "昨日、友達と映画見ましたけど、ちょっとつまらなかったです。ストーリーは分からなかったから。",
-    //   },
-    //   {
-    //     role: "assistant",
-    //     content: "そうなんですね。どんな映画だったんですか？",
-    //   },
-    //   {
-    //     role: "user",
-    //     content: "えっと…サスペンスの映画です。主人公が最後死んだです。",
-    //   },
-    //   {
-    //     role: "assistant",
-    //     content: "最後に主人公が亡くなったんですね。どんなシーンでしたか？",
-    //   },
-    //   {
-    //     role: "user",
-    //     content: "彼は車で逃げる時に、雨が強くて、道滑って事故になった。",
-    //   },
-    //   { role: "assistant", content: "なるほど、緊張感のあるシーンですね。" },
-    //   {
-    //     role: "user",
-    //     content: "はい。でも俳優は有名じゃないだから、少し違和感ありました。",
-    //   },
-    // ];
-
     const conversationText = history
       .map(
         (msg: { role: string; content: string }) =>
@@ -123,6 +94,22 @@ JSONのキー:
     } else {
       parsed = { summary: raw, mistakes: [], goodPoints: [] };
     }
+
+    const usage = completion.usage; // open ai usage
+    const openaiCost = (usage.total_tokens / 1000) * 0.015;
+    console.log("Open AI usage", usage);
+
+    logUsage({
+      timestamp: new Date().toISOString(),
+      chatId,
+      openai: {
+        model: "gpt-4o-mini",
+        prompt_tokens: usage.prompt_tokens,
+        completion_tokens: usage.completion_tokens,
+        total_tokens: usage.total_tokens,
+        estimated_cost_usd: openaiCost,
+      },
+    });
 
     res.status(200).json(parsed);
   } catch (error) {

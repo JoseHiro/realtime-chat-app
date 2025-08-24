@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { OpenAI } from "openai";
+import { logUsage } from "../../lib/logger";
 
 const speechKey = process.env.AZURE_API_KEY || "";
 const serviceRegion = process.env.AZURE_SERVICE_REGION;
@@ -9,12 +10,10 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { level, theme, politeness } = req.body;
+  const { level, theme, politeness, chatId } = req.body;
   if (!level || !theme) {
     return res.status(400).json({ error: "Text is required" });
   }
-
-  console.log(politeness);
 
   const prompt = `あなたは日本語会話の練習相手です。
 以下の条件で会話を始めてください。
@@ -94,7 +93,31 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
     const audioBuffer = Buffer.from(await ttsResponse.arrayBuffer());
 
-    console.log(reply);
+    const usage = completion.usage; // open ai usage
+    const charCount = reply.length; // azure usage
+    const openaiCost = (usage.total_tokens / 1000) * 0.015;
+    const azureCost = (charCount / 1000000) * 16;
+    console.log("Open AI id ---------------------", chatId);
+
+    logUsage({
+      chatId,
+      timestamp: new Date().toISOString(),
+      level,
+      theme,
+      politeness,
+      openai: {
+        model: "gpt-4o-mini",
+        prompt_tokens: usage.prompt_tokens,
+        completion_tokens: usage.completion_tokens,
+        total_tokens: usage.total_tokens,
+        estimated_cost_usd: openaiCost,
+      },
+      azure_tts: {
+        voice: "ja-JP-NanamiNeural",
+        characters: charCount,
+        estimated_cost_usd: azureCost,
+      },
+    });
 
     res.setHeader("Content-Type", "application/json");
     res.status(200).json({

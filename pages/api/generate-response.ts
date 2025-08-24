@@ -1,6 +1,7 @@
 // Generate response for a chat application using OpenAI and Azure TTS
 import type { NextApiRequest, NextApiResponse } from "next";
 import { OpenAI } from "openai";
+import { logUsage } from "../../lib/logger";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 const speechKey = process.env.AZURE_API_KEY || "";
@@ -16,13 +17,13 @@ export default async function handler(
   }
 
   try {
-    const { messages, politeness, level, history, checkGrammarMode } = req.body;
+    const { messages, politeness, level, history, checkGrammarMode, chatId } =
+      req.body;
 
     const formality =
       politeness === "casual"
         ? "話し方はカジュアルで、です・ます調は使わない。"
         : "話し方は丁寧で、です・ます調を使う。";
-    console.log(politeness);
 
     const fixGrammar = checkGrammarMode
       ? "- あなたは学習者の発話に文法の誤りがあれば、友達のように自然に訂正して正しい文を提示してください。訂正後も会話は自然に続けてください。"
@@ -34,7 +35,7 @@ export default async function handler(
 あなたは日本語会話の練習相手です。
 - 学習者の日本語レベル: ${level}
 - 丁寧さ: ${politeness}
-- 返答は長文でお願い。
+- 返答は短めで1〜2文で自然に。
 - 会話が続くようにオープンエンドの質問を入れる。
 - これまでの会話の文脈を踏まえて回答する。
 - ${formality}
@@ -106,6 +107,31 @@ ${fixGrammar}
     res.status(200).json({
       reply: reply,
       audio: audioBuffer.toString("base64"), // フロントでは base64 を再生用に変換
+    });
+
+    const usage = completion.usage; // open ai usage
+    const charCount = reply.length; // azure usage
+    const openaiCost = (usage.total_tokens / 1000) * 0.015;
+    const azureCost = (charCount / 1000000) * 16;
+    console.log("Open AI usage", usage);
+
+    logUsage({
+      timestamp: new Date().toISOString(),
+      chatId,
+      level,
+      politeness,
+      openai: {
+        model: "gpt-4o-mini",
+        prompt_tokens: usage.prompt_tokens,
+        completion_tokens: usage.completion_tokens,
+        total_tokens: usage.total_tokens,
+        estimated_cost_usd: openaiCost,
+      },
+      azure_tts: {
+        voice: "ja-JP-NanamiNeural",
+        characters: charCount,
+        estimated_cost_usd: azureCost,
+      },
     });
   } catch (err) {
     console.error(err);
