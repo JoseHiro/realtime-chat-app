@@ -102,6 +102,12 @@ export const ModeSelectScreen = ({
     }
   };
 
+  const handleTest = async () => {
+    console.log("dsdssdsdsds");
+
+    const res = await fetch("/api/test", { method: "GET" });
+  };
+
   return (
     <div className="z-10 min-h-screen shadow-sm backdrop-blur-xl overflow-auto w-full">
       <div className="min-h-screen p-4 overflow-auto w-full ">
@@ -111,6 +117,7 @@ export const ModeSelectScreen = ({
             <div className="inline-flex items-center justify-center w-16 h-16 bg-green-500 rounded-full mb-4 shadow-lg shadow-green-200">
               <MessageCircle className="w-8 h-8 text-white" />
             </div>
+            <button onClick={() => handleTest()}>Test</button>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
               Japanese Conversation Practice
             </h1>
