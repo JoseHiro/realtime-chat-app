@@ -1,8 +1,19 @@
 import { useState } from "react";
-import { Volume2, VolumeX, Sparkles, Plus, Settings } from "lucide-react";
+import {
+  Volume2,
+  VolumeX,
+  Sparkles,
+  Plus,
+  Settings,
+  Ellipsis,
+} from "lucide-react";
+import { ChatDataType } from "../type/types";
 
-export const Sidebar = () => {
+export const Sidebar = ({ chats }: { chats: ChatDataType[] }) => {
   const [isMuted, setIsMuted] = useState(false);
+
+  // Sample data for demonstration
+
   return (
     <div className="hidden lg:flex w-80 border-r h-full border-gray-200 shadow-sm bg-white/15 backdrop-blur-xl">
       <div className="flex flex-col w-full p-6">
@@ -15,19 +26,49 @@ export const Sidebar = () => {
 
         <button className=" cursor-pointer flex items-center gap-3 p-4 rounded-xl bg-green-500 text-white mb-4 hover:bg-green-600 transition-all duration-200 shadow-sm">
           <Plus className="w-5 h-5" />
-          新しい会話
+          New Chat
         </button>
 
-        <div className="flex-1 space-y-2">
-          <div className="p-3 rounded-lg bg-gray-50 border border-gray-200 text-gray-600 text-sm">
-            音声会話履歴
-          </div>
+        <div className="flex-1 space-y-1 overflow-y-auto">
+          <p className="text-gray-400">Chats</p>
+          {!chats || (0 && chats.length === 0) ? (
+            <div className="text-center text-gray-400 text-sm py-8">
+              No chats
+            </div>
+          ) : (
+            <div className="space-y-1">
+              {chats.map((chat) => (
+                <div
+                  key={chat.id}
+                  className="p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors group"
+                >
+                  <div className="flex gap-1 items-center">
+                    <div className="flex-1 min-w-0">
+                      <div className="text-xs font-small text-gray-900 truncate">
+                        {chat.title}
+                      </div>
+                      {chat.message.length > 0 && (
+                        <div className="text-xs text-gray-500 mt-1 truncate">
+                          {chat.message[chat.message.length - 1].message}
+                        </div>
+                      )}
+                    </div>
+                    <Ellipsis className="w-4 h-4 text-gray-400 mt-1 flex-shrink-0" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
-        <div className="mt-auto space-y-2">
+        <div className="flex">
+          <button className="cursor-pointer flex items-center gap-3 p-3 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors">
+            <Settings className="w-5 h-5" />
+            {/* 設定 */}
+          </button>
           <button
             onClick={() => setIsMuted(!isMuted)}
-            className={`flex items-center gap-3 p-3 rounded-lg w-full transition-colors ${
+            className={`cursor-pointer flex items-center gap-3 p-3 rounded-lg transition-colors ${
               isMuted
                 ? "text-red-600 bg-red-50 border border-red-200"
                 : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
@@ -38,11 +79,6 @@ export const Sidebar = () => {
             ) : (
               <Volume2 className="w-5 h-5" />
             )}
-            {isMuted ? "ミュート中" : "音声オン"}
-          </button>
-          <button className="flex items-center gap-3 p-3 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-50 w-full transition-colors">
-            <Settings className="w-5 h-5" />
-            設定
           </button>
         </div>
       </div>

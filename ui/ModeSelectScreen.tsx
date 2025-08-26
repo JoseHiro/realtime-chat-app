@@ -72,7 +72,7 @@ export const ModeSelectScreen = ({
     const uniqueId = uuidv4();
     setChatId(uniqueId);
 
-    const res = await fetch("/api/start-conversation-tts", {
+    const res = await fetch("/api/start-chat", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -102,12 +102,6 @@ export const ModeSelectScreen = ({
     }
   };
 
-  const handleTest = async () => {
-    console.log("dsdssdsdsds");
-
-    const res = await fetch("/api/test", { method: "GET" });
-  };
-
   return (
     <div className="z-10 min-h-screen shadow-sm backdrop-blur-xl overflow-auto w-full">
       <div className="min-h-screen p-4 overflow-auto w-full ">
@@ -117,7 +111,7 @@ export const ModeSelectScreen = ({
             <div className="inline-flex items-center justify-center w-16 h-16 bg-green-500 rounded-full mb-4 shadow-lg shadow-green-200">
               <MessageCircle className="w-8 h-8 text-white" />
             </div>
-            <button onClick={() => handleTest()}>Test</button>
+
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
               Japanese Conversation Practice
             </h1>
@@ -203,44 +197,77 @@ export const ModeSelectScreen = ({
             <h2 className="text-xl font-semibold text-gray-900 mb-6 text-center">
               Choose Conversation Theme
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {themes.map((theme) => {
-                const IconComponent = iconMap[theme.icon] ?? User; // fallback
+                const IconComponent = iconMap[theme.icon];
+                const isSelected = selectedTheme === theme.id;
+
                 return (
-                  <SelectModeButton
+                  <div
                     key={theme.id}
-                    onClick={() => {
-                      setSelectedTheme(theme.id);
-                      setCustomTheme("");
-                    }}
-                    className={`cursor-pointer relative group p-6 rounded-xl bg-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border-2 ${
-                      selectedTheme === theme.id
-                        ? "border-green-500 shadow-green-200"
-                        : "border-transparent hover:border-green-200"
+                    onClick={() => setSelectedTheme(theme.id)}
+                    className={`relative group cursor-pointer rounded-2xl overflow-hidden bg-white shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 ${
+                      isSelected
+                        ? "ring-4 ring-green-500 ring-opacity-50 shadow-green-200"
+                        : "hover:shadow-xl"
                     }`}
                   >
-                    <div className="flex flex-col items-center text-center">
-                      <div
-                        className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 transition-colors duration-300 ${
-                          selectedTheme === theme.id
-                            ? "bg-green-500 text-white"
-                            : "bg-green-100 text-green-600 group-hover:bg-green-200"
-                        }`}
-                      >
-                        <IconComponent className="w-6 h-6" />
-                      </div>
-                      <ButtonContents
-                        label={theme.label}
-                        description={theme.description}
+                    {/* Background Image */}
+                    <div className="relative h-48 overflow-hidden">
+                      <img
+                        src={theme.imgURL}
+                        alt={theme.label}
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                       />
+
+                      {/* Gradient Overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+
+                      {/* Selected Badge */}
+                      {isSelected && (
+                        <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                          Selected
+                        </div>
+                      )}
                     </div>
-                  </SelectModeButton>
+
+                    {/* Content */}
+                    <div className="p-6">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div
+                          className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
+                            isSelected
+                              ? "bg-green-500 text-white"
+                              : "bg-green-100 text-green-600 group-hover:bg-green-200"
+                          }`}
+                        >
+                          <IconComponent className="w-5 h-5" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-gray-900">
+                          {theme.label}
+                        </h3>
+                      </div>
+
+                      <p className="text-gray-600 text-sm leading-relaxed">
+                        {theme.description}
+                      </p>
+                    </div>
+
+                    {/* Hover Effect Border */}
+                    <div
+                      className={`absolute inset-0 rounded-2xl transition-all duration-300 pointer-events-none ${
+                        isSelected
+                          ? "border-2 border-green-500"
+                          : "border-2 border-transparent group-hover:border-green-300"
+                      }`}
+                    />
+                  </div>
                 );
               })}
             </div>
 
             {/* Custom Theme */}
-            <div className="max-w-md mx-auto">
+            <div className="max-w-md mx-auto mt-6">
               <SelectModeButton
                 onClick={() => {
                   setSelectedTheme("");

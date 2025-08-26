@@ -1,0 +1,37 @@
+import { NextApiRequest, NextApiResponse } from "next";
+import { PrismaClient } from "@prisma/client";
+import { verifyAuth } from "../../../middleware/middleware";
+const prisma = new PrismaClient();
+
+export default async (req: NextApiRequest, res: NextApiResponse) => {
+  if (req.method !== "GET") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  // if not userId
+
+  try {
+    const token = req.cookies.access_token;
+    const decodedToken = verifyAuth(token);
+    console.log("token:", decodedToken.userId);
+
+    const user = await prisma.user.findUnique({
+      where: { id: decodedToken.userId },
+      include: {
+        chats: {
+          include: {
+            message: true, // or messages depending on your model
+          },
+        },
+      },
+    });
+
+    console.log("chats: ", user.chats);
+
+    if (user.chats) {
+      return res.status(200).json({ chats: user.chats });
+    }
+  } catch (error) {
+    res.status(400).json({ error: "" });
+  }
+};

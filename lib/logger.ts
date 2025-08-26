@@ -2,9 +2,6 @@ import fs from "fs";
 import path from "path";
 
 const dataPath = path.join(process.cwd(), "data", "token.json");
-console.log("------------------------");
-
-console.log(dataPath);
 
 export function logUsage(entry: any) {
   const { chatId, ...rest } = entry;

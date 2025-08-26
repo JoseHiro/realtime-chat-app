@@ -1,6 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { OpenAI } from "openai";
 import { logUsage } from "../../lib/logger";
+import { verifyAuth } from "../../middleware/middleware";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 const speechKey = process.env.AZURE_API_KEY || "";
 const serviceRegion = process.env.AZURE_SERVICE_REGION;
@@ -9,6 +13,14 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
+
+  const token = req.cookies.access_token;
+  const decodedToken = verifyAuth(token);
+  if (!decodedToken) {
+    return res.status(400).json({ error: "Not authenticated" });
+  }
+
+  console.log("user: --", decodedToken);
 
   const { level, theme, politeness, chatId } = req.body;
   if (!level || !theme) {
@@ -97,7 +109,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     const charCount = reply.length; // azure usage
     const openaiCost = (usage.total_tokens / 1000) * 0.015;
     const azureCost = (charCount / 1000000) * 16;
-    console.log("Open AI id ---------------------", chatId);
 
     logUsage({
       chatId,
@@ -116,6 +127,23 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         voice: "ja-JP-NanamiNeural",
         characters: charCount,
         estimated_cost_usd: azureCost,
+      },
+    });
+
+    // chat store in DB
+    const chat = await prisma.chat.create({
+      data: {
+        userId: decodedToken.userId,
+        title: "My new Chat",
+      },
+    });
+
+    // chat message store in DB
+    const message = await prisma.message.create({
+      data: {
+        chatId: chat.id,
+        sender: "assistant",
+        message: reply,
       },
     });
 

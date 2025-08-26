@@ -37,3 +37,19 @@ export type SummaryData = {
 };
 
 export type ChatType = { role: string; content: string }[];
+
+export type MessageType = {
+  id: number;
+  chatId: number;
+  sender: string;
+  message: string;
+  createdAt: string;
+};
+
+export type ChatDataType = {
+  id: number;
+  userId: string;
+  title: string;
+  createdAt: string;
+  message: MessageType[];
+};

@@ -10,7 +10,7 @@ import { useSpeech } from "../context/SpeechContext";
 import { Clock } from "lucide-react";
 import { SummaryData, ChatType } from "../type/types";
 import { SpeechProvider } from "../context/SpeechContext";
-
+import { useQuery } from "@tanstack/react-query";
 // notes : common mistakes, tendencies,
 // vocabulary, natural word selection,
 // UI while the chat is thinking
@@ -43,6 +43,15 @@ export const Chat = () => {
   const [history, setHistory] = useState<{ role: string; content: string }[]>(
     []
   );
+
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["chats"],
+    queryFn: async () => {
+      const res = await fetch("/api/chats/get");
+      if (!res.ok) throw new Error("Failed to fetch chats");
+      return res.json();
+    },
+  });
 
   const handleSetReading = async (text: string) => {
     const response = await fetch("/api/kuromoji", {
@@ -111,7 +120,7 @@ export const Chat = () => {
     <SpeechProvider>
       <div className="relative w-full h-screen flex">
         {/* サイドバー */}
-        <Sidebar />
+        <Sidebar chats={data?.chats} />
 
         {!chatStart ? (
           <div className="min-h-screen bg-gradient-to-br from-gray-50 to-green-50 overflow-auto w-full">

@@ -3,30 +3,35 @@
     "id": "daily",
     "label": "Daily Life",
     "icon": "Coffee",
-    "description": "Everyday conversations and activities"
+    "description": "Everyday conversations and activities",
+    "imgURL": "https://res.cloudinary.com/dtziqs4pq/image/upload/v1746286072/Screenshot_2025-05-03_at_10.23.46_a.m._rpj6ci.png"
   },
   {
     "id": "business",
     "label": "Business",
     "icon": "Briefcase",
-    "description": "Professional and workplace discussions"
+    "description": "Professional and workplace discussions",
+    "imgURL": "https://res.cloudinary.com/dtziqs4pq/image/upload/v1745643249/Screenshot_2025-04-25_at_10.50.00_p.m._ry3i45.png"
   },
   {
     "id": "travel",
     "label": "Travel",
     "icon": "Plane",
-    "description": "Tourism and cultural experiences"
+    "description": "Tourism and cultural experiences",
+    "imgURL": "https://res.cloudinary.com/dtziqs4pq/image/upload/v1746550403/Screenshot_2025-05-06_at_11.53.20_a.m._ayi7xd.png"
   },
   {
     "id": "culture",
     "label": "Culture",
     "icon": "BookOpen",
-    "description": "Japanese traditions and society"
+    "description": "Japanese traditions and society",
+    "imgURL": "https://res.cloudinary.com/dtziqs4pq/image/upload/v1746550366/Screenshot_2025-05-06_at_11.52.41_a.m._awhxnq.png"
   },
   {
     "id": "social",
     "label": "Social",
     "icon": "Users",
-    "description": "Making friends and social interactions"
+    "description": "Making friends and social interactions",
+    "imgURL": "https://res.cloudinary.com/dtziqs4pq/image/upload/v1751475769/Screenshot_2025-07-02_at_11.02.15_a.m._smz8wo.png"
   }
 ]
