@@ -20,6 +20,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(400).json({ error: "Not authenticated" });
   }
 
+
   console.log("user: --", decodedToken);
 
   const { level, theme, politeness, chatId } = req.body;
@@ -134,6 +135,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     const chat = await prisma.chat.create({
       data: {
         userId: decodedToken.userId,
+        level: level,
+        theme: theme,
+        politeness: politeness,
         title: "My new Chat",
       },
     });
