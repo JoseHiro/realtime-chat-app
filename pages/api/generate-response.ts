@@ -2,6 +2,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { OpenAI } from "openai";
 import { logUsage } from "../../lib/logger";
+import { saveMessage } from "../../lib/helper/messageService";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 const speechKey = process.env.AZURE_API_KEY || "";
@@ -20,6 +21,10 @@ export default async function handler(
     const { messages, politeness, level, history, checkGrammarMode, chatId } =
       req.body;
 
+    console.log("chat Id", chatId);
+    console.log("last chat", messages[messages.length - 1].content);
+
+    saveMessage(chatId, "user", messages[messages.length - 1].content);
     const formality =
       politeness === "casual"
         ? "話し方はカジュアルで、です・ます調は使わない。"
@@ -32,15 +37,15 @@ export default async function handler(
     const systemMessage = {
       role: "system",
       content: `
-あなたは日本語会話の練習相手です。
-- 学習者の日本語レベル: ${level}
-- 丁寧さ: ${politeness}
-- 返答は短めで1〜2文で自然に。
-- 会話が続くようにオープンエンドの質問を入れる。
-- これまでの会話の文脈を踏まえて回答する。
-- ${formality}
-${fixGrammar}
-`,
+        あなたは日本語会話の練習相手です。
+        - 学習者の日本語レベル: ${level}
+        - 丁寧さ: ${politeness}
+        - 返答は短めで1〜2文で自然に。
+        - 会話が続くようにオープンエンドの質問を入れる。
+        - これまでの会話の文脈を踏まえて回答する。
+        - ${formality}
+        ${fixGrammar}
+      `,
     };
 
     const messagesWithInstruction = [
@@ -55,8 +60,8 @@ ${fixGrammar}
       messages: messagesWithInstruction,
     });
 
-    // console.log(completion.choices[0].message);
     const reply = completion.choices[0].message?.content ?? "";
+    saveMessage(chatId, "assistant", reply);
 
     // 2. Azure TTS用アクセストークン取得
     const tokenUrl = `https://${serviceRegion}.api.cognitive.microsoft.com/sts/v1.0/issuetoken`;
@@ -113,7 +118,6 @@ ${fixGrammar}
     const charCount = reply.length; // azure usage
     const openaiCost = (usage.total_tokens / 1000) * 0.015;
     const azureCost = (charCount / 1000000) * 16;
-    console.log("Open AI usage", usage);
 
     logUsage({
       timestamp: new Date().toISOString(),

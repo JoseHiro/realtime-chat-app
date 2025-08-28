@@ -1,5 +1,5 @@
 // SpeechContext.tsx
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 
 interface SpeechContextType {
   selectedLevel: string;
@@ -12,8 +12,8 @@ interface SpeechContextType {
   setCustomTheme: React.Dispatch<React.SetStateAction<string>>;
   checkGrammarMode: boolean;
   setCheckGrammarMode: React.Dispatch<React.SetStateAction<boolean>>;
-  chatId: string;
-  setChatId: React.Dispatch<React.SetStateAction<string>>;
+  chatId: null | number;
+  setChatId: React.Dispatch<React.SetStateAction<number | null>>;
 }
 
 const SpeechContext = createContext<SpeechContextType>({
@@ -27,7 +27,7 @@ const SpeechContext = createContext<SpeechContextType>({
   setCustomTheme: () => {},
   checkGrammarMode: false,
   setCheckGrammarMode: () => {},
-  chatId: "",
+  chatId: null,
   setChatId: () => {},
 });
 
@@ -39,7 +39,10 @@ export const SpeechProvider: React.FC<{ children: React.ReactNode }> = ({
   const [selectedTheme, setSelectedTheme] = useState<string>("");
   const [customTheme, setCustomTheme] = useState<string>("");
   const [checkGrammarMode, setCheckGrammarMode] = useState<boolean>(false);
-  const [chatId, setChatId] = useState<string>("");
+  const [chatId, setChatId] = useState<number | null>(null);
+  useEffect(() => {
+    console.log("chatId in provider changed:", chatId);
+  }, [chatId]);
   return (
     <SpeechContext.Provider
       value={{

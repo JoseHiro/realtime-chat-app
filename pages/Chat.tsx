@@ -9,7 +9,6 @@ import { ModeSelectScreen } from "../ui/ModeSelectScreen";
 import { useSpeech } from "../context/SpeechContext";
 import { Clock } from "lucide-react";
 import { SummaryData, ChatType } from "../type/types";
-import { SpeechProvider } from "../context/SpeechContext";
 
 // notes : common mistakes, tendencies,
 // vocabulary, natural word selection,
@@ -26,13 +25,8 @@ import { SpeechProvider } from "../context/SpeechContext";
 // pricing
 
 export const Chat = () => {
-  const {
-    selectedPoliteness,
-    selectedLevel,
-    checkGrammarMode,
-    chatId,
-    setChatId,
-  } = useSpeech();
+  const { selectedPoliteness, selectedLevel, checkGrammarMode, chatId } =
+    useSpeech();
   const [audioList, setAudioList] = useState<string[]>([]);
   const [chatStart, setChartStart] = useState<boolean>(false);
   const [overlayOpened, setOverlayOpened] = useState<boolean>(false);
@@ -55,9 +49,13 @@ export const Chat = () => {
     setHiraganaReadingList((prev) => [...prev, data.hiragana]);
   };
 
+
   // Send messages to the API and get the response and audio
   const sendToAPI = async (messages: ChatType) => {
+
     setChatLoading(true);
+
+    console.log("chatis", chatId);
 
     const res = await fetch("/api/generate-response", {
       method: "POST",
@@ -101,73 +99,71 @@ export const Chat = () => {
 
       const data = await res.json();
       setSummary(data);
-      setChatId("");
+      // setChatId(null);
     } catch (error) {
       console.error("Error creating summary:", error);
     }
   };
 
   return (
-    <SpeechProvider>
-      <div className="relative w-full h-screen flex">
-        {/* サイドバー */}
-        <Sidebar />
+    <div className="relative w-full h-screen flex">
+      {/* サイドバー */}
+      <Sidebar />
 
-        {!chatStart ? (
-          <div className="min-h-screen bg-gradient-to-br from-gray-50 to-green-50 overflow-auto w-full">
-            <ModeSelectScreen
-              setHistory={setHistory}
-              setAudioList={setAudioList}
-              setChartStart={setChartStart}
-              handleSetReading={handleSetReading}
-            />
-          </div>
-        ) : (
-          <div className="min-h-screen bg-gradient-to-br from-gray-50 to-green-50 w-full flex flex-col justify-between">
-            <Header
-              setOverlayOpened={setOverlayOpened}
-              summary={summary}
-              handleCreateSummary={handleCreateSummary}
-            />
-            <Messages
-              history={history}
-              audioList={audioList}
-              chatLoading={chatLoading}
-              hiraganaReadingList={hiraganaReadingList}
-              handleSetReading={handleSetReading}
-            />
-            <VoiceInput setHistory={setHistory} sendToAPI={sendToAPI} />
-          </div>
-        )}
+      {!chatStart ? (
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-green-50 overflow-auto w-full">
+          <ModeSelectScreen
+            setHistory={setHistory}
+            setAudioList={setAudioList}
+            setChartStart={setChartStart}
+            handleSetReading={handleSetReading}
+          />
+        </div>
+      ) : (
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-green-50 w-full flex flex-col justify-between">
+          <Header
+            setOverlayOpened={setOverlayOpened}
+            summary={summary}
+            handleCreateSummary={handleCreateSummary}
+          />
+          <Messages
+            history={history}
+            audioList={audioList}
+            chatLoading={chatLoading}
+            hiraganaReadingList={hiraganaReadingList}
+            handleSetReading={handleSetReading}
+          />
+          <VoiceInput setHistory={setHistory} sendToAPI={sendToAPI} />
+        </div>
+      )}
 
-        {/* 時間切れ時のオーバーレイ */}
-        {overlayOpened && (
-          <Overlay onClose={() => setOverlayOpened(false)}>
-            {!summaryOpened ? (
-              <div className="text-center p-6">
-                <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Clock className="w-8 h-8 text-white" />
-                </div>
-                <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                  Conversation Finished
-                </h2>
-                <p className="text-gray-600 mb-6">
-                  Good job! Please check the summary of your conversation.
-                </p>
-                <button
-                  onClick={() => setSummaryOpened(true)}
-                  className="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
-                >
-                  View Summary
-                </button>
+      {/* 時間切れ時のオーバーレイ */}
+      {overlayOpened && (
+        <Overlay onClose={() => setOverlayOpened(false)}>
+          {!summaryOpened ? (
+            <div className="text-center p-6">
+              <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Clock className="w-8 h-8 text-white" />
               </div>
-            ) : (
-              <Summary summary={summary} />
-            )}
-          </Overlay>
-        )}
-      </div>
-    </SpeechProvider>
+              <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                Conversation Finished
+              </h2>
+              <p className="text-gray-600 mb-6">
+                Good job! Please check the summary of your conversation.
+              </p>
+              <button
+                onClick={() => setSummaryOpened(true)}
+                className="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+              >
+                View Summary
+              </button>
+            </div>
+          ) : (
+            <Summary summary={summary} />
+          )}
+        </Overlay>
+      )}
+    </div>
   );
 };
 

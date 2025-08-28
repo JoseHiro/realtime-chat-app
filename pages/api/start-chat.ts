@@ -76,16 +76,16 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     const accessToken = await tokenResponse.text();
     // SSML構築
     const ssml = `
-<speak version='1.0' xml:lang='ja-JP' xmlns:mstts="http://www.w3.org/2001/mstts">
-  <voice xml:lang='ja-JP' xml:gender='Female' name='ja-JP-NanamiNeural'>
-    <mstts:express-as style="sad" styledegree="1.0">
-      <prosody rate="1.0">
-        ${reply}
-      </prosody>
-    </mstts:express-as>
-  </voice>
-</speak>
-`;
+      <speak version='1.0' xml:lang='ja-JP' xmlns:mstts="http://www.w3.org/2001/mstts">
+        <voice xml:lang='ja-JP' xml:gender='Female' name='ja-JP-NanamiNeural'>
+          <mstts:express-as style="sad" styledegree="1.0">
+            <prosody rate="1.0">
+              ${reply}
+            </prosody>
+          </mstts:express-as>
+        </voice>
+      </speak>
+      `;
     const ttsUrl = `https://${serviceRegion}.tts.speech.microsoft.com/cognitiveservices/v1`;
 
     const ttsResponse = await fetch(ttsUrl, {
@@ -154,6 +154,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     res.setHeader("Content-Type", "application/json");
     res.status(200).json({
       reply: reply,
+      chatId: chat.id,
       audio: audioBuffer.toString("base64"), // フロントでは base64 を再生用に変換
     });
   } catch (error) {
