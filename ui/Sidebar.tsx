@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/router";
 import {
   Volume2,
   VolumeX,
@@ -10,13 +11,14 @@ import {
   Trash2,
 } from "lucide-react";
 import { ChatDataType } from "../type/types";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const Sidebar = () => {
+  const router = useRouter();
   const menuRef = useRef<HTMLDivElement>(null);
   const [isMuted, setIsMuted] = useState(false);
   const [activeChat, setActiveChat] = useState<number | null>(null);
-
+  const queryClient = useQueryClient();
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -66,6 +68,7 @@ export const Sidebar = () => {
     const result = await res.json();
 
     setActiveChat(null);
+    queryClient.invalidateQueries({ queryKey: ["chats"] });
   };
 
   return (
@@ -78,7 +81,10 @@ export const Sidebar = () => {
           <h1 className="text-xl font-bold text-gray-900">Kaiwa Kun</h1>
         </div>
 
-        <button className=" cursor-pointer flex items-center gap-3 p-4 rounded-xl bg-green-500 text-white mb-4 hover:bg-green-600 transition-all duration-200 shadow-sm">
+        <button
+          onClick={() => router.push("/chat")}
+          className=" cursor-pointer flex items-center gap-3 p-4 rounded-xl bg-green-500 text-white mb-4 hover:bg-green-600 transition-all duration-200 shadow-sm"
+        >
           <Plus className="w-5 h-5" />
           New Chat
         </button>
@@ -97,7 +103,10 @@ export const Sidebar = () => {
                   className="p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors group"
                 >
                   <div className="relative flex gap-1 items-center">
-                    <div className="flex-1 min-w-0">
+                    <div
+                      className="flex-1 min-w-0"
+                      onClick={() => router.push(`/chats/${chat.id}`)}
+                    >
                       <div className="text-xs font-small text-gray-900 truncate">
                         {chat.title}
                       </div>

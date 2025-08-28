@@ -23,7 +23,6 @@ import { levels } from "../data/levels.json";
 import corrections from "../data/corrections.json";
 import themes from "../data/themes.json";
 import politenesses from "../data/politenesses.json";
-import { v4 as uuidv4 } from "uuid";
 
 export const ModeSelectScreen = ({
   setHistory,
@@ -47,7 +46,6 @@ export const ModeSelectScreen = ({
     setCustomTheme,
     checkGrammarMode,
     setCheckGrammarMode,
-    // chatId,
     setChatId,
   } = useSpeech();
 
@@ -77,8 +75,6 @@ export const ModeSelectScreen = ({
   const handleBeginConversation = async () => {
     if (isStarting) return;
     setIsStarting(true);
-    const uniqueId = uuidv4();
-    setChatId(uniqueId);
 
     const res = await fetch("/api/start-chat", {
       method: "POST",
@@ -89,12 +85,13 @@ export const ModeSelectScreen = ({
         level: selectedLevel,
         theme: selectedTheme || customTheme.trim(),
         politeness: selectedPoliteness || "polite",
-        chatId: uniqueId,
       }),
     });
 
     const data = await res.json();
     setHistory((prev) => [...prev, { role: "assistant", content: data.reply }]);
+    console.log(data);
+    setChatId(Number(data.chatId));
     handleSetReading(data.reply);
 
     if (data.audio) {
