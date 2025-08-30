@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { OpenAI } from "openai";
-import { logUsage } from "../../lib/logger";
+import { logUsage } from "../../lib/loggingData/logger";
 import { verifyAuth } from "../../middleware/middleware";
 import { PrismaClient } from "@prisma/client";
 
@@ -19,7 +19,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (!decodedToken) {
     return res.status(400).json({ error: "Not authenticated" });
   }
-
 
   console.log("user: --", decodedToken);
 

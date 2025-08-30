@@ -1,8 +1,8 @@
 // Generate response for a chat application using OpenAI and Azure TTS
 import type { NextApiRequest, NextApiResponse } from "next";
 import { OpenAI } from "openai";
-import { logUsage } from "../../lib/logger";
-import { saveMessage } from "../../lib/helper/messageService";
+import { logUsage } from "../../lib/loggingData/logger";
+import { saveMessage } from "../../lib/message/messageService";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 const speechKey = process.env.AZURE_API_KEY || "";

@@ -2,7 +2,7 @@ import { NextApiResponse, NextApiRequest } from "next";
 import { verifyAuth } from "../../../middleware/middleware";
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
-import { convertHira } from "../../../lib/convertHira";
+import { convertHira } from "../../../lib/convert/convertHira";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== "GET")
@@ -11,7 +11,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   const token = req.cookies.access_token;
 
   const decodedToken = verifyAuth(token);
-  if (!decodedToken) {
+  if (!decodedToken || typeof decodedToken === "string" || !("userId" in decodedToken)) {
     return res.status(400).json({ message: "" });
   }
 
@@ -19,7 +19,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     const chat = await prisma.chat.findUnique({
       where: {
         id: Number(id), // convert string to number
-        userId: decodedToken.userId,
+        userId: (decodedToken as any).userId,
       },
       include: {
         message: {

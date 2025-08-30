@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 
 const jwtKey = "secretChatKey";
 const jwtOptions: SignOptions = {
-  algorithm: "HS256" as Algorithm, // <- cast to Algorithm
+  algorithm: "HS256" as Algorithm,
   expiresIn: "7d",
 };
 export default async function handler(
@@ -54,7 +54,7 @@ export default async function handler(
 
     // Return user data without password
     const { password: _, ...userWithoutPassword } = user;
-    return res.status(201).json(userWithoutPassword);
+    return res.status(201).json({ userId: user.id });
   } catch (error: any) {
     console.error(error);
     if (error.code === "P2002") {

@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import OpenAI from "openai";
-import { logUsage } from "../../lib/logger";
+import { logUsage } from "../../lib/loggingData/logger";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 

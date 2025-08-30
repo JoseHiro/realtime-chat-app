@@ -20,6 +20,14 @@ model User {
   password  String
   chats     Chat[]
   createdAt DateTime @default(now())
+
+  // Stripe-related fields
+  stripeCustomerId     String?   @unique
+  stripeSubscriptionId String?   @unique
+  subscriptionStatus   String?   // e.g. "trialing", "active", "canceled", "past_due"
+  subscriptionPlan     String?   // e.g. "free", "trial", "pro"
+
+  trialEndsAt DateTime?  // null if no trial
 }
 
 model Chat {
