@@ -2,6 +2,7 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
+import { startStripeSession } from "../lib/stripe/startSession";
 
 type SigninFormInputs = {
   email: string;
@@ -9,7 +10,7 @@ type SigninFormInputs = {
   username: string;
 };
 
-const Signin = () => {
+const Signup = () => {
   const router = useRouter();
   const {
     register,
@@ -18,9 +19,10 @@ const Signin = () => {
   } = useForm<SigninFormInputs>();
 
   const onSubmit = async (data: SigninFormInputs) => {
-    console.log("Form Data:", data);
+    console.log(data);
+
     // Here you can call your API to signin
-    const response = await fetch("/api/signin", {
+    const response = await fetch("/api/auth/signup", {
       body: JSON.stringify({
         username: data.username,
         password: data.password,
@@ -31,15 +33,20 @@ const Signin = () => {
     });
 
     const result = await response.json();
-    router.push("/chat");
-    console.log(result);
+    const userId = result.userId;
+
+    console.log(userId);
+
+    startStripeSession(userId);
+
+    // router.push("/chat");
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white">
       <div className="w-full max-w-md p-8 border border-gray-200 rounded-lg shadow-lg">
         <h1 className="text-2xl font-bold mb-6 text-green-600 text-center">
-          Sign In
+          Signup
         </h1>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -49,6 +56,7 @@ const Signin = () => {
               Email
             </label>
             <input
+              placeholder="you@example.com"
               type="email"
               {...register("email", { required: "Email is required" })}
               className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-400 text-black ${
@@ -69,7 +77,7 @@ const Signin = () => {
             <input
               type="text"
               {...register("username", { required: "Username is required" })}
-              placeholder="This will be your student name"
+              placeholder="We will call with you this name!"
               className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-400 text-black ${
                 errors.email ? "border-red-500" : "border-gray-300"
               }`}
@@ -88,6 +96,7 @@ const Signin = () => {
             </label>
             <input
               type="password"
+              placeholder="••••••••"
               {...register("password", { required: "Password is required" })}
               className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-400 text-black ${
                 errors.password ? "border-red-500" : "border-gray-300"
@@ -105,7 +114,7 @@ const Signin = () => {
             type="submit"
             className="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition"
           >
-            Sign In
+            Signup
           </button>
         </form>
 
@@ -121,4 +130,4 @@ const Signin = () => {
   );
 };
 
-export default Signin;
+export default Signup;

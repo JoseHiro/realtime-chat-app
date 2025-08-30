@@ -2,19 +2,35 @@ import React, { useState } from "react";
 import { useRouter } from "next/router";
 import { useQuery } from "@tanstack/react-query";
 import { Sidebar } from "../../ui/Sidebar";
-import { Bot, Play, Pause } from "lucide-react";
+import { Bot } from "lucide-react";
+
+type Message = {
+  id: string;
+  sender: "user" | "assistant";
+  message: string;
+  reading?: string;
+  createdAt: string;
+};
+
+type Chat = {
+  title?: string;
+  theme?: string;
+  level?: string;
+  politeness?: string;
+  message: Message[];
+};
 
 const ChatPage = () => {
   const router = useRouter();
   const { id } = router.query;
   const [displayMode, setDisplayMode] = useState("text");
-  const [currentPlayingId, setCurrentPlayingId] = useState(null);
+  const [currentPlayingId, setCurrentPlayingId] = useState<null | string>(null);
 
   const {
     data: chat,
     isLoading,
     error,
-  } = useQuery({
+  } = useQuery<Chat>({
     queryKey: ["chat", id],
     queryFn: async () => {
       const res = await fetch(`/api/chats/${id}`);
@@ -22,8 +38,8 @@ const ChatPage = () => {
       return res.json();
     },
   });
-  console.log(chat);
-  const formatTime = (dateString) => {
+
+  const formatTime = (dateString: string) => {
     return new Date(dateString).toLocaleTimeString("ja-JP", {
       hour: "2-digit",
       minute: "2-digit",
@@ -78,13 +94,13 @@ const ChatPage = () => {
                 >
                   <Volume2 className="w-4 h-4" />
                   Audio
-                </button>
-                <button
-                  onClick={() => setDisplayMode("text")}
-                  className={`cursor-pointer flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                    displayMode === "text"
-                      ? "bg-emerald-500 text-white shadow-sm transform scale-105"
-                      : "text-gray-600 hover:text-gray-800 hover:bg-gray-50"
+            {chat?.message.map((message: Message) => (
+              <div
+                key={message.id}
+                className={`flex gap-4 transition-all duration-300 ease-out ${
+                  message.sender === "user" ? "justify-end" : "justify-start"
+                }`}
+              >
                   }`}
                 >
                   <MessageSquare className="w-4 h-4" />
@@ -166,17 +182,6 @@ const ChatPage = () => {
                               ))}
                             </div>
                           </div>
-                          <p
-                            className={`text-xs font-medium ${
-                              message.sender === "user"
-                                ? "text-white/80"
-                                : "text-gray-500"
-                            }`}
-                          >
-                            {currentPlayingId === message.id
-                              ? "Playing..."
-                              : "Audio Message"}
-                          </p>
                         </div>
                       </div>
                     ) : (

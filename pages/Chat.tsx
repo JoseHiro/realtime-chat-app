@@ -54,7 +54,6 @@ export const Chat = () => {
   const sendToAPI = async (messages: ChatType) => {
 
     setChatLoading(true);
-
     console.log("chatis", chatId);
 
     const res = await fetch("/api/generate-response", {

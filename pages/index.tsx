@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { RoundedButton } from "../component/button";
+import { LandingHeader } from "../ui/LandingHeader";
 
 const Index = () => {
-  const [isScrolled, setIsScrolled] = useState(false);
   const [currentMessage, setCurrentMessage] = useState(0);
   const [isTyping, setIsTyping] = useState(false);
   const router = useRouter();
@@ -22,13 +22,6 @@ const Index = () => {
     },
   ];
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 100);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -41,7 +34,17 @@ const Index = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const FeatureCard = ({ icon, title, description, highlight }) => (
+  const FeatureCard = ({
+    icon,
+    title,
+    description,
+    highlight,
+  }: {
+    icon: React.ReactNode;
+    title: string;
+    description: string;
+    highlight: string;
+  }) => (
     <div className="group bg-gradient-to-br from-green-50 to-white p-8 rounded-2xl border border-green-100 transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-green-100/50 cursor-pointer">
       <div className="w-16 h-16 bg-green-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
         {icon}
@@ -52,7 +55,15 @@ const Index = () => {
     </div>
   );
 
-  const StepCard = ({ number, title, description }) => (
+  const StepCard = ({
+    number,
+    title,
+    description,
+  }: {
+    number: string;
+    title: string;
+    description: string;
+  }) => (
     <div className="text-center group">
       <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6 text-white text-2xl font-bold group-hover:scale-110 transition-transform duration-300 shadow-lg">
         {number}
@@ -65,59 +76,7 @@ const Index = () => {
   return (
     <div className="bg-white text-gray-900 overflow-x-hidden">
       {/* Navigation */}
-      <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          isScrolled
-            ? "bg-white/90 backdrop-blur-md shadow-lg"
-            : "bg-white/80 backdrop-blur-md"
-        } border-b border-gray-100`}
-      >
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-green-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">日</span>
-              </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-green-500 to-green-600 bg-clip-text text-transparent">
-                Kaiwa AI Demo
-              </span>
-            </div>
-
-            <div className="hidden md:flex items-center space-x-8">
-              <a
-                href="#features"
-                className="text-gray-600 hover:text-green-600 transition-colors duration-200"
-              >
-                Features
-              </a>
-              <a
-                href="#how-it-works"
-                className="text-gray-600 hover:text-green-600 transition-colors duration-200"
-              >
-                How it Works
-              </a>
-              <a
-                href="#pricing"
-                className="text-gray-600 hover:text-green-600 transition-colors duration-200"
-              >
-                Pricing
-              </a>
-              <RoundedButton
-                onClick={() => router.push("/chat")}
-                className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 transition-all duration-200 hover:scale-105 shadow-md hover:shadow-lg"
-              >
-                Start Learning
-              </RoundedButton>
-            </div>
-
-            <button className="md:hidden p-2">
-              <div className="w-6 h-0.5 bg-gray-600 mb-1.5 transition-all duration-200"></div>
-              <div className="w-6 h-0.5 bg-gray-600 mb-1.5 transition-all duration-200"></div>
-              <div className="w-6 h-0.5 bg-gray-600 transition-all duration-200"></div>
-            </button>
-          </div>
-        </div>
-      </nav>
+      <LandingHeader />
 
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center pt-16">
@@ -324,7 +283,7 @@ const Index = () => {
                 Grammar Feedback
               </div>
               <div className="text-sm text-gray-700 mb-2">
-                Great conversation! Here's what to improve:
+                {`Great conversation! Here's what to improve:`}
               </div>
               <div className="text-xs text-gray-500 space-y-1">
                 <div>• Perfect use of です/ます form</div>
@@ -527,7 +486,7 @@ const Index = () => {
                 </li>
                 <li>
                   <a
-                    href="#"
+                    href="/pricing"
                     className="hover:text-white transition-colors duration-200"
                   >
                     Pricing

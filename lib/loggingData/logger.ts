@@ -3,7 +3,7 @@ import path from "path";
 
 const dataPath = path.join(process.cwd(), "data", "token.json");
 
-export function logUsage(entry: any) {
+export const logUsage = (entry: any) => {
   const { chatId, ...rest } = entry;
 
   if (!chatId) {
@@ -37,4 +37,4 @@ export function logUsage(entry: any) {
   data.chats[chatId].push(rest);
 
   fs.writeFileSync(dataPath, JSON.stringify(data, null, 2));
-}
+};
