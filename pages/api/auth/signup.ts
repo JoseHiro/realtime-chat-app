@@ -20,7 +20,7 @@ export default async function handler(
   }
 
   try {
-    const { username, password, email } = req.body;
+    const { username, password, email, plan } = req.body;
 
     if (!email || !password) {
       return res.status(400).json({ error: "Email and password are required" });
@@ -28,12 +28,17 @@ export default async function handler(
 
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
+    const trialEndsAt =
+      plan === "trial" ? new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) : null;
 
     const user = await prisma.user.create({
       data: {
         email,
         username,
         password: hashedPassword,
+        subscriptionPlan: plan,
+        subscriptionStatus: plan === "trial" ? "trialing" : "pro",
+        trialEndsAt,
       },
     });
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import { RoundedButton } from "../component/button";
+import { RoundedButton } from "../button";
+import Link from "next/link";
 
 export const LandingHeader = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -44,14 +45,14 @@ export const LandingHeader = () => {
             >
               How it Works
             </a>
-            <a
-              href="#pricing"
+            <Link
+              href="/pricing"
               className="text-gray-600 hover:text-green-600 transition-colors duration-200"
             >
               Pricing
-            </a>
+            </Link>
             <RoundedButton
-              onClick={() => router.push("/chat")}
+              onClick={() => router.push("/login")}
               className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 transition-all duration-200 hover:scale-105 shadow-md hover:shadow-lg"
             >
               Start Learning

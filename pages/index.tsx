@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { RoundedButton } from "../component/button";
-import { LandingHeader } from "../ui/LandingHeader";
+import { LandingHeader } from "../component/ui/LandingHeader";
 
 const Index = () => {
   const [currentMessage, setCurrentMessage] = useState(0);
@@ -21,7 +21,6 @@ const Index = () => {
       translation: "Wonderful! Did anything interesting happen?",
     },
   ];
-
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -134,7 +133,7 @@ const Index = () => {
 
             <div className="flex flex-col sm:flex-row gap-4 mb-12">
               <RoundedButton
-                onClick={() => router.push("/signin")}
+                onClick={() => router.push("/signup?plan=trial")}
                 className="group bg-green-500 hover:bg-green-600 text-white px-8 py-4 text-lg font-semibold transition-all duration-300 hover:scale-105 hover:shadow-xl shadow-lg"
               >
                 Start Free Trial

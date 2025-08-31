@@ -16,13 +16,13 @@ import {
   Mountain,
   Edit3,
 } from "lucide-react";
-import { useSpeech } from "../context/SpeechContext";
-import { ChatType } from "../type/types";
-import { SelectModeButton } from "../component/button";
-import { levels } from "../data/levels.json";
-import corrections from "../data/corrections.json";
-import themes from "../data/themes.json";
-import politenesses from "../data/politenesses.json";
+import { useSpeech } from "../../context/SpeechContext";
+import { ChatType } from "../../type/types";
+import { SelectModeButton } from "../button";
+import { levels } from "../../data/levels.json";
+import corrections from "../../data/corrections.json";
+import themes from "../../data/themes.json";
+import politenesses from "../../data/politenesses.json";
 
 export const ModeSelectScreen = ({
   setHistory,

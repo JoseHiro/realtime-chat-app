@@ -10,7 +10,7 @@ import {
   Ellipsis,
   Trash2,
 } from "lucide-react";
-import { ChatDataType } from "../type/types";
+import { ChatDataType } from "../../type/types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const Sidebar = () => {

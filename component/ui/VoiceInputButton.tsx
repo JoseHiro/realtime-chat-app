@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Mic, Square } from "lucide-react";
-import { ChatType } from "../type/types";
+import { ChatType } from "../../type/types";
 
 // Type declarations for SpeechRecognition
 declare global {

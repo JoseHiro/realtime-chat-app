@@ -1,14 +1,16 @@
-import { useState } from "react";
-import { VoiceInput } from "../ui/VoiceInputButton";
-import { Messages } from "../ui/Messages";
+import { useState, useEffect } from "react";
+import { VoiceInput } from "../component/ui/VoiceInputButton";
+import { Messages } from "../component/ui/Messages";
 import { Overlay } from "../component/overlay";
-import { Summary } from "../ui/Summary";
-import { Sidebar } from "../ui/Sidebar";
-import { Header } from "../ui/Header";
-import { ModeSelectScreen } from "../ui/ModeSelectScreen";
+import { Summary } from "../component/ui/Summary";
+import { Sidebar } from "../component/ui/Sidebar";
+import { Header } from "../component/ui/Header";
+import { ModeSelectScreen } from "../component/ui/ModeSelectScreen";
 import { useSpeech } from "../context/SpeechContext";
 import { Clock } from "lucide-react";
 import { SummaryData, ChatType } from "../type/types";
+import { useQuery } from "@tanstack/react-query";
+import { PaymentPromotionContent } from "../component/ui/PaymentPromotionContent";
 
 // notes : common mistakes, tendencies,
 // vocabulary, natural word selection,
@@ -37,6 +39,34 @@ export const Chat = () => {
   const [history, setHistory] = useState<{ role: string; content: string }[]>(
     []
   );
+  const [paymentOverlay, setPaymentOverlay] = useState(false);
+
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["trial"],
+    queryFn: async () => {
+      const response = await fetch("/api/trial");
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.error || "Failed to fetch trial data");
+      }
+      return response.json();
+    },
+    retry: false,
+  });
+
+  useEffect(() => {
+    if (error) {
+      const err: any = error;
+      if (
+        err.message.includes("Trial period ended") ||
+        err.message.includes("Trial limit reached")
+      ) {
+        setPaymentOverlay(true);
+      }
+    }
+  }, [error]);
+
+  // console.log(paymentOverlay);
 
   const handleSetReading = async (text: string) => {
     const response = await fetch("/api/kuromoji", {
@@ -49,10 +79,8 @@ export const Chat = () => {
     setHiraganaReadingList((prev) => [...prev, data.hiragana]);
   };
 
-
   // Send messages to the API and get the response and audio
   const sendToAPI = async (messages: ChatType) => {
-
     setChatLoading(true);
     console.log("chatis", chatId);
 
@@ -117,6 +145,9 @@ export const Chat = () => {
             setChartStart={setChartStart}
             handleSetReading={handleSetReading}
           />
+          {paymentOverlay && (
+            <h1 className="text-red-500">Hellllllllllooooo</h1>
+          )}
         </div>
       ) : (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-green-50 w-full flex flex-col justify-between">
@@ -160,6 +191,12 @@ export const Chat = () => {
           ) : (
             <Summary summary={summary} />
           )}
+        </Overlay>
+      )}
+
+      {paymentOverlay && (
+        <Overlay onClose={() => setPaymentOverlay(false)}>
+          <PaymentPromotionContent onClose={() => setPaymentOverlay(false)} />
         </Overlay>
       )}
     </div>
