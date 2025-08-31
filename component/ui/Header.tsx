@@ -12,8 +12,8 @@ import {
   Users,
   Settings,
 } from "lucide-react";
-import { useSpeech } from "../context/SpeechContext";
-import { SummaryData } from "../type/types";
+import { useSpeech } from "../../context/SpeechContext";
+import { SummaryData } from "../../type/types";
 
 export const Header = ({
   summary,

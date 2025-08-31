@@ -40,9 +40,7 @@ export const SpeechProvider: React.FC<{ children: React.ReactNode }> = ({
   const [customTheme, setCustomTheme] = useState<string>("");
   const [checkGrammarMode, setCheckGrammarMode] = useState<boolean>(false);
   const [chatId, setChatId] = useState<number | null>(null);
-  useEffect(() => {
-    console.log("chatId in provider changed:", chatId);
-  }, [chatId]);
+
   return (
     <SpeechContext.Provider
       value={{

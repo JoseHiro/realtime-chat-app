@@ -1,146 +1,225 @@
-import React, { useEffect, useState } from "react";
-import Link from "next/link";
+import React, { useState } from "react";
 import { useRouter } from "next/router";
+import { useQuery } from "@tanstack/react-query";
 
-const PaymentSuccess = ({ username }: { username: string }) => {
+const PaymentSuccess = () => {
   const router = useRouter();
-  const [countdown, setCountdown] = useState(5);
-
-  // Auto redirect to chat after 5 seconds
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev <= 1) {
+  const [isRedirecting, setIsRedirecting] = useState(false);
+  const {
+    data: payment,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["payment"],
+    queryFn: async () => {
+      const res = await fetch("/api/stripe/status");
+      if (!res.ok) throw new Error("Failed to fetch payment status");
+      return res.json();
+    },
+    refetchInterval: (data) => {
+      return data?.subscriptionStatus === "active" ? false : 3000;
+    },
+    retry: 3,
+    onSuccess: (data) => {
+      console.log("Payment data:", data);
+      if (data?.subscriptionStatus === "active") {
+        // 2秒後にリダイレクト
+        setTimeout(() => {
+          setIsRedirecting(true);
           router.push("/chat");
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+        }, 2000);
+      }
+    },
+  });
 
-    return () => clearInterval(timer);
-  }, [router]);
+  // 手動でチャットに移動
+  const handleStartNow = () => {
+    if (payment?.subscriptionStatus === "active") {
+      setIsRedirecting(true);
+      router.push("/chat");
+    }
+  };
 
+  // ローディング状態
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-green-50 flex items-center justify-center p-4">
       <div className="max-w-lg mx-auto">
-        {/* Success Animation Container */}
         <div className="bg-white rounded-2xl shadow-2xl p-8 text-center relative overflow-hidden">
-          {/* Background decoration */}
           <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-green-400 to-green-600"></div>
 
-          {/* Animated Success Icon */}
+          {/* Dynamic Icon Based on State */}
           <div className="relative mb-6">
-            <div className="w-24 h-24 mx-auto bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center shadow-lg animate-pulse">
-              <svg
-                className="w-12 h-12 text-white animate-bounce"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="3"
-                  d="M5 13l4 4L19 7"
-                />
-              </svg>
-            </div>
-            {/* Floating particles effect */}
-            <div className="absolute -top-2 -right-2 w-4 h-4 bg-yellow-400 rounded-full animate-ping"></div>
-            <div className="absolute -bottom-1 -left-1 w-3 h-3 bg-blue-400 rounded-full animate-ping animation-delay-300"></div>
+            {isLoading ? (
+              // Loading state
+              <div className="w-24 h-24 mx-auto border-4 border-green-200 border-t-green-600 rounded-full animate-spin"></div>
+            ) : error ? (
+              // Error state
+              <div className="w-24 h-24 mx-auto bg-red-100 rounded-full flex items-center justify-center">
+                <svg
+                  className="w-12 h-12 text-red-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.082 16.5c-.77.833.192 2.5 1.732 2.5z"
+                  />
+                </svg>
+              </div>
+            ) : payment?.subscriptionStatus !== "active" ? (
+              // Processing state
+              <div className="w-24 h-24 mx-auto bg-yellow-100 rounded-full flex items-center justify-center relative">
+                <div className="absolute inset-0 border-4 border-yellow-300 rounded-full animate-pulse"></div>
+                <svg
+                  className="w-12 h-12 text-yellow-600 animate-bounce"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </div>
+            ) : (
+              // Success state
+              <div className="w-24 h-24 mx-auto bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center shadow-lg animate-pulse">
+                <svg
+                  className="w-12 h-12 text-white animate-bounce"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="3"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+              </div>
+            )}
+
+            {/* Floating particles effect - only show on success */}
+            {!isLoading &&
+              !error &&
+              payment?.subscriptionStatus === "active" && (
+                <>
+                  <div className="absolute -top-2 -right-2 w-4 h-4 bg-yellow-400 rounded-full animate-ping"></div>
+                  <div className="absolute -bottom-1 -left-1 w-3 h-3 bg-blue-400 rounded-full animate-ping animation-delay-300"></div>
+                </>
+              )}
           </div>
 
-          {/* Success Message */}
+          {/* Dynamic Title */}
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            🎉 Payment Successful!
+            {isLoading
+              ? "Verifying Payment..."
+              : error
+              ? "Verification Failed"
+              : payment?.subscriptionStatus !== "active"
+              ? "Setting Up Account..."
+              : "🎉 Welcome to Kaiwa AI!"}
           </h1>
 
-          {/* Personalized Welcome */}
-          {username ? (
-            <h2 className="text-xl text-green-600 font-semibold mb-4">
-              Welcome to Kaiwa AI, {username}!
-            </h2>
-          ) : (
-            <h2 className="text-xl text-green-600 font-semibold mb-4">
-              Welcome to Kaiwa AI!
-            </h2>
-          )}
-
+          {/* Dynamic Description */}
           <p className="text-gray-600 mb-6 leading-relaxed">
-            {`Thank you for subscribing! You now have unlimited access to
-                AI-powered Japanese conversations. Let's start your learning
-                journey! 🚀`}
+            {isLoading
+              ? "Please wait while we confirm your subscription and prepare your account."
+              : error
+              ? "We encountered an issue verifying your payment. Please try again."
+              : payment?.subscriptionStatus !== "active"
+              ? "Payment received! We're now activating your subscription and preparing your Japanese learning experience."
+              : "Your subscription is now active! You have unlimited access to AI-powered Japanese conversations. Let's start your learning journey! 🚀"}
           </p>
 
-          {/* Session ID (if needed) */}
-          {/* {session_id && (
-            <div className="bg-gray-50 rounded-lg p-3 mb-6">
-              <p className="text-xs text-gray-500 mb-1">Transaction ID</p>
-              <p className="text-sm font-mono text-gray-700">{session_id}</p>
+          {/* Dynamic Content Based on State */}
+          {isLoading && (
+            <div className="bg-blue-50 rounded-xl p-4 mb-6">
+              <div className="flex items-center justify-center mb-2">
+                <div className="flex space-x-1">
+                  <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>
+                  <div
+                    className="w-2 h-2 bg-blue-600 rounded-full animate-pulse"
+                    style={{ animationDelay: "0.2s" }}
+                  ></div>
+                  <div
+                    className="w-2 h-2 bg-blue-600 rounded-full animate-pulse"
+                    style={{ animationDelay: "0.4s" }}
+                  ></div>
+                </div>
+              </div>
+              <p className="text-sm text-blue-700">
+                This usually takes just a moment
+              </p>
             </div>
-          )} */}
+          )}
 
-          {/* What's Next Section */}
-          <div className="bg-green-50 rounded-xl p-4 mb-6">
-            <h3 className="font-semibold text-green-800 mb-2">{`What's next?`}</h3>
-            <ul className="text-sm text-green-700 space-y-1">
-              <li>✨ Start unlimited conversations</li>
-              <li>📊 Track your progress</li>
-              <li>🎯 Choose your difficulty level</li>
-              <li>🗣️ Practice with voice mode</li>
-            </ul>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="space-y-3">
-            <Link
-              href="/chat"
-              className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 hover:scale-105 hover:shadow-lg inline-block"
+          {error && (
+            <button
+              onClick={() => window.location.reload()}
+              className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 mb-4"
             >
-              Start Learning Japanese Now! 🇯🇵
-            </Link>
+              Try Again
+            </button>
+          )}
 
-            {/* <div className="flex space-x-3">
-              <Link
-                href="/"
-                className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors duration-200 inline-block"
-              >
-                Home
-              </Link>
-              <Link
-                href="/profile"
-                className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors duration-200 inline-block"
-              >
-                Profile
-              </Link>
-            </div> */}
-          </div>
-
-          {/* Auto-redirect notice */}
-          <div className="mt-6 pt-4 border-t border-gray-100">
-            <p className="text-xs text-gray-500">
-              Automatically redirecting to chat in {countdown} seconds...
-            </p>
-            <div className="w-full bg-gray-200 rounded-full h-1 mt-2">
-              <div
-                className="bg-green-500 h-1 rounded-full transition-all duration-1000"
-                style={{ width: `${((5 - countdown) / 5) * 100}%` }}
-              ></div>
+          {!isLoading && !error && payment?.subscriptionStatus !== "active" && (
+            <div className="bg-yellow-50 rounded-xl p-4 mb-6">
+              <h3 className="font-semibold text-yellow-800 mb-2">
+                What's happening:
+              </h3>
+              <ul className="text-sm text-yellow-700 space-y-1">
+                <li>✅ Payment confirmed</li>
+                <li>🔄 Activating subscription...</li>
+                <li>⏳ Setting up your profile</li>
+                <li>🚀 Almost ready!</li>
+              </ul>
             </div>
-          </div>
+          )}
+
+          {/* Action Button - Always show but change behavior */}
+          <button
+            onClick={error ? () => window.location.reload() : handleStartNow}
+            disabled={
+              isRedirecting ||
+              (payment?.subscriptionStatus !== "active" && !error)
+            }
+            className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 hover:scale-105 hover:shadow-lg disabled:cursor-not-allowed disabled:scale-100 mb-4"
+          >
+            {isRedirecting ? (
+              <span className="flex items-center justify-center">
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                Redirecting...
+              </span>
+            ) : error ? (
+              "Try Again"
+            ) : payment?.subscriptionStatus !== "active" ? (
+              "Please wait..."
+            ) : (
+              "Start Learning Japanese Now! 🇯🇵"
+            )}
+          </button>
+
+          {/* Dynamic Footer Message */}
         </div>
 
         {/* Bottom decoration */}
         <div className="text-center mt-6">
           <p className="text-sm text-gray-500">
-            Need help? Contact our{" "}
-            <Link
-              href="/support"
-              className="text-green-600 hover:text-green-700 font-medium"
-            >
-              support team
-            </Link>
+            {!isRedirecting && !error && (
+              <p className="text-sm text-gray-500">
+                {payment?.subscriptionStatus === "active"
+                  ? "You'll be automatically redirected in a moment, or click the button above to start now."
+                  : "Please don't refresh the page while we set up your account."}
+              </p>
+            )}
           </p>
         </div>
       </div>
@@ -148,20 +227,6 @@ const PaymentSuccess = ({ username }: { username: string }) => {
       <style jsx>{`
         .animation-delay-300 {
           animation-delay: 300ms;
-        }
-
-        @keyframes float {
-          0%,
-          100% {
-            transform: translateY(0px);
-          }
-          50% {
-            transform: translateY(-10px);
-          }
-        }
-
-        .animate-float {
-          animation: float 3s ease-in-out infinite;
         }
       `}</style>
     </div>

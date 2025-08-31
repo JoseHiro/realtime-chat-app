@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import { useRouter } from "next/router";
 import { RoundedButton } from "../component/button";
-import { LandingHeader } from "../ui/LandingHeader";
+import { LandingHeader } from "../component/ui/LandingHeader";
 
 const Pricing = () => {
   const router = useRouter();
-
   const plans = [
     {
       name: "Free Trial",
+      type: "trial",
       description: "Try Kaiwa AI with 2 free conversation sessions",
       price: 0,
       features: [
@@ -31,6 +31,7 @@ const Pricing = () => {
     },
     {
       name: "Pro",
+      type: "pro",
       description: "Unlimited conversations for serious Japanese learners",
       price: 15,
       features: [
@@ -55,6 +56,7 @@ const Pricing = () => {
     },
     {
       name: "Premium",
+      type: "premium",
       description: "Advanced features for professional Japanese mastery",
       price: null,
       features: [
@@ -165,7 +167,7 @@ const Pricing = () => {
           <RoundedButton
             onClick={() => {
               if (!plan.disabled) {
-                router.push("/signup");
+                router.push(`/signup?plan=${plan.type}`);
               }
             }}
             className={`w-full py-4 text-lg font-semibold transition-all duration-200 ${
@@ -442,7 +444,7 @@ const Pricing = () => {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <RoundedButton
-              onClick={() => router.push("/signup")}
+              onClick={() => router.push("/signup?plan=trial")}
               className="bg-white text-green-600 px-8 py-4 text-lg font-semibold hover:bg-gray-50 hover:scale-105 hover:shadow-xl shadow-lg transition-all duration-200"
             >
               Start Free Trial

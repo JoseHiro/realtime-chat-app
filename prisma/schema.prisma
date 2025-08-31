@@ -26,7 +26,7 @@ model User {
   stripeSubscriptionId String?   @unique
   subscriptionStatus   String?   // e.g. "trialing", "active", "canceled", "past_due"
   subscriptionPlan     String?   // e.g. "free", "trial", "pro"
-
+  trialUsedChats   Int　@default(0)
   trialEndsAt DateTime?  // null if no trial
 }
 

@@ -20,9 +20,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(400).json({ error: "Not authenticated" });
   }
 
-  console.log("user: --", decodedToken);
-
   const { level, theme, politeness, chatId } = req.body;
+
   if (!level || !theme) {
     return res.status(400).json({ error: "Text is required" });
   }

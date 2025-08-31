@@ -1,15 +1,15 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Bot, User, Play, Pause, MessageSquare, Volume2 } from "lucide-react";
-import { LoadingMessage } from "../component/loading";
-import { ChatType } from "../type/types";
+import { LoadingMessage } from "../loading";
+import { ChatType } from "../../type/types";
 
 export const Messages = ({
   history,
   audioList,
   chatLoading,
   hiraganaReadingList,
-  // handleSetReading,
-}: {
+}: // handleSetReading,
+{
   chatLoading: boolean;
   history: ChatType;
   audioList: string[];

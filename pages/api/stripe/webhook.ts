@@ -37,7 +37,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     switch (event.type) {
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
-        console.log("session :", session);
+        // console.log("session :", session);
 
         // You likely passed userId in your checkout session creation metadata
         const userId = session.metadata?.userId;
@@ -52,7 +52,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             stripeCustomerId: session.customer as string,
             stripeSubscriptionId: session.subscription as string | null,
             subscriptionStatus: "active",
-            subscriptionPlan: "pro", // or infer from your product/price ID
+            // subscriptionPlan: "pro", // or infer from your product/price ID
           },
         });
 

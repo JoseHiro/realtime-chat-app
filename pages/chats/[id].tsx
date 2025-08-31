@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/router";
 import { useQuery } from "@tanstack/react-query";
-import { Sidebar } from "../../ui/Sidebar";
+import { Sidebar } from "../../component/ui/Sidebar";
 import { Bot } from "lucide-react";
 
 type Message = {
