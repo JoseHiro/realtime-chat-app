@@ -23,7 +23,7 @@ export const RoundedButton = ({
 }: SelectModeButtonType) => {
   return (
     <button
-      className={`rounded-full flex items-center transition-all duration-300 justify-center ${className}`}
+      className={`cursor-pointer rounded-full flex items-center transition-all duration-300 justify-center ${className}`}
       onClick={onClick}
     >
       {children}
