@@ -19,7 +19,7 @@ import {
 import { useSpeech } from "../../context/SpeechContext";
 import { ChatType } from "../../type/types";
 import { SelectModeButton } from "../button";
-import { levels } from "../../data/levels.json";
+import levels from "../../data/levels.json";
 import corrections from "../../data/corrections.json";
 import themes from "../../data/themes.json";
 import politenesses from "../../data/politenesses.json";
@@ -27,13 +27,14 @@ import politenesses from "../../data/politenesses.json";
 export const ModeSelectScreen = ({
   setHistory,
   setAudioList,
-  setChartStart,
-  handleSetReading,
+  setChatMode,
+  setHiraganaReadingList,
 }: {
   setHistory: React.Dispatch<React.SetStateAction<ChatType>>;
   setAudioList: React.Dispatch<React.SetStateAction<string[]>>;
-  setChartStart: (start: boolean) => void;
-  handleSetReading: any;
+  setChatMode: (start: boolean) => void;
+  setHiraganaReadingList: React.Dispatch<React.SetStateAction<string[]>>;
+  // handleSetReading: any;
 }) => {
   const {
     selectedPoliteness,
@@ -76,7 +77,7 @@ export const ModeSelectScreen = ({
     if (isStarting) return;
     setIsStarting(true);
 
-    const res = await fetch("/api/start-chat", {
+    const res = await fetch("/api/chat/start-chat", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -90,9 +91,9 @@ export const ModeSelectScreen = ({
 
     const data = await res.json();
     setHistory((prev) => [...prev, { role: "assistant", content: data.reply }]);
-    console.log(data);
     setChatId(Number(data.chatId));
-    handleSetReading(data.reply);
+    setHiraganaReadingList((prev) => [...prev, data.reading]);
+    // handleSetReading(data.reply);
 
     if (data.audio) {
       const audioBuffer = Uint8Array.from(atob(data.audio), (c) =>
@@ -103,11 +104,11 @@ export const ModeSelectScreen = ({
       const audio = new Audio(audioUrl);
       audio.play();
       setAudioList((prev) => [...prev, audioUrl]);
-      setChartStart(true);
+      setChatMode(true);
     }
   };
 
-  const DifficultyStars = ({ level }) => {
+  const DifficultyStars = ({ level }: { level: number }) => {
     return (
       <div className="flex gap-1">
         {[1, 2, 3].map((star) => (

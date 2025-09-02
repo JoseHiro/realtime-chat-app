@@ -26,11 +26,19 @@ import { PaymentPromotionContent } from "../component/ui/PaymentPromotionContent
 // chat list sidebar
 // pricing
 
+// authenticate return to login page []
+// payment for trial account[]
+// cancel message input after chat is completed[x]
+// generate original chat title after finishing chat[]
+// reading for the kanji[]
+// not enough chat data and won't get the summary[]
+
 export const Chat = () => {
   const { selectedPoliteness, selectedLevel, checkGrammarMode, chatId } =
     useSpeech();
   const [audioList, setAudioList] = useState<string[]>([]);
-  const [chatStart, setChartStart] = useState<boolean>(false);
+  const [chatMode, setChatMode] = useState<boolean>(false);
+  const [chatEnded, setChatEnded] = useState<boolean>(false);
   const [overlayOpened, setOverlayOpened] = useState<boolean>(false);
   const [summary, setSummary] = useState<SummaryData | null>(null);
   const [summaryOpened, setSummaryOpened] = useState<boolean>(false);
@@ -66,25 +74,10 @@ export const Chat = () => {
     }
   }, [error]);
 
-  // console.log(paymentOverlay);
-
-  const handleSetReading = async (text: string) => {
-    const response = await fetch("/api/kuromoji", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text }),
-    });
-
-    const data = await response.json();
-    setHiraganaReadingList((prev) => [...prev, data.hiragana]);
-  };
-
   // Send messages to the API and get the response and audio
   const sendToAPI = async (messages: ChatType) => {
     setChatLoading(true);
-    console.log("chatis", chatId);
-
-    const res = await fetch("/api/generate-response", {
+    const res = await fetch("/api/chat/generate-response", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -101,7 +94,7 @@ export const Chat = () => {
 
     setChatLoading(false);
     setHistory((prev) => [...prev, { role: "assistant", content: data.reply }]);
-    handleSetReading(data.reply);
+    setHiraganaReadingList((prev) => [...prev, data.reading]);
 
     if (data.audio) {
       const audioBuffer = Uint8Array.from(atob(data.audio), (c) =>
@@ -117,6 +110,7 @@ export const Chat = () => {
 
   // Create a summary of the conversation history
   const handleCreateSummary = async () => {
+    setChatEnded(true);
     try {
       const res = await fetch("/api/generate-summary", {
         method: "POST",
@@ -126,7 +120,6 @@ export const Chat = () => {
 
       const data = await res.json();
       setSummary(data);
-      // setChatId(null);
     } catch (error) {
       console.error("Error creating summary:", error);
     }
@@ -137,17 +130,14 @@ export const Chat = () => {
       {/* サイドバー */}
       <Sidebar />
 
-      {!chatStart ? (
+      {!chatMode ? (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-green-50 overflow-auto w-full">
           <ModeSelectScreen
             setHistory={setHistory}
             setAudioList={setAudioList}
-            setChartStart={setChartStart}
-            handleSetReading={handleSetReading}
+            setChatMode={setChatMode}
+            setHiraganaReadingList={setHiraganaReadingList}
           />
-          {paymentOverlay && (
-            <h1 className="text-red-500">Hellllllllllooooo</h1>
-          )}
         </div>
       ) : (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-green-50 w-full flex flex-col justify-between">
@@ -161,9 +151,15 @@ export const Chat = () => {
             audioList={audioList}
             chatLoading={chatLoading}
             hiraganaReadingList={hiraganaReadingList}
-            handleSetReading={handleSetReading}
           />
-          <VoiceInput setHistory={setHistory} sendToAPI={sendToAPI} />
+          <VoiceInput
+            history={history}
+            setHistory={setHistory}
+            sendToAPI={sendToAPI}
+            chatEnded={chatEnded}
+            setHiraganaReadingList={setHiraganaReadingList}
+            // setChatEnded={setChatEnded}
+          />
         </div>
       )}
 

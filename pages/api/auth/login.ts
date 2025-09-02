@@ -31,7 +31,7 @@ export default async function handler(
     }
 
     const token = jwt.sign(
-      { id: user.id, email: user.email },
+      { userId: user.id },
       process.env.JWT_SECRET as string,
       { expiresIn: "1h" }
     );
@@ -50,7 +50,7 @@ export default async function handler(
 
     return res.status(200).json({
       message: "Login successful",
-      user: { id: user.id, email: user.email },
+      user: { id: user.id  },
     });
   } catch (error) {
     return res.status(200).json;

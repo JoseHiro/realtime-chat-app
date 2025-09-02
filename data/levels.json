@@ -1,34 +1,32 @@
-{
-  "levels": [
-    {
-      "id": "easy",
-      "label": "Easy",
-      "description": "Basic vocabulary and simple sentences",
-      "color": "from-green-300 to-green-400",
-      "icon": "Leaf",
-      "difficulty": 1,
-      "japaneseLevel": "初級",
-      "examples": ["こんにちは", "ありがとう", "すみません"]
-    },
-    {
-      "id": "medium",
-      "label": "Medium",
-      "description": "Everyday conversations and expressions",
-      "color": "from-green-400 to-green-500",
-      "icon": "TreePine",
-      "difficulty": 2,
-      "japaneseLevel": "中級",
-      "examples": ["買い物", "レストラン", "趣味の話"]
-    },
-    {
-      "id": "hard",
-      "label": "Hard",
-      "description": "Complex topics and advanced grammar",
-      "color": "from-green-500 to-green-600",
-      "icon": "Mountain",
-      "difficulty": 3,
-      "japaneseLevel": "上級",
-      "examples": ["ビジネス", "政治", "文化論"]
-    }
-  ]
-}
+[
+  {
+    "id": "easy",
+    "label": "Easy",
+    "description": "Basic vocabulary and simple sentences",
+    "color": "from-green-300 to-green-400",
+    "icon": "Leaf",
+    "difficulty": 1,
+    "japaneseLevel": "初級",
+    "examples": ["こんにちは", "ありがとう", "すみません"]
+  },
+  {
+    "id": "medium",
+    "label": "Medium",
+    "description": "Everyday conversations and expressions",
+    "color": "from-green-400 to-green-500",
+    "icon": "TreePine",
+    "difficulty": 2,
+    "japaneseLevel": "中級",
+    "examples": ["買い物", "レストラン", "趣味の話"]
+  },
+  {
+    "id": "hard",
+    "label": "Hard",
+    "description": "Complex topics and advanced grammar",
+    "color": "from-green-500 to-green-600",
+    "icon": "Mountain",
+    "difficulty": 3,
+    "japaneseLevel": "上級",
+    "examples": ["ビジネス", "政治", "文化論"]
+  }
+]

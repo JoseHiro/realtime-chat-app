@@ -14,6 +14,8 @@ import { ChatDataType } from "../../type/types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const Sidebar = () => {
+  // console.log(setChatMode, setChatEnded);
+
   const router = useRouter();
   const menuRef = useRef<HTMLDivElement>(null);
   const [isMuted, setIsMuted] = useState(false);
@@ -71,6 +73,12 @@ export const Sidebar = () => {
     queryClient.invalidateQueries({ queryKey: ["chats"] });
   };
 
+  const handleGoToSelectMode = () => {
+    // setChatMode(false);
+    // setChatEnded(false);
+    router.push("/chat");
+  };
+
   return (
     <div className="hidden lg:flex w-80 border-r h-full border-gray-200 shadow-sm bg-white/15 backdrop-blur-xl">
       <div className="flex flex-col w-full p-6">
@@ -82,7 +90,7 @@ export const Sidebar = () => {
         </div>
 
         <button
-          onClick={() => router.push("/chat")}
+          onClick={() => handleGoToSelectMode()}
           className=" cursor-pointer flex items-center gap-3 p-4 rounded-xl bg-green-500 text-white mb-4 hover:bg-green-600 transition-all duration-200 shadow-sm"
         >
           <Plus className="w-5 h-5" />
