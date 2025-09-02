@@ -24,7 +24,7 @@ export const Header = ({
   setOverlayOpened: (open: boolean) => void;
   handleCreateSummary: () => void;
 }) => {
-  const [timeLeft, setTimeLeft] = useState(1 * 60);
+  const [timeLeft, setTimeLeft] = useState(1 * 30);
   const [isActive, setIsActive] = useState(true);
 
   const { selectedPoliteness, selectedLevel, selectedTheme, customTheme } =

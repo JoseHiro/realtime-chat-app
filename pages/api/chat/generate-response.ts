@@ -1,8 +1,8 @@
 // Generate response for a chat application using OpenAI and Azure TTS
 import type { NextApiRequest, NextApiResponse } from "next";
 import { OpenAI } from "openai";
-import { logUsage } from "../../lib/loggingData/logger";
-import { saveMessage } from "../../lib/message/messageService";
+import { logUsage } from "../../../lib/loggingData/logger";
+import { saveMessage } from "../../../lib/message/messageService";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 const speechKey = process.env.AZURE_API_KEY || "";
@@ -20,9 +20,6 @@ export default async function handler(
   try {
     const { messages, politeness, level, history, checkGrammarMode, chatId } =
       req.body;
-
-    console.log("chat Id", chatId);
-    console.log("last chat", messages[messages.length - 1].content);
 
     saveMessage(chatId, "user", messages[messages.length - 1].content);
     const formality =
@@ -61,7 +58,8 @@ export default async function handler(
     });
 
     const reply = completion.choices[0].message?.content ?? "";
-    saveMessage(chatId, "assistant", reply);
+    const reading = await addReading(reply);
+    saveMessage(chatId, "assistant", reply, reading);
 
     // 2. Azure TTS用アクセストークン取得
     const tokenUrl = `https://${serviceRegion}.api.cognitive.microsoft.com/sts/v1.0/issuetoken`;
@@ -112,6 +110,7 @@ export default async function handler(
     res.status(200).json({
       reply: reply,
       audio: audioBuffer.toString("base64"), // フロントでは base64 を再生用に変換
+      reading: reading,
     });
 
     const usage = completion.usage; // open ai usage
@@ -142,3 +141,27 @@ export default async function handler(
     res.status(500).json({ error: "Failed to process request" });
   }
 }
+
+// Add reading japanese since some might have kanji
+const addReading = async (text: string) => {
+  const prompt = `以下の文章の漢字をひらがなに変換してください。
+- 元々ひらがな・カタカナの部分はそのまま残す
+- ローマ字に変換しない
+- 句読点などはそのまま残す
+- 出力は文章全体をひらがなで返す
+例: "ラーメン、美味しいよね！好きなラーメンの種類はある？"
+→ "ラーメン、おいしいよね！すきならーめんのしゅるいはある？"
+;`;
+
+  const completion = await openai.chat.completions.create({
+    model: "gpt-4o-mini",
+    messages: [
+      { role: "system", content: prompt },
+      { role: "user", content: text },
+    ],
+  });
+  const reading = completion.choices[0]?.message?.content ?? "";
+  console.log("reading", reading);
+
+  return reading;
+};

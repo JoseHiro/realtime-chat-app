@@ -31,7 +31,7 @@ const Login = () => {
 
     const result = await response.json();
     router.push("/chat");
-    console.log(result);
+    // console.log(result);
   };
 
   return (

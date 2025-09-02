@@ -5,13 +5,15 @@ const prisma = new PrismaClient();
 export const saveMessage = async (
   chatId: number,
   sender: string,
-  message: string
+  message: string,
+  reading?: string
 ) => {
   return await prisma.message.create({
     data: {
       chatId,
       sender,
       message,
+      reading: reading || "",
     },
   });
 };

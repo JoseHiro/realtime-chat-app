@@ -48,5 +48,6 @@ model Message {
   chatId    Int
   sender    String
   message   String
+  reading  String?
   createdAt DateTime @default(now())
 }

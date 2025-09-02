@@ -13,8 +13,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const token = req.cookies.access_token;
     const decodedToken = verifyAuth(token);
-    console.log("token:", decodedToken.userId);
-
     const user = await prisma.user.findUnique({
       where: { id: decodedToken.userId },
       include: {
