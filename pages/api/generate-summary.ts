@@ -97,7 +97,6 @@ JSONのキー:
 
     const usage = completion.usage; // open ai usage
     const openaiCost = (usage.total_tokens / 1000) * 0.015;
-    console.log("Open AI usage", usage);
 
     logUsage({
       timestamp: new Date().toISOString(),

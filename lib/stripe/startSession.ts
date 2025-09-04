@@ -4,14 +4,7 @@ import { loadStripe } from "@stripe/stripe-js";
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_TEST_NEXT_PUBLIC_STRIPE_KEY!
 );
-export const startStripeSession = async (userId: string) => {
-  console.log(
-    process.env.NEXT_TEST_STRIPE_PRICE_ID_KEY,
-    process.env.NEXT_PUBLIC_TEST_STRIPE_PRICE_ID_KEY
-  );
-
-  console.log(userId);
-
+export const startStripeSession = async () => {
   try {
     // Call your API to create checkout session
     const response = await fetch("/api/stripe/session", {
@@ -20,14 +13,12 @@ export const startStripeSession = async (userId: string) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        priceId: process.env.NEXT_PUBLIC_TEST_STRIPE_PRICE_ID_KEY, // Replace with your actual Stripe Price ID
+        priceId: process.env.NEXT_PUBLIC_TEST_STRIPE_PRICE_ID_KEY,
         quantity: 1,
-        userId: userId,
       }),
     });
 
     const { sessionId } = await response.json();
-    console.log(sessionId);
 
     // Redirect to Stripe Checkout
     const stripe = await stripePromise;

@@ -18,7 +18,6 @@ export const Messages = ({
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [currentPlayingId, setCurrentPlayingId] = useState<number | null>(null);
   const [displayMode, setDisplayMode] = useState<"audio" | "text">("audio");
-  console.log(hiraganaReadingList);
 
   // Auto-scroll when new messages arrive
   useEffect(() => {

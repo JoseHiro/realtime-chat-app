@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Mic, Square } from "lucide-react";
 import { ChatType } from "../../type/types";
-
+import { useSpeech } from "../../context/SpeechContext";
 // Type declarations for SpeechRecognition
 declare global {
   interface Window {
@@ -18,19 +18,18 @@ export const VoiceInput = ({
   setHistory,
   sendToAPI,
   history,
-  chatEnded,
   setHiraganaReadingList,
 }: {
   setHistory: React.Dispatch<React.SetStateAction<ChatType>>;
   sendToAPI: (text: ChatType) => Promise<void>;
   history: ChatType;
-  chatEnded: boolean;
   setHiraganaReadingList: React.Dispatch<React.SetStateAction<string[]>>;
 }) => {
+
   const [isRecording, setIsRecording] = useState(false);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const [isAITalking] = useState(false);
-
+  const { chatEnded } = useSpeech();
   useEffect(() => {
     const SpeechRecognition =
       window.SpeechRecognition || window.webkitSpeechRecognition;

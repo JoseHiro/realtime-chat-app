@@ -3,9 +3,9 @@ import { OpenAI } from "openai";
 import { logUsage } from "../../../lib/loggingData/logger";
 import { verifyAuth } from "../../../middleware/middleware";
 import { PrismaClient } from "@prisma/client";
+import { decode } from "punycode";
 
 const prisma = new PrismaClient();
-
 const speechKey = process.env.AZURE_API_KEY || "";
 const serviceRegion = process.env.AZURE_SERVICE_REGION;
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
@@ -18,16 +18,15 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   const token = req.cookies.access_token;
   const decodedToken = verifyAuth(token);
   if (!decodedToken) {
-    return res.status(400).json({ error: "Not authenticated" });
+    return res.status(401).json({ error: "Not authenticated" });
   }
-  const { level, theme, politeness } = req.body;
 
+  const { level, theme, politeness } = req.body;
   if (!level || !theme) {
     return res.status(400).json({ error: "Text is required" });
   }
 
   const prompt = `あなたは日本語会話の練習相手です。以下の条件で会話を始めてください。
-
 - 学習者のレベル: ${level}
 - テーマ: ${theme}
 - 会話の丁寧さ ${politeness}
@@ -66,10 +65,10 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       model: "gpt-4o-mini",
       messages: [{ role: "system", content: prompt }],
     });
+
     const raw = completion.choices[0]?.message?.content ?? "";
     const reply = raw.replace(/^\d+\.\s*/, "").trim();
     const reading = await addReading(reply);
-
     const tokenUrl = `https://${serviceRegion}.api.cognitive.microsoft.com/sts/v1.0/issuetoken`;
     const tokenResponse = await fetch(tokenUrl, {
       method: "POST",
@@ -141,7 +140,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     });
 
     // chat message store in DB
-    const message = await prisma.message.create({
+    await prisma.message.create({
       data: {
         chatId: chat.id,
         sender: "assistant",
@@ -149,6 +148,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         reading: reading,
       },
     });
+    increaseChatCount(decodedToken.userId);
 
     res.setHeader("Content-Type", "application/json");
     res.status(200).json({
@@ -177,4 +177,28 @@ const addReading = async (text: string) => {
   });
   const reading = completion.choices[0]?.message?.content ?? "";
   return reading;
+};
+
+export const increaseChatCount = async (userId: string) => {
+  console.log("userId", userId);
+  console.log("---------");
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+  });
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  // trial ユーザーだけ増やす
+  if (user.subscriptionStatus === "trialing") {
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        trialUsedChats: { increment: 1 }, // race condition 対策
+      },
+    });
+  }
+  console.log(user);
 };

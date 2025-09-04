@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { verifyAuth } from "../../middleware/middleware";
 import { PrismaClient } from "@prisma/client";
+
 const prisma = new PrismaClient();
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
@@ -10,8 +11,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
   const token = req.cookies.access_token;
   const decodedToken = verifyAuth(token);
+
   if (!decodedToken) {
-    return res.status(400).json({ error: "Not authenticated" });
+    return res.status(401).json({ error: "Not authenticated" });
   }
 
   try {
@@ -19,27 +21,22 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       where: { id: decodedToken.userId },
     });
     if (!user) return res.status(404).json({ error: "User not found" });
-
+    console.log(user);
     if (user.subscriptionStatus === "trialing") {
       const now = new Date();
-      console.log(now);
+      console.log(user.trialEndsAt && now > user.trialEndsAt);
 
       if (user.trialEndsAt && now > user.trialEndsAt) {
         return res
           .status(403)
           .json({ error: "Trial period ended. Please subscribe." });
       }
+
       if ((user.trialUsedChats ?? 0) >= 2) {
         return res
           .status(403)
           .json({ error: "Trial limit reached. Please subscribe." });
       }
-
-      // チャット回数をカウント
-      // await prisma.user.update({
-      //   where: { id: user.id },
-      //   data: { trialUsedChats: (user.trialUsedChats ?? 0) + 1 },
-      // });
     }
     return res.status(200).json({ message: "" });
   } catch (error) {
