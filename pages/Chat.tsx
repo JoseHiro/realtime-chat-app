@@ -30,15 +30,22 @@ import { PaymentPromotionContent } from "../component/ui/PaymentPromotionContent
 // payment for trial account[]
 // cancel message input after chat is completed[x]
 // generate original chat title after finishing chat[]
-// reading for the kanji[]
+// reading for the kanji[x]
 // not enough chat data and won't get the summary[]
+// loading starting chat
+// display username in the conversation
 
 export const Chat = () => {
-  const { selectedPoliteness, selectedLevel, checkGrammarMode, chatId } =
-    useSpeech();
+  const {
+    selectedPoliteness,
+    selectedLevel,
+    checkGrammarMode,
+    chatId,
+    chatMode,
+    setChatEnded,
+  } = useSpeech();
+
   const [audioList, setAudioList] = useState<string[]>([]);
-  const [chatMode, setChatMode] = useState<boolean>(false);
-  const [chatEnded, setChatEnded] = useState<boolean>(false);
   const [overlayOpened, setOverlayOpened] = useState<boolean>(false);
   const [summary, setSummary] = useState<SummaryData | null>(null);
   const [summaryOpened, setSummaryOpened] = useState<boolean>(false);
@@ -135,8 +142,13 @@ export const Chat = () => {
           <ModeSelectScreen
             setHistory={setHistory}
             setAudioList={setAudioList}
-            setChatMode={setChatMode}
             setHiraganaReadingList={setHiraganaReadingList}
+            setPaymentOverlay={setPaymentOverlay}
+            trialError={
+              !!error &&
+              (error.message.includes("Trial period ended") ||
+                error.message.includes("Trial limit reached"))
+            }
           />
         </div>
       ) : (
@@ -156,9 +168,7 @@ export const Chat = () => {
             history={history}
             setHistory={setHistory}
             sendToAPI={sendToAPI}
-            chatEnded={chatEnded}
             setHiraganaReadingList={setHiraganaReadingList}
-            // setChatEnded={setChatEnded}
           />
         </div>
       )}

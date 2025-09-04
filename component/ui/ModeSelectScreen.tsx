@@ -23,18 +23,21 @@ import levels from "../../data/levels.json";
 import corrections from "../../data/corrections.json";
 import themes from "../../data/themes.json";
 import politenesses from "../../data/politenesses.json";
+import { RoundedButton } from "../button";
+import { BlockUseOverlay } from "../overlay";
 
 export const ModeSelectScreen = ({
   setHistory,
   setAudioList,
-  setChatMode,
   setHiraganaReadingList,
+  setPaymentOverlay,
+  trialError,
 }: {
   setHistory: React.Dispatch<React.SetStateAction<ChatType>>;
   setAudioList: React.Dispatch<React.SetStateAction<string[]>>;
-  setChatMode: (start: boolean) => void;
   setHiraganaReadingList: React.Dispatch<React.SetStateAction<string[]>>;
-  // handleSetReading: any;
+  setPaymentOverlay: React.Dispatch<React.SetStateAction<boolean>>;
+  trialError: boolean;
 }) => {
   const {
     selectedPoliteness,
@@ -48,6 +51,7 @@ export const ModeSelectScreen = ({
     checkGrammarMode,
     setCheckGrammarMode,
     setChatId,
+    setChatMode,
   } = useSpeech();
 
   const iconMap: Record<string, React.ElementType> = {
@@ -74,37 +78,44 @@ export const ModeSelectScreen = ({
 
   // Start the chat
   const handleBeginConversation = async () => {
-    if (isStarting) return;
-    setIsStarting(true);
+    // if trial is ended overlay
+    if (trialError) {
+      setPaymentOverlay(true);
+    } else {
+      if (isStarting) return;
+      setIsStarting(true);
 
-    const res = await fetch("/api/chat/start-chat", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        level: selectedLevel,
-        theme: selectedTheme || customTheme.trim(),
-        politeness: selectedPoliteness || "polite",
-      }),
-    });
+      const res = await fetch("/api/chat/start-chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          level: selectedLevel,
+          theme: selectedTheme || customTheme.trim(),
+          politeness: selectedPoliteness || "polite",
+        }),
+      });
 
-    const data = await res.json();
-    setHistory((prev) => [...prev, { role: "assistant", content: data.reply }]);
-    setChatId(Number(data.chatId));
-    setHiraganaReadingList((prev) => [...prev, data.reading]);
-    // handleSetReading(data.reply);
+      const data = await res.json();
+      setHistory((prev) => [
+        ...prev,
+        { role: "assistant", content: data.reply },
+      ]);
+      setChatId(Number(data.chatId));
+      setHiraganaReadingList((prev) => [...prev, data.reading]);
 
-    if (data.audio) {
-      const audioBuffer = Uint8Array.from(atob(data.audio), (c) =>
-        c.charCodeAt(0)
-      );
-      const blob = new Blob([audioBuffer], { type: "audio/mpeg" });
-      const audioUrl = URL.createObjectURL(blob);
-      const audio = new Audio(audioUrl);
-      audio.play();
-      setAudioList((prev) => [...prev, audioUrl]);
-      setChatMode(true);
+      if (data.audio) {
+        const audioBuffer = Uint8Array.from(atob(data.audio), (c) =>
+          c.charCodeAt(0)
+        );
+        const blob = new Blob([audioBuffer], { type: "audio/mpeg" });
+        const audioUrl = URL.createObjectURL(blob);
+        const audio = new Audio(audioUrl);
+        audio.play();
+        setAudioList((prev) => [...prev, audioUrl]);
+        setChatMode(true);
+      }
     }
   };
 
@@ -412,43 +423,6 @@ export const ModeSelectScreen = ({
                 />
               </div>
             </div>
-
-            {/* Custom Theme */}
-            {/* <div className="max-w-md mx-auto mt-6">
-              <SelectModeButton
-                onClick={() => {
-                  setSelectedTheme("");
-                  const input = document.getElementById("custom-theme");
-                  if (input) input.focus();
-                }}
-                className={`cursor-pointer w-full p-4 rounded-xl bg-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border-2 mb-4 ${
-                  customTheme.trim()
-                    ? "border-green-500 shadow-green-200"
-                    : "border-dashed border-gray-300 hover:border-green-300"
-                }`}
-              >
-                <div className="flex items-center justify-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
-                    <Plus className="w-5 h-5 text-gray-600" />
-                  </div>
-                  <span className="font-medium text-gray-700">
-                    Custom Theme
-                  </span>
-                </div>
-              </SelectModeButton>
-
-              <input
-                id="custom-theme"
-                type="text"
-                placeholder="Enter your own conversation topic..."
-                value={customTheme}
-                onChange={(e) => {
-                  setCustomTheme(e.target.value);
-                  setSelectedTheme("");
-                }}
-                className="text-black w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-500 focus:outline-none transition-colors duration-300 bg-white shadow-lg"
-              />
-            </div> */}
           </div>
 
           {/* fix grammar during conversation */}
@@ -497,7 +471,7 @@ export const ModeSelectScreen = ({
 
           {/* Start Button */}
           <div className="text-center">
-            <button
+            <RoundedButton
               disabled={!canProceed}
               onClick={() => handleBeginConversation()}
               className={`cursor-pointer inline-flex items-center gap-2 px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform ${
@@ -508,13 +482,15 @@ export const ModeSelectScreen = ({
             >
               Start Conversation
               <ChevronRight className="w-5 h-5" />
-            </button>
+            </RoundedButton>
           </div>
         </div>
       </div>
+      {trialError && <BlockUseOverlay />}
     </div>
   );
 };
+
 
 type ButtonContentsProps = {
   color?: string;

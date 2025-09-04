@@ -1,4 +1,5 @@
 import React from "react";
+import { startStripeSession } from "../../lib/stripe/startSession";
 
 export const PaymentPromotionContent = ({
   onClose,
@@ -33,7 +34,7 @@ export const PaymentPromotionContent = ({
 
       {/* Message */}
       <p className="text-gray-600 mb-2 text-lg">
-       {"You've used all "}
+        {"You've used all "}
         <span className="font-semibold text-green-600">
           2 free conversations
         </span>
@@ -78,7 +79,7 @@ export const PaymentPromotionContent = ({
       {/* Action Buttons */}
       <div className="space-y-3">
         <button
-          // onClick={onUpgrade}
+          onClick={() => startStripeSession()}
           className="cursor-pointer w-full bg-green-400 hover:from-orange-600 hover:to-red-600 text-white font-bold py-4 px-6 rounded-lg transition-all duration-200 hover:scale-105 shadow-lg"
         >
           🇯🇵 Start Learning Now!

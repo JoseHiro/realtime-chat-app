@@ -19,16 +19,10 @@ const Signup = () => {
   } = useForm<SigninFormInputs>();
 
   const { plan } = router.query;
-
-  console.log(plan);
-  
-
   const onSubmit = async (data: SigninFormInputs) => {
     if (!plan) {
-      console.log("Plan is not set");
       return;
     }
-    console.log(data);
 
     // Here you can call your API to signin
     const response = await fetch("/api/auth/signup", {
@@ -43,12 +37,12 @@ const Signup = () => {
     });
 
     const result = await response.json();
-    const userId = result.userId;
+    // const userId = result.userId;
 
     if (plan === "trial") {
       router.push("/chat");
     } else {
-      startStripeSession(userId);
+      startStripeSession();
     }
 
     // router.push("/chat");

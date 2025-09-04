@@ -56,10 +56,7 @@ export default async function handler(
         maxAge: 60 * 60 * 24 * 7, // 7 days
       })
     );
-
-    // Return user data without password
-    const { password: _, ...userWithoutPassword } = user;
-    return res.status(201).json({ userId: user.id });
+    return res.status(201).json({ message: "successfully signed up" });
   } catch (error: any) {
     console.error(error);
     if (error.code === "P2002") {

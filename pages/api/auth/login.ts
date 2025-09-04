@@ -19,7 +19,6 @@ export default async function handler(
     }
 
     const user = await prisma.user.findUnique({ where: { email } });
-    console.log(user);
 
     if (!user) {
       return res.status(401).json({ message: "Invalid credentials" });

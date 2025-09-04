@@ -12,10 +12,10 @@ import {
 } from "lucide-react";
 import { ChatDataType } from "../../type/types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useSpeech } from "../../context/SpeechContext";
 
 export const Sidebar = () => {
-  // console.log(setChatMode, setChatEnded);
-
+  const { setChatMode, setChatEnded } = useSpeech();
   const router = useRouter();
   const menuRef = useRef<HTMLDivElement>(null);
   const [isMuted, setIsMuted] = useState(false);
@@ -67,15 +67,15 @@ export const Sidebar = () => {
       }),
     });
 
-    const result = await res.json();
+    // const result = await res.json();
 
     setActiveChat(null);
     queryClient.invalidateQueries({ queryKey: ["chats"] });
   };
 
   const handleGoToSelectMode = () => {
-    // setChatMode(false);
-    // setChatEnded(false);
+    setChatMode(false);
+    setChatEnded(false);
     router.push("/chat");
   };
 
