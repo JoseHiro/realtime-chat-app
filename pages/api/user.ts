@@ -19,26 +19,39 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const user = await prisma.user.findUnique({
       where: { id: decodedToken.userId },
+      select: {
+        username: true,
+        subscriptionStatus: true,
+        subscriptionPlan: true,
+        trialUsedChats: true,
+        trialEndsAt: true,
+        createdAt: true,
+      },
     });
     if (!user) return res.status(404).json({ error: "User not found" });
     console.log(user);
+
+    let trialStatus: "active" | "ended" | null = null;
     if (user.subscriptionStatus === "trialing") {
       const now = new Date();
-      console.log(user.trialEndsAt && now > user.trialEndsAt);
-
       if (user.trialEndsAt && now > user.trialEndsAt) {
-        return res
-          .status(403)
-          .json({ error: "Trial period ended. Please subscribe." });
-      }
-
-      if ((user.trialUsedChats ?? 0) >= 2) {
-        return res
-          .status(403)
-          .json({ error: "Trial limit reached. Please subscribe." });
+        trialStatus = "ended";
+      } else if ((user.trialUsedChats ?? 0) >= 2) {
+        trialStatus = "ended";
+      } else {
+        trialStatus = "active";
       }
     }
-    return res.status(200).json({ message: "" });
+
+    return res.status(200).json({
+      user: {
+        username: user.username,
+        subscriptionStatus: user.subscriptionStatus,
+        subscriptionPlan: user.subscriptionPlan,
+        createdAt: user.createdAt,
+      },
+      trialStatus,
+    });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: "Something went wrong" });

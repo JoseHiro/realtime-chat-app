@@ -3,7 +3,6 @@ import { OpenAI } from "openai";
 import { logUsage } from "../../../lib/loggingData/logger";
 import { verifyAuth } from "../../../middleware/middleware";
 import { PrismaClient } from "@prisma/client";
-import { decode } from "punycode";
 
 const prisma = new PrismaClient();
 const speechKey = process.env.AZURE_API_KEY || "";

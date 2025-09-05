@@ -9,7 +9,7 @@ const Pricing = () => {
     {
       name: "Free Trial",
       type: "trial",
-      description: "Try Kaiwa AI with 2 free conversation sessions",
+      description: "Try Kaiwa Kun with 2 free conversation sessions",
       price: 0,
       features: [
         "2 conversation sessions",
@@ -84,7 +84,7 @@ const Pricing = () => {
     {
       question: "How does the free trial work?",
       answer:
-        "You get 2 complete conversation sessions to experience Kaiwa AI. No credit card required to start your trial.",
+        "You get 2 complete conversation sessions to experience Kaiwa Kun. No credit card required to start your trial.",
     },
     {
       question: "Can I cancel my subscription anytime?",
@@ -468,7 +468,7 @@ const Pricing = () => {
                 <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-green-600 rounded-lg flex items-center justify-center">
                   <span className="text-white font-bold text-sm">日</span>
                 </div>
-                <span className="text-xl font-bold">Kaiwa AI</span>
+                <span className="text-xl font-bold">Kaiwa Kun</span>
               </div>
               <p className="text-gray-400 mb-6 max-w-md">
                 The most natural way to learn Japanese through AI-powered
@@ -538,7 +538,7 @@ const Pricing = () => {
           </div>
 
           <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
-            <p>&copy; 2025 Kaiwa AI. All rights reserved.</p>
+            <p>&copy; 2025 Kaiwa Kun. All rights reserved.</p>
           </div>
         </div>
       </footer>

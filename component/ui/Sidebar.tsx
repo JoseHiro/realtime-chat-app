@@ -3,7 +3,6 @@ import { useRouter } from "next/router";
 import {
   Volume2,
   VolumeX,
-  Sparkles,
   Plus,
   Settings,
   Edit2,
@@ -14,6 +13,7 @@ import { ChatDataType } from "../../type/types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSpeech } from "../../context/SpeechContext";
 import { apiRequest } from "../../lib/apiRequest";
+import { SidebarAppName } from "./AppName";
 
 export const Sidebar = () => {
   const { setChatMode, setChatEnded, setChatId } = useSpeech();
@@ -87,12 +87,7 @@ export const Sidebar = () => {
   return (
     <div className="hidden lg:flex w-80 border-r h-full border-gray-200 shadow-sm bg-white/15 backdrop-blur-xl">
       <div className="flex flex-col w-full p-6">
-        <div className="flex items-center gap-3 mb-8">
-          <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
-            <Sparkles className="w-5 h-5 text-white" />
-          </div>
-          <h1 className="text-xl font-bold text-gray-900">Kaiwa Kun</h1>
-        </div>
+        <SidebarAppName />
 
         <button
           onClick={() => handleGoToSelectMode()}
