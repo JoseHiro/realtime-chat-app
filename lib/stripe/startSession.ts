@@ -1,4 +1,5 @@
 import { loadStripe } from "@stripe/stripe-js";
+import { apiRequest } from "../apiRequest";
 
 // Initialize Stripe (you'll need your publishable key)
 const stripePromise = loadStripe(
@@ -7,7 +8,7 @@ const stripePromise = loadStripe(
 export const startStripeSession = async () => {
   try {
     // Call your API to create checkout session
-    const response = await fetch("/api/stripe/session", {
+    const response = await apiRequest("/api/stripe/session", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

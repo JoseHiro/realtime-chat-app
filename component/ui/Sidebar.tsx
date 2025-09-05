@@ -13,9 +13,10 @@ import {
 import { ChatDataType } from "../../type/types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSpeech } from "../../context/SpeechContext";
+import { apiRequest } from "../../lib/apiRequest";
 
 export const Sidebar = () => {
-  const { setChatMode, setChatEnded } = useSpeech();
+  const { setChatMode, setChatEnded, setChatId } = useSpeech();
   const router = useRouter();
   const menuRef = useRef<HTMLDivElement>(null);
   const [isMuted, setIsMuted] = useState(false);
@@ -44,9 +45,9 @@ export const Sidebar = () => {
   const { data, isLoading, error } = useQuery({
     queryKey: ["chats"],
     queryFn: async () => {
-      const res = await fetch("/api/chats/get");
-      if (!res.ok) throw new Error("Failed to fetch chats");
-      return res.json();
+      const data = await apiRequest("/api/chats/get");
+      if (!data) throw new Error("Failed to fetch chats");
+      return data;
     },
   });
 
@@ -59,23 +60,27 @@ export const Sidebar = () => {
 
   const handleDeleteChat = async (id: number) => {
     if (id === null) return;
-    const res = await fetch("/api/chat/delete", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        id,
-      }),
-    });
 
-    // const result = await res.json();
+    try {
+      await apiRequest("/api/chat/delete", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id,
+        }),
+      });
 
-    setActiveChat(null);
-    queryClient.invalidateQueries({ queryKey: ["chats"] });
+      setActiveChat(null);
+      queryClient.invalidateQueries({ queryKey: ["chats"] });
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const handleGoToSelectMode = () => {
     setChatMode(false);
     setChatEnded(false);
+    setChatId(null);
     router.push("/chat");
   };
 

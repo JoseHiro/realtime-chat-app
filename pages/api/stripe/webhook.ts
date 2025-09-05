@@ -52,7 +52,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             stripeCustomerId: session.customer as string,
             stripeSubscriptionId: session.subscription as string | null,
             subscriptionStatus: "active",
-            // subscriptionPlan: "pro", // or infer from your product/price ID
+            subscriptionPlan: "pro", // or infer from your product/price ID
           },
         });
 

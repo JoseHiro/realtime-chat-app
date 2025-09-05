@@ -25,6 +25,7 @@ import themes from "../../data/themes.json";
 import politenesses from "../../data/politenesses.json";
 import { RoundedButton } from "../button";
 import { BlockUseOverlay } from "../overlay";
+import { apiRequest } from "../../lib/apiRequest";
 
 export const ModeSelectScreen = ({
   setHistory,
@@ -85,7 +86,7 @@ export const ModeSelectScreen = ({
       if (isStarting) return;
       setIsStarting(true);
 
-      const res = await fetch("/api/chat/start-chat", {
+      const data = await apiRequest("/api/chat/start-chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -97,7 +98,6 @@ export const ModeSelectScreen = ({
         }),
       });
 
-      const data = await res.json();
       setHistory((prev) => [
         ...prev,
         { role: "assistant", content: data.reply },
@@ -490,7 +490,6 @@ export const ModeSelectScreen = ({
     </div>
   );
 };
-
 
 type ButtonContentsProps = {
   color?: string;
