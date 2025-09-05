@@ -36,7 +36,7 @@ const Signup = () => {
       headers: { "Content-Type": "application/json" },
     });
 
-    const result = await response.json();
+    // const result = await response.json();
     // const userId = result.userId;
 
     if (plan === "trial") {

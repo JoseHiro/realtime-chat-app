@@ -11,6 +11,7 @@ import { Clock } from "lucide-react";
 import { SummaryData, ChatType } from "../type/types";
 import { useQuery } from "@tanstack/react-query";
 import { PaymentPromotionContent } from "../component/ui/PaymentPromotionContent";
+import { apiRequest } from "../lib/apiRequest";
 
 // notes : common mistakes, tendencies,
 // vocabulary, natural word selection,
@@ -27,13 +28,15 @@ import { PaymentPromotionContent } from "../component/ui/PaymentPromotionContent
 // pricing
 
 // authenticate return to login page []
-// payment for trial account[]
+// payment for trial account, after payment activate[x]
 // cancel message input after chat is completed[x]
 // generate original chat title after finishing chat[]
 // reading for the kanji[x]
 // not enough chat data and won't get the summary[]
 // loading starting chat
 // display username in the conversation
+// english reading
+// popup message
 
 export const Chat = () => {
   const {
@@ -43,6 +46,7 @@ export const Chat = () => {
     chatId,
     chatMode,
     setChatEnded,
+    setChatId,
   } = useSpeech();
 
   const [audioList, setAudioList] = useState<string[]>([]);
@@ -84,51 +88,60 @@ export const Chat = () => {
   // Send messages to the API and get the response and audio
   const sendToAPI = async (messages: ChatType) => {
     setChatLoading(true);
-    const res = await fetch("/api/chat/generate-response", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        messages,
-        politeness: selectedPoliteness,
-        level: selectedLevel,
-        history,
-        checkGrammarMode,
-        chatId,
-      }),
-    });
 
-    const data = await res.json();
+    try {
+      const data = await apiRequest("/api/chat/generate-response", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages,
+          politeness: selectedPoliteness,
+          level: selectedLevel,
+          history,
+          checkGrammarMode,
+          chatId,
+        }),
+      });
 
-    setChatLoading(false);
-    setHistory((prev) => [...prev, { role: "assistant", content: data.reply }]);
-    setHiraganaReadingList((prev) => [...prev, data.reading]);
+      setChatLoading(false);
+      setHistory((prev) => [
+        ...prev,
+        { role: "assistant", content: data.reply },
+      ]);
+      setHiraganaReadingList((prev) => [...prev, data.reading]);
 
-    if (data.audio) {
-      const audioBuffer = Uint8Array.from(atob(data.audio), (c) =>
-        c.charCodeAt(0)
-      );
-      const blob = new Blob([audioBuffer], { type: "audio/mpeg" });
-      const audioUrl = URL.createObjectURL(blob);
-      const audio = new Audio(audioUrl);
-      audio.play();
-      setAudioList((prev) => [...prev, audioUrl]);
+      if (data.audio) {
+        const audioBuffer = Uint8Array.from(atob(data.audio), (c) =>
+          c.charCodeAt(0)
+        );
+        const blob = new Blob([audioBuffer], { type: "audio/mpeg" });
+        const audioUrl = URL.createObjectURL(blob);
+        const audio = new Audio(audioUrl);
+        audio.play();
+        setAudioList((prev) => [...prev, audioUrl]);
+      }
+    } catch (error) {
+      console.error("sendToAPI error:", error);
+    } finally {
+      setChatLoading(false);
     }
   };
 
   // Create a summary of the conversation history
   const handleCreateSummary = async () => {
-    setChatEnded(true);
     try {
-      const res = await fetch("/api/generate-summary", {
+      const data = await apiRequest("/api/generate-summary", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ history: history, chatId }),
       });
 
-      const data = await res.json();
       setSummary(data);
     } catch (error) {
       console.error("Error creating summary:", error);
+    } finally {
+      setChatEnded(true);
+      setChatId(null);
     }
   };
 

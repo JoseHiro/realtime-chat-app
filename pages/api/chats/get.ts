@@ -8,6 +8,11 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
+  const token = req.cookies.access_token;
+  const decodedToken = verifyAuth(token);
+  if (!decodedToken) {
+    return res.status(401).json({ error: "Not authenticated" });
+  }
   // if not userId
 
   try {

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/router";
 import { useQuery } from "@tanstack/react-query";
+import { RoundedButton } from "../component/button";
 
 const PaymentSuccess = () => {
   const router = useRouter();
@@ -125,7 +126,7 @@ const PaymentSuccess = () => {
               ? "Verification Failed"
               : payment?.subscriptionStatus !== "active"
               ? "Setting Up Account..."
-              : "🎉 Welcome to Kaiwa AI!"}
+              : "🎉 Welcome to Kaiwa Kun!"}
           </h1>
 
           {/* Dynamic Description */}
@@ -185,7 +186,7 @@ const PaymentSuccess = () => {
           )}
 
           {/* Action Button - Always show but change behavior */}
-          <button
+          <RoundedButton
             onClick={error ? () => window.location.reload() : handleStartNow}
             disabled={
               isRedirecting ||
@@ -205,7 +206,7 @@ const PaymentSuccess = () => {
             ) : (
               "Start Learning Japanese Now! 🇯🇵"
             )}
-          </button>
+          </RoundedButton>
 
           {/* Dynamic Footer Message */}
         </div>

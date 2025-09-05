@@ -12,11 +12,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   const token = req.cookies.access_token;
   const decodedToken = verifyAuth(token);
   if (!decodedToken) {
-    return res.status(400).json({ error: "Not authenticated" });
+    return res.status(401).json({ error: "Not authenticated" });
   }
   const { id } = req.body;
-
-  console.log(id);
 
   if (!id) {
     return res.status(400).json({ error: "No data provided" });
