@@ -18,6 +18,10 @@ interface SpeechContextType {
   setChatMode: React.Dispatch<React.SetStateAction<boolean>>;
   chatEnded: boolean;
   setChatEnded: React.Dispatch<React.SetStateAction<boolean>>;
+  username: string;
+  setUsername: React.Dispatch<React.SetStateAction<string>>;
+  subscriptionPlan: string;
+  setSubscriptionPlan: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const SpeechContext = createContext<SpeechContextType>({
@@ -37,6 +41,10 @@ const SpeechContext = createContext<SpeechContextType>({
   setChatMode: () => {},
   chatEnded: false,
   setChatEnded: () => {},
+  username: "",
+  setUsername: () => {},
+  subscriptionPlan: "",
+  setSubscriptionPlan: () => {},
 });
 
 export const SpeechProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -50,6 +58,8 @@ export const SpeechProvider: React.FC<{ children: React.ReactNode }> = ({
   const [chatId, setChatId] = useState<number | null>(null);
   const [chatMode, setChatMode] = useState<boolean>(false);
   const [chatEnded, setChatEnded] = useState<boolean>(false);
+  const [username, setUsername] = useState<string>("");
+  const [subscriptionPlan, setSubscriptionPlan] = useState<string>("");
 
   return (
     <SpeechContext.Provider
@@ -70,6 +80,10 @@ export const SpeechProvider: React.FC<{ children: React.ReactNode }> = ({
         setChatMode,
         chatEnded,
         setChatEnded,
+        username,
+        setUsername,
+        subscriptionPlan,
+        setSubscriptionPlan,
       }}
     >
       {children}

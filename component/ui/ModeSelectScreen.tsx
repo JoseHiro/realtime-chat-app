@@ -53,6 +53,8 @@ export const ModeSelectScreen = ({
     setCheckGrammarMode,
     setChatId,
     setChatMode,
+    username,
+    subscriptionPlan,
   } = useSpeech();
 
   const iconMap: Record<string, React.ElementType> = {
@@ -70,7 +72,7 @@ export const ModeSelectScreen = ({
     TreePine,
     Mountain,
   };
-  const [isStarting, setIsStarting] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const canProceed =
     selectedLevel &&
@@ -83,38 +85,44 @@ export const ModeSelectScreen = ({
     if (trialError) {
       setPaymentOverlay(true);
     } else {
-      if (isStarting) return;
-      setIsStarting(true);
+      if (loading) return; // prevent double click
+      setLoading(true);
 
-      const data = await apiRequest("/api/chat/start-chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          level: selectedLevel,
-          theme: selectedTheme || customTheme.trim(),
-          politeness: selectedPoliteness || "polite",
-        }),
-      });
+      try {
+        const data = await apiRequest("/api/chat/start-chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            level: selectedLevel,
+            theme: selectedTheme || customTheme.trim(),
+            politeness: selectedPoliteness || "polite",
+          }),
+        });
 
-      setHistory((prev) => [
-        ...prev,
-        { role: "assistant", content: data.reply },
-      ]);
-      setChatId(Number(data.chatId));
-      setHiraganaReadingList((prev) => [...prev, data.reading]);
+        setHistory((prev) => [
+          ...prev,
+          { role: "assistant", content: data.reply },
+        ]);
+        setChatId(Number(data.chatId));
+        setHiraganaReadingList((prev) => [...prev, data.reading]);
 
-      if (data.audio) {
-        const audioBuffer = Uint8Array.from(atob(data.audio), (c) =>
-          c.charCodeAt(0)
-        );
-        const blob = new Blob([audioBuffer], { type: "audio/mpeg" });
-        const audioUrl = URL.createObjectURL(blob);
-        const audio = new Audio(audioUrl);
-        audio.play();
-        setAudioList((prev) => [...prev, audioUrl]);
-        setChatMode(true);
+        if (data.audio) {
+          const audioBuffer = Uint8Array.from(atob(data.audio), (c) =>
+            c.charCodeAt(0)
+          );
+          const blob = new Blob([audioBuffer], { type: "audio/mpeg" });
+          const audioUrl = URL.createObjectURL(blob);
+          const audio = new Audio(audioUrl);
+          audio.play();
+          setAudioList((prev) => [...prev, audioUrl]);
+          setChatMode(true);
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
       }
     }
   };
@@ -141,7 +149,37 @@ export const ModeSelectScreen = ({
       <div className="min-h-screen p-4 overflow-auto w-full ">
         <div className="max-w-4xl mx-auto py-8">
           {/* Header */}
-          <div className="text-center mb-12">
+          <div className="text-center mb-12 relative">
+            <div className="absolute top-0 right-0 flex items-center gap-3 bg-white/95 backdrop-blur-sm rounded-full  px-4 py-2 shadow-sm">
+              {/* Avatar */}
+              <div
+                className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold ${
+                  subscriptionPlan === "pro"
+                    ? "bg-gradient-to-r from-yellow-400 to-orange-500"
+                    : "bg-gradient-to-r from-gray-400 to-gray-500"
+                }`}
+              >
+                {username?.charAt(0).toUpperCase()}
+              </div>
+
+              <div className="text-right">
+                <div className="text-sm font-medium text-gray-900">
+                  Hello {username}!
+                </div>
+                <div className="flex items-center gap-1 mt-0.5">
+                  <span
+                    className={`text-xs px-2 py-1 rounded-full font-medium ${
+                      subscriptionPlan === "pro"
+                        ? "bg-yellow-100 text-yellow-800"
+                        : "bg-gray-100 text-gray-600"
+                    }`}
+                  >
+                    {subscriptionPlan} plan
+                  </span>
+                </div>
+              </div>
+            </div>
+
             <div className="inline-flex items-center justify-center w-16 h-16 bg-green-500 rounded-full mb-4 shadow-lg shadow-green-200">
               <MessageCircle className="w-8 h-8 text-white" />
             </div>
@@ -473,6 +511,7 @@ export const ModeSelectScreen = ({
           <div className="text-center">
             <RoundedButton
               disabled={!canProceed}
+              loading={loading}
               onClick={() => handleBeginConversation()}
               className={`cursor-pointer inline-flex items-center gap-2 px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform ${
                 canProceed

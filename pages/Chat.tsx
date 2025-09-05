@@ -47,6 +47,8 @@ export const Chat = () => {
     chatMode,
     setChatEnded,
     setChatId,
+    setUsername,
+    setSubscriptionPlan,
   } = useSpeech();
 
   const [audioList, setAudioList] = useState<string[]>([]);
@@ -61,9 +63,9 @@ export const Chat = () => {
   const [paymentOverlay, setPaymentOverlay] = useState(false);
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ["trial"],
+    queryKey: ["user"],
     queryFn: async () => {
-      const response = await fetch("/api/trial");
+      const response = await fetch("/api/user");
       if (!response.ok) {
         const err = await response.json().catch(() => ({}));
         throw new Error(err.error || "Failed to fetch trial data");
@@ -74,16 +76,13 @@ export const Chat = () => {
   });
 
   useEffect(() => {
-    if (error) {
-      const err: any = error;
-      if (
-        err.message.includes("Trial period ended") ||
-        err.message.includes("Trial limit reached")
-      ) {
-        setPaymentOverlay(true);
-      }
+    if (data?.trialStatus === "ended") {
+      setPaymentOverlay(true);
     }
-  }, [error]);
+    setUsername(data?.user.username);
+    setSubscriptionPlan(data?.user.subscriptionPlan);
+  }, [data]);
+  console.log(data);
 
   // Send messages to the API and get the response and audio
   const sendToAPI = async (messages: ChatType) => {
@@ -157,11 +156,7 @@ export const Chat = () => {
             setAudioList={setAudioList}
             setHiraganaReadingList={setHiraganaReadingList}
             setPaymentOverlay={setPaymentOverlay}
-            trialError={
-              !!error &&
-              (error.message.includes("Trial period ended") ||
-                error.message.includes("Trial limit reached"))
-            }
+            trialError={false}
           />
         </div>
       ) : (

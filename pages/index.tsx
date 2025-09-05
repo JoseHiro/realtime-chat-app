@@ -300,7 +300,7 @@ const Index = () => {
             <h2 className="text-4xl font-bold mb-4">
               Why Choose{" "}
               <span className="bg-gradient-to-r from-green-500 to-green-600 bg-clip-text text-transparent">
-                Kaiwa AI?
+                Kaiwa Kun?
               </span>
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
@@ -448,7 +448,7 @@ const Index = () => {
                 <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-green-600 rounded-lg flex items-center justify-center">
                   <span className="text-white font-bold text-sm">日</span>
                 </div>
-                <span className="text-xl font-bold">Kaiwa AI</span>
+                <span className="text-xl font-bold">Kaiwa Kun</span>
               </div>
               <p className="text-gray-400 mb-6 max-w-md">
                 The most natural way to learn Japanese through AI-powered
@@ -550,7 +550,7 @@ const Index = () => {
           </div>
 
           <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
-            <p>&copy; 2025 Kaiwa AI. All rights reserved.</p>
+            <p>&copy; 2025 Kaiwa Kun. All rights reserved.</p>
           </div>
         </div>
       </footer>
