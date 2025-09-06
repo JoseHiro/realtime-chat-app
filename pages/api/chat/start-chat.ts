@@ -147,7 +147,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         reading: reading,
       },
     });
-    increaseChatCount(decodedToken.userId);
+    
 
     res.setHeader("Content-Type", "application/json");
     res.status(200).json({
@@ -176,28 +176,4 @@ const addReading = async (text: string) => {
   });
   const reading = completion.choices[0]?.message?.content ?? "";
   return reading;
-};
-
-export const increaseChatCount = async (userId: string) => {
-  console.log("userId", userId);
-  console.log("---------");
-
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-  });
-
-  if (!user) {
-    throw new Error("User not found");
-  }
-
-  // trial ユーザーだけ増やす
-  if (user.subscriptionStatus === "trialing") {
-    await prisma.user.update({
-      where: { id: userId },
-      data: {
-        trialUsedChats: { increment: 1 }, // race condition 対策
-      },
-    });
-  }
-  console.log(user);
 };

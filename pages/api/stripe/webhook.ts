@@ -55,8 +55,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             subscriptionPlan: "pro", // or infer from your product/price ID
           },
         });
-
-        console.log(`✅ User ${userId} subscription info updated`);
         break;
       }
       default:

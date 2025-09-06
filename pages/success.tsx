@@ -22,7 +22,6 @@ const PaymentSuccess = () => {
     },
     retry: 3,
     onSuccess: (data) => {
-      console.log("Payment data:", data);
       if (data?.subscriptionStatus === "active") {
         // 2秒後にリダイレクト
         setTimeout(() => {

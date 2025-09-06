@@ -18,7 +18,6 @@ const Login = () => {
   } = useForm<LoginFormInputs>();
 
   const onSubmit = async (data: LoginFormInputs) => {
-    console.log("Form Data:", data);
     // Here you can call your API to signin
     const response = await fetch("/api/auth/login", {
       body: JSON.stringify({

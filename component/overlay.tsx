@@ -1,5 +1,6 @@
 import React from "react";
 import { startStripeSession } from "../lib/stripe/startSession";
+import { CircleX } from "lucide-react";
 
 type OverlayProps = {
   children: React.ReactNode;
@@ -13,14 +14,14 @@ export const Overlay: React.FC<OverlayProps> = ({ children, onClose }) => {
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-xl shadow-xl border border-gray-200 max-w-[80%] w-full max-h-[80vh] p-6 overflow-y-auto"
+        className="relative bg-white rounded-xl shadow-xl border border-gray-200 max-w-[80%] w-full max-h-[80vh] p-6 overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <button
           onClick={onClose}
-          className="mb-4 px-3 py-1 rounded bg-red-500 text-white hover:bg-red-600 transition"
+          className="cursor-pointer absolute rounded text-gray-400 hover:text-black transition top-3 right-3 z-100"
         >
-          Close
+          <CircleX />
         </button>
         {children}
       </div>
@@ -32,7 +33,9 @@ export const BlockUseOverlay = () => {
   return (
     <div className="fixed top-0 left-0 w-full h-full bg-gray-400/50 backdrop-blur-sm z-50 flex justify-center items-center">
       <div className="bg-white rounded-2xl p-8 shadow-xl max-w-sm w-full text-center">
-        <h2 className="text-xl text-green-400 font-bold mb-1">{"Let's start your next chat!"}</h2>
+        <h2 className="text-xl text-green-400 font-bold mb-1">
+          {"Let's start your next chat!"}
+        </h2>
         <p className="mb-6 text-gray-400">Please subscribe to continue.</p>
         <button
           onClick={() => startStripeSession()}

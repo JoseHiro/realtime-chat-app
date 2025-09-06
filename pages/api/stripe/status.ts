@@ -13,8 +13,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(400).json({ error: "Not authenticated" });
   }
 
-  console.log(decodedToken);
-
   try {
     const user = await prisma.user.findUnique({
       where: { id: decodedToken.userId },
