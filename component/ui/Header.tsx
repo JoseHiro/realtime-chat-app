@@ -26,7 +26,6 @@ export const Header = ({
 }) => {
   const [timeLeft, setTimeLeft] = useState(1 * 30);
   const [isActive, setIsActive] = useState(true);
-
   const { selectedPoliteness, selectedLevel, selectedTheme, customTheme } =
     useSpeech();
 
@@ -62,15 +61,15 @@ export const Header = ({
   };
 
   const getTimerColor = () => {
-    if (timeLeft <= 60) return "text-red-500"; // 1分以下は赤
-    if (timeLeft <= 120) return "text-orange-500"; // 2分以下はオレンジ
-    return "text-green-600"; // それ以外は緑
+    if (timeLeft <= 60) return "text-red-500";
+    if (timeLeft <= 120) return "text-orange-500";
+    return "text-green-600";
   };
 
   const getTimerBgColor = () => {
-    if (timeLeft <= 60) return "bg-red-50 border-red-200"; // 1分以下は赤背景
-    if (timeLeft <= 120) return "bg-orange-50 border-orange-200"; // 2分以下はオレンジ背景
-    return "bg-green-50 border-green-200"; // それ以外は緑背景
+    if (timeLeft <= 60) return "bg-red-50 border-red-200";
+    if (timeLeft <= 120) return "bg-orange-50 border-orange-200";
+    return "bg-green-50 border-green-200";
   };
 
   // テーマのアイコンとラベルを取得
@@ -204,17 +203,19 @@ export const Header = ({
               </div>
 
               <button
-                className={`px-4 py-2 text-white rounded-lg transition-colors duration-200 hover:bg-green-600 ${
-                  timeLeft > 0
-                    ? "!bg-gray-300 cursor-not-allowed"
-                    : "bg-green-500 cursor-pointer "
+                className={`px-4 py-2 text-white rounded-lg transition-colors duration-200 ${
+                  !summary
+                    ? "bg-gray-300 cursor-not-allowed"
+                    : "bg-green-500 hover:bg-green-600 cursor-pointer"
                 }`}
-                // disabled={timeLeft >= 0}
+                disabled={!summary}
                 onClick={() => {
-                  summary ? setOverlayOpened(true) : handleCreateSummary();
+                  if (summary) {
+                    setOverlayOpened(true);
+                  }
                 }}
               >
-                {summary ? "Summary" : "Finish"}
+                {summary ? "Summary" : "No Summary"}
               </button>
             </div>
           </div>

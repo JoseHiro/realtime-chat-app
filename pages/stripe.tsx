@@ -24,7 +24,6 @@ const Checkout = () => {
       });
 
       const { sessionId } = await response.json();
-      console.log(sessionId);
 
       // Redirect to Stripe Checkout
       const stripe = await stripePromise;

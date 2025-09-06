@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import OpenAI from "openai";
 import { logUsage } from "../../lib/loggingData/logger";
+import { verifyAuth } from "../../middleware/middleware";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 
@@ -12,7 +13,25 @@ export default async function handler(
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { history, chatId } = req.body;
+  const token = req.cookies.access_token;
+  const decodedToken = verifyAuth(token);
+  if (!decodedToken) {
+    return res.status(401).json({ error: "Not authenticated" });
+  }
+
+  const { history, chatId, politeness } = req.body;
+
+  if (!history || !chatId || !politeness) {
+    return res.status(400).json({ error: "No data provided" });
+  }
+
+  // if not enough data in the history, no generate summary
+  if (history.length < 3) {
+    return res
+      .status(204)
+      .json({ message: "Not enough conversation for summary" });
+  }
+
   try {
     const conversationText = history
       .map(
@@ -22,6 +41,8 @@ export default async function handler(
       .join("\n");
 
     const prompt = `あなたは日本語教師です。以下の会話を分析し、学習者にフィードバックを与えてください。
+会話は「${politeness}」な話し方で行われています。
+提示する corrections, sentenceUpgrades はこの politeness（話し方のレベル）を保つようにしてください。
 必ず次のJSON形式で出力してください。
 
 JSONのキー:
@@ -37,30 +58,34 @@ JSONのキー:
   各要素は { "original": { "kanji": "...", "kana": "..." }, "upgraded": { "kanji": "...", "kana": "..." } } の形式で出力してください。
 - vocabularySuggestions: 会話に関連して学習者に役立つ単語や表現（日本語の文字列配列、漢字 + 読み仮名を () 内に表記）
 - score (0-100): 学習者の会話の総合的なスコア（0-100の整数）
+- topicDevelopment: 話題を広げる能力の評価（英語で、簡潔に）
+- responseSkill: 相槌・反応スキルの評価（英語で、簡潔に）
+- difficultyReason: なぜその difficultyLevel と判定したのか、その具体的理由（英語で）
 
 出力例:
 {
   "summary": "English summary here",
   "mistakes": [
-    { "kanji": "映画見ました", "kana": "えいが みました" },
-    { "kanji": "かっこいでした", "kana": "かっこいでした" }
+    { "kanji": "映画見ました", "kana": "えいが みました" }
   ],
   "corrections": [
-    { "kanji": "映画を見ました", "kana": "えいが を みました" },
-    { "kanji": "かっこよかったです", "kana": "かっこよかったです" }
+    { "kanji": "映画を見ました", "kana": "えいが を みました" }
   ],
-  "goodPoints": ["Good point 1", "Good point 2"],
+  "goodPoints": ["Good point 1"],
   "difficultyLevel": "N4",
-  "improvementPoints": ["Improvement point 1", "Improvement point 2"],
-  "commonMistakes": ["よくする間違い1", "よくする間違い2"],
+  "improvementPoints": ["Improvement point 1"],
+  "commonMistakes": ["よくする間違い1"],
   "sentenceUpgrades": [
     {
       "original": { "kanji": "映画見ました", "kana": "えいが みました" },
       "upgraded": { "kanji": "昨日映画を見ました", "kana": "きのう えいが を みました" }
     }
   ],
-  "vocabularySuggestions": ["旅行 (りょこう)", "友達 (ともだち)"],
-  "score": 85
+  "vocabularySuggestions": ["旅行 (りょこう)"],
+  "score": 85,
+  "topicDevelopment": "The learner can expand on basic topics but struggles with transitions.",
+  "responseSkill": "The learner uses basic backchanneling but sometimes misses natural timing.",
+  "difficultyReason": "基礎的な文法と語彙は理解しているが、自然な会話の流れや文型の多様性がまだ不足しているため、N4相当と判断した。"
 }
 
 注意:
@@ -110,9 +135,33 @@ JSONのキー:
       },
     });
 
+    increaseChatCount(decodedToken.userId);
+
     res.status(200).json(parsed);
   } catch (error) {
     console.error("Summarization error:", error);
     res.status(500).json({ error: "Failed to summarize text" });
   }
 }
+
+export const increaseChatCount = async (userId: string) => {
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+  });
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  // trial ユーザーだけ増やす
+  if (user.subscriptionStatus === "trialing") {
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        trialUsedChats: { increment: 1 }, // race condition 対策
+      },
+    });
+  }
+
+};

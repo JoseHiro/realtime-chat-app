@@ -33,12 +33,14 @@ export const ModeSelectScreen = ({
   setHiraganaReadingList,
   setPaymentOverlay,
   trialError,
+  handleRefreshPreviousData,
 }: {
   setHistory: React.Dispatch<React.SetStateAction<ChatType>>;
   setAudioList: React.Dispatch<React.SetStateAction<string[]>>;
   setHiraganaReadingList: React.Dispatch<React.SetStateAction<string[]>>;
   setPaymentOverlay: React.Dispatch<React.SetStateAction<boolean>>;
   trialError: boolean;
+  handleRefreshPreviousData: () => void;
 }) => {
   const {
     selectedPoliteness,
@@ -55,6 +57,7 @@ export const ModeSelectScreen = ({
     setChatMode,
     username,
     subscriptionPlan,
+    chatId,
   } = useSpeech();
 
   const iconMap: Record<string, React.ElementType> = {
@@ -82,11 +85,13 @@ export const ModeSelectScreen = ({
   // Start the chat
   const handleBeginConversation = async () => {
     // if trial is ended overlay
+
     if (trialError) {
       setPaymentOverlay(true);
     } else {
       if (loading) return; // prevent double click
       setLoading(true);
+      handleRefreshPreviousData();
 
       try {
         const data = await apiRequest("/api/chat/start-chat", {
@@ -106,6 +111,7 @@ export const ModeSelectScreen = ({
           { role: "assistant", content: data.reply },
         ]);
         setChatId(Number(data.chatId));
+
         setHiraganaReadingList((prev) => [...prev, data.reading]);
 
         if (data.audio) {

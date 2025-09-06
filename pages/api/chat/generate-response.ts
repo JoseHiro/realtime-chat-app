@@ -161,7 +161,6 @@ const addReading = async (text: string) => {
     ],
   });
   const reading = completion.choices[0]?.message?.content ?? "";
-  console.log("reading", reading);
 
   return reading;
 };
