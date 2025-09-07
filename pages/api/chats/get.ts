@@ -22,8 +22,11 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       where: { id: decodedToken.userId },
       include: {
         chats: {
+          orderBy: { createdAt: "desc" }, // 作成順にソート
           include: {
-            message: true, // or messages depending on your model
+            message: {
+              orderBy: { createdAt: "asc" }, // メッセージも作成順にソート
+            },
           },
         },
       },
