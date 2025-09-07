@@ -31,6 +31,7 @@ export type SummaryData = {
       kanji: string;
       kana: string;
     };
+    advice: string;
   }>;
   vocabularySuggestions: string[];
   score: number;

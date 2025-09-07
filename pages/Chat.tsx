@@ -28,7 +28,7 @@ import { SummaryContent } from "../component/ui/SummaryContent";
 // authenticate return to login page [x]
 // payment for trial account, after payment activate[x]
 // cancel message input after chat is completed[x]
-// generate original chat title after finishing chat[]
+// generate original chat title after finishing chat[x]
 // reading for the kanji[x]
 // not enough chat data and won't get the summary[]
 // loading starting chat[x] loading for data fetch[]
@@ -36,6 +36,11 @@ import { SummaryContent } from "../component/ui/SummaryContent";
 // use username in the conversation[x]
 // english reading[]
 // popup message[]
+// display summary for each chat page
+// beautify chat style
+// block reloading (Prevent stopping conversation)
+//
+//
 
 export const Chat = () => {
   const {
@@ -51,7 +56,7 @@ export const Chat = () => {
   } = useSpeech();
 
   const [audioList, setAudioList] = useState<string[]>([]);
-  const [overlayOpened, setOverlayOpened] = useState<boolean>(true);
+  const [overlayOpened, setOverlayOpened] = useState<boolean>(false);
   const [summary, setSummary] = useState<SummaryData | null>(null);
   const [summaryOpened, setSummaryOpened] = useState<boolean>(false);
   const [chatLoading, setChatLoading] = useState<boolean>(false);

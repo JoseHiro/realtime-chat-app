@@ -2,7 +2,9 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import OpenAI from "openai";
 import { logUsage } from "../../lib/loggingData/logger";
 import { verifyAuth } from "../../middleware/middleware";
+import { PrismaClient } from "@prisma/client";
 
+const prisma = new PrismaClient();
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 
 export default async function handler(
@@ -46,6 +48,7 @@ export default async function handler(
 必ず次のJSON形式で出力してください。
 
 JSONのキー:
+- title : 内容によるこの会話のタイトル名
 - summary: 会話全体の簡潔な要約（英語で）
 - mistakes: 学習者が犯した文法的な間違い（オブジェクト配列形式、各要素は { "kanji": "漢字を含む文", "kana": "ひらがなの読み" }）
 - corrections: mistakes に対応する訂正例（mistakes と同じ順序で対応、オブジェクト配列形式、各要素は { "kanji": "訂正後の文", "kana": "ひらがなの読み" }）
@@ -53,17 +56,17 @@ JSONのキー:
 - difficultyLevel: 学習者の日本語レベル（N5, N4, N3, N2, N1 のいずれか）
 - improvementPoints: 改善すべき点（英語の文字列配列）
 - commonMistakes: 学習者が繰り返しやすい典型的な間違い（英語の文字列配列）
-- sentenceUpgrades: 学習者の現在のレベル（difficultyLevel）を踏まえ、そこから一段階上の自然な表現を提示してください。
+- sentenceUpgrades: 学習者の現在のレベル（difficultyLevel）を踏まえ、そこから一段階上の自然な表現を提示してください。さらにより良くするためのアドバイスも付けてください。
   （例: N5ならN4程度、N4ならN3程度、N3ならN2程度を目安にしてください）
-  各要素は { "original": { "kanji": "...", "kana": "..." }, "upgraded": { "kanji": "...", "kana": "..." } } の形式で出力してください。
-- vocabularySuggestions: 会話に関連して学習者に役立つ単語や表現（日本語の文字列配列、漢字 + 読み仮名を () 内に表記）
-- score (0-100): 学習者の会話の総合的なスコア（0-100の整数）
+  各要素は { "original": { "kanji": "...", "kana": "..." }, "upgraded": { "kanji": "...", "kana": "..." }, "advice": "..." } の形式で出力してください。
 - topicDevelopment: 話題を広げる能力の評価（英語で、簡潔に）
 - responseSkill: 相槌・反応スキルの評価（英語で、簡潔に）
+- score (0-100): 学習者の会話の総合的なスコア（0-100の整数）
 - difficultyReason: なぜその difficultyLevel と判定したのか、その具体的理由（英語で）
 
 出力例:
 {
+  "title": "Chat title",
   "summary": "English summary here",
   "mistakes": [
     { "kanji": "映画見ました", "kana": "えいが みました" }
@@ -75,23 +78,34 @@ JSONのキー:
   "difficultyLevel": "N4",
   "improvementPoints": ["Improvement point 1"],
   "commonMistakes": ["よくする間違い1"],
-  "sentenceUpgrades": [
+  "sentenceUpgrades":  [
     {
       "original": { "kanji": "映画見ました", "kana": "えいが みました" },
-      "upgraded": { "kanji": "昨日映画を見ました", "kana": "きのう えいが を みました" }
+      "upgraded": { "kanji": "昨日久しぶりに友達と映画を見ました", "kana": "きのう ひさしぶりに ともだちと えいが を みました" },
+      "advice": "Added context and time expressions to make the sentence more descriptive. You can also add extra details to enrich the sentence."
+    },
+    {
+      "original": { "kanji": "私は寿司が好きじゃないです", "kana": "わたしは すし が すきじゃないです。" },
+      "upgraded": { "kanji": "実は私は寿司が好きじゃないですが、今日の寿司は特別でした", "kana": "じつは わたしは すし が すきじゃないですが、きょうの すし は とくべつでした" },
+      "advice": "Added contrast and extra detail to make the sentence more interesting and natural."
     }
   ],
-  "vocabularySuggestions": ["旅行 (りょこう)"],
-  "score": 85,
   "topicDevelopment": "The learner can expand on basic topics but struggles with transitions.",
   "responseSkill": "The learner uses basic backchanneling but sometimes misses natural timing.",
-  "difficultyReason": "基礎的な文法と語彙は理解しているが、自然な会話の流れや文型の多様性がまだ不足しているため、N4相当と判断した。"
+  "score": 85,
+  "difficultyReason": "Why the score is that score"
 }
 
 注意:
 - mistakes, corrections, sentenceUpgrades は必ず { "kanji": "...", "kana": "..." } を含む形式で出力してください。
 - sentenceUpgrades は飛躍的に難しい表現にせず、学習者が現実的にすぐ使えるレベルの自然な日本語にしてください。
-- 出力は余計な説明を加えず、純粋なJSONのみ返してください。`;
+- 出力は余計な説明を加えず、純粋なJSONのみ返してください。
+- Only include sentences in "mistakes" and "corrections" if there is a grammatical or usage error.
+- Sentences that are already correct, even if slightly informal or casual, should NOT appear in "mistakes" or "corrections".
+- For "sentenceUpgrades", only suggest more advanced but realistic expressions, keeping the politeness style.
+- "mistakes" と "corrections" には、文法や使い方の誤りがある文のみを含めること。
+  自然で正しい文（カジュアルでも可）は含めないでください。
+`;
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
@@ -136,6 +150,8 @@ JSONのキー:
     });
 
     increaseChatCount(decodedToken.userId);
+    storeAnalysisDB(chatId, parsed);
+    storeChatTitle(chatId, parsed.title);
 
     res.status(200).json(parsed);
   } catch (error) {
@@ -145,7 +161,6 @@ JSONのキー:
 }
 
 export const increaseChatCount = async (userId: string) => {
-
   const user = await prisma.user.findUnique({
     where: { id: userId },
   });
@@ -163,5 +178,20 @@ export const increaseChatCount = async (userId: string) => {
       },
     });
   }
+};
 
+const storeAnalysisDB = (chatId: number, analysisJson: any) => {
+  prisma.analysis.create({
+    data: {
+      chatId,
+      result: analysisJson, // JSONオブジェクトそのまま保存
+    },
+  });
+};
+
+const storeChatTitle = async (chatId: number, title: string) => {
+  await prisma.chat.update({
+    where: { id: chatId },
+    data: { title }, // ← data の中に更新内容を入れる
+  });
 };

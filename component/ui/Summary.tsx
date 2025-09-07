@@ -22,7 +22,7 @@ export const Summary = ({ summary }: { summary: SummaryData | null }) => {
   const scorePercentage = summary?.score || 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50">
       {/* Hero Section */}
       <div className="relative overflow-hidden bg-white border-b border-gray-100 shadow-sm">
         <div className="px-6 py-12 lg:px-12 lg:py-16">
@@ -30,14 +30,13 @@ export const Summary = ({ summary }: { summary: SummaryData | null }) => {
             <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
               <div className="space-y-6">
                 <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+                  <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center shadow-lg">
                     <Zap className="w-7 h-7 text-white" />
                   </div>
                   <div>
-                    <h1 className="text-4xl lg:text-5xl font-bold font-bold bg-gradient-to-r from-green-600 via-blue-600 to-purple-600 bg-clip-text text-transparent">
+                    <h1 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-green-600 via-blue-600 to-gray-900 bg-clip-text text-transparent">
                       Conversation Analysis
                     </h1>
-                    <p className="text-lg text-gray-500 mt-1"></p>
                   </div>
                 </div>
                 <p className="text-xl text-gray-600 max-w-2xl">
@@ -80,20 +79,16 @@ export const Summary = ({ summary }: { summary: SummaryData | null }) => {
                         x2="100%"
                         y2="0%"
                       >
-                        <stop offset="0%" stopColor="#3b82f6" />
-                        <stop offset="50%" stopColor="#8b5cf6" />
-                        <stop offset="100%" stopColor="#ec4899" />
+                        <stop offset="0%" stopColor="#22c55e" />
+                        <stop offset="50%" stopColor="#3b82f6" />
+                        <stop offset="100%" stopColor="#1f2937" />
                       </linearGradient>
                     </defs>
                   </svg>
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="text-center">
-                      <div className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                        {scorePercentage ? (
-                          scorePercentage
-                        ) : (
-                          <Skeleton className="w-32 h-4 mt-2" />
-                        )}
+                      <div className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+                        {scorePercentage || <Skeleton className="w-16 h-8" />}
                       </div>
                       <div className="text-sm text-gray-500 font-medium">
                         Total Score
@@ -117,28 +112,28 @@ export const Summary = ({ summary }: { summary: SummaryData | null }) => {
                 sublabel: "Corrections",
                 value: summary?.mistakes?.length || 0,
                 icon: AlertCircle,
-                color: "bg-green-500",
+                color: "from-green-500 to-green-600",
               },
               {
                 label: "良い点",
                 sublabel: "Strengths",
                 value: summary?.goodPoints?.length || 0,
                 icon: Star,
-                color: "from-blue-500 to-cyan-500",
+                color: "from-blue-500 to-blue-600",
               },
               {
                 label: "レベル",
                 sublabel: "Level",
                 value: summary?.difficultyLevel || "N/A",
                 icon: Award,
-                color: "from-green-500 to-emerald-500",
+                color: "from-gray-800 to-gray-900",
               },
               {
                 label: "改善点",
                 sublabel: "Tips",
                 value: summary?.improvementPoints?.length || 0,
                 icon: Target,
-                color: "from-blue-500 to-cyan-500",
+                color: "from-green-500 to-green-600",
               },
             ].map((stat, index) => {
               const Icon = stat.icon;
@@ -155,10 +150,9 @@ export const Summary = ({ summary }: { summary: SummaryData | null }) => {
                   <div className="text-2xl font-bold text-gray-900 mb-1">
                     {stat.value}
                   </div>
-                  <div className="text-gray-500 text-sm font-semibold mb-1">
+                  <div className="text-gray-500 text-sm font-semibold">
                     {stat.sublabel}
                   </div>
-                  {/* <div className="text-gray-500 text-xs">{stat.sublabel}</div> */}
                 </div>
               );
             })}
@@ -175,17 +169,17 @@ export const Summary = ({ summary }: { summary: SummaryData | null }) => {
               {/* Summary Card */}
               <div className="bg-white rounded-2xl p-8 shadow-md border border-gray-100">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
+                  <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center">
                     <BookOpen className="w-5 h-5 text-white" />
                   </div>
                   <h2 className="text-2xl font-bold text-gray-900">Summary</h2>
                 </div>
-                <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-6 border border-blue-100">
+                <div className="bg-gray-100 rounded-xl p-6 ">
                   <p className="text-gray-800 leading-relaxed text-lg">
                     {summary ? (
                       summary?.summary
                     ) : (
-                      <Skeleton className="w-32 h-4 mt-2" />
+                      <Skeleton className="w-full h-6" />
                     )}
                   </p>
                 </div>
@@ -194,13 +188,12 @@ export const Summary = ({ summary }: { summary: SummaryData | null }) => {
               {/* Mistakes Section */}
               <div className="bg-white rounded-2xl p-8 shadow-md border border-gray-100">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-8 h-8 bg-gradient-to-br from-red-500 to-pink-500 rounded-xl flex items-center justify-center">
+                  <div className="w-8 h-8 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center">
                     <AlertCircle className="w-5 h-5 text-white" />
                   </div>
                   <h2 className="text-2xl font-bold text-gray-900">
                     Corrections
                   </h2>
-
                   <div className="ml-auto bg-red-100 text-red-700 px-4 py-2 rounded-full text-sm font-semibold">
                     {summary?.mistakes?.length || 0} 個
                   </div>
@@ -210,9 +203,9 @@ export const Summary = ({ summary }: { summary: SummaryData | null }) => {
                   {summary?.mistakes?.map((mistake, index) => (
                     <div
                       key={index}
-                      className="bg-gradient-to-br from-gray-50 to-red-50 border border-red-100 rounded-xl p-6"
+                      className="bg-gray-100 rounded-xl p-6"
                     >
-                      <div className="grid md:grid-cols-2 gap-6 items-center">
+                      <div className="space-y-4">
                         <div className="space-y-3">
                           <div className="flex items-center gap-2">
                             <div className="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
@@ -230,11 +223,11 @@ export const Summary = ({ summary }: { summary: SummaryData | null }) => {
                           </div>
                         </div>
 
-                        <div className="flex items-center justify-center">
-                          <ArrowRight className="w-8 h-8 text-gray-400" />
+                        <div className="flex justify-center">
+                          <ArrowRight className="w-6 h-6 text-gray-400" />
                         </div>
 
-                        <div className="space-y-3 md:col-start-2">
+                        <div className="space-y-3">
                           <div className="flex items-center gap-2">
                             <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
                               <CheckCircle className="w-3 h-3 text-white" />
@@ -245,10 +238,10 @@ export const Summary = ({ summary }: { summary: SummaryData | null }) => {
                           </div>
                           <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
                             <p className="text-gray-900 font-bold text-lg mb-1">
-                              {summary.corrections[index]?.kanji}
+                              {summary?.corrections[index]?.kanji}
                             </p>
                             <p className="text-gray-600">
-                              {summary.corrections[index]?.kana}
+                              {summary?.corrections[index]?.kana}
                             </p>
                           </div>
                         </div>
@@ -261,60 +254,73 @@ export const Summary = ({ summary }: { summary: SummaryData | null }) => {
               {/* Sentence Upgrades Section */}
               <div className="bg-white rounded-2xl p-8 shadow-md border border-gray-100">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-xl flex items-center justify-center">
+                  <div className="w-8 h-8 bg-black rounded-xl flex items-center justify-center">
                     <RotateCcw className="w-5 h-5 text-white" />
                   </div>
                   <h2 className="text-2xl font-bold text-gray-900">
                     Sentence Upgrades
                   </h2>
+                  <div className="ml-auto bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm font-semibold">
+                    {summary?.sentenceUpgrades?.length || 0} 個
+                  </div>
                 </div>
 
                 <div className="space-y-6">
                   {summary?.sentenceUpgrades?.map((item, index) => (
                     <div
                       key={index}
-                      className="p-6 bg-gradient-to-br from-purple-50 to-indigo-50 border border-purple-100 rounded-xl"
+                      className="p-6 bg-gray-100 border border-blue-100 rounded-xl"
                     >
                       <div className="flex items-center gap-3 mb-6">
-                        <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                        <div className="w-8 h-8 bg-green-400 rounded-full flex items-center justify-center text-white text-sm font-bold">
                           {index + 1}
                         </div>
                         <h4 className="text-xl font-bold text-gray-800">
-                          Fixed Sentence {index + 1}
+                          Upgrade {index + 1}
                         </h4>
                       </div>
 
-                      <div className="grid md:grid-cols-2 gap-6">
+                      <div className="space-y-6">
                         {/* Original Sentence */}
                         <div className="space-y-3">
                           <div className="flex items-center gap-2">
                             <span className="px-4 py-2 bg-red-100 text-red-700 text-sm font-semibold rounded-full">
-                              Before fixing
+                              Before
                             </span>
                           </div>
                           <div className="p-5 bg-red-50 border border-red-200 rounded-xl">
                             <p className="font-bold text-gray-900 mb-2 text-lg">
                               {item.original.kanji}
                             </p>
-                            <p className="text-gray-600">
+                            <p className="text-gray-600 text-xs mb-3">
                               {item.original.kana}
                             </p>
+                            <p className="text-sm text-red-600 font-medium">
+                              {item.advice}
+                            </p>
                           </div>
+                        </div>
+
+                        <div className="flex justify-center">
+                          <ArrowRight className="w-6 h-6 text-gray-400" />
                         </div>
 
                         {/* Improved Sentence */}
                         <div className="space-y-3">
                           <div className="flex items-center gap-2">
                             <span className="px-4 py-2 bg-green-100 text-green-700 text-sm font-semibold rounded-full">
-                              Fixed Sentence
+                              After
                             </span>
                           </div>
                           <div className="p-5 bg-green-50 border border-green-200 rounded-xl">
                             <p className="font-bold text-gray-900 mb-2 text-lg">
                               {item.upgraded.kanji}
                             </p>
-                            <p className="text-gray-600">
+                            <p className="text-gray-600 text-xs mb-3">
                               {item.upgraded.kana}
+                            </p>
+                            <p className="text-sm text-green-600 font-medium">
+                              {item.advice}
                             </p>
                           </div>
                         </div>
@@ -329,11 +335,11 @@ export const Summary = ({ summary }: { summary: SummaryData | null }) => {
                 {/* Topic Development */}
                 <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
+                    <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
                       <MessageSquare className="w-4 h-4 text-white" />
                     </div>
                     <h3 className="text-lg font-bold text-gray-900">
-                      Developing Conversation
+                      Topic Development
                     </h3>
                   </div>
                   <p className="text-gray-700 leading-relaxed">
@@ -344,11 +350,11 @@ export const Summary = ({ summary }: { summary: SummaryData | null }) => {
                 {/* Response Skill */}
                 <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-6 h-6 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg flex items-center justify-center">
+                    <div className="w-6 h-6 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center">
                       <Clock className="w-4 h-4 text-white" />
                     </div>
                     <h3 className="text-lg font-bold text-gray-900">
-                      Responding skills
+                      Response Skills
                     </h3>
                   </div>
                   <p className="text-gray-700 leading-relaxed">
@@ -360,7 +366,7 @@ export const Summary = ({ summary }: { summary: SummaryData | null }) => {
               {/* Difficulty Reason */}
               <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-6 h-6 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+                  <div className="w-6 h-6 bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg flex items-center justify-center">
                     <Brain className="w-4 h-4 text-white" />
                   </div>
                   <h3 className="text-lg font-bold text-gray-900">
@@ -381,7 +387,12 @@ export const Summary = ({ summary }: { summary: SummaryData | null }) => {
                   <h2 className="text-2xl font-bold text-gray-900">
                     Common Mistakes
                   </h2>
-                  <span className="text-gray-500 text-sm">Common Patterns</span>
+                  <span className="text-gray-500 text-sm">
+                    Patterns to Watch
+                  </span>
+                  <div className="ml-auto bg-orange-100 text-orange-700 px-4 py-2 rounded-full text-sm font-semibold">
+                    {summary?.commonMistakes?.length || 0} 個
+                  </div>
                 </div>
 
                 <div className="space-y-4">
@@ -407,17 +418,20 @@ export const Summary = ({ summary }: { summary: SummaryData | null }) => {
               {/* Strengths */}
               <div className="bg-white rounded-2xl p-8 shadow-md border border-gray-100">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
+                  <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center">
                     <Star className="w-5 h-5 text-white" />
                   </div>
                   <h3 className="text-xl font-bold text-gray-900">Strengths</h3>
+                  <div className="ml-auto bg-green-100 text-green-700 px-4 py-2 rounded-full text-sm font-semibold">
+                    {summary?.goodPoints?.length || 0} 個
+                  </div>
                 </div>
 
                 <div className="space-y-4">
                   {summary?.goodPoints?.map((point, index) => (
                     <div
                       key={index}
-                      className="flex items-start gap-3 p-4 bg-gradient-to-br from-green-50 to-emerald-50 border border-green-100 rounded-xl"
+                      className="flex items-start gap-3 p-4 bg-gradient-to-br from-green-50 to-green-100 border border-green-200 rounded-xl"
                     >
                       <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0">
                         <CheckCircle className="w-3 h-3 text-white" />
@@ -431,21 +445,24 @@ export const Summary = ({ summary }: { summary: SummaryData | null }) => {
               {/* Improvement Tips */}
               <div className="bg-white rounded-2xl p-8 shadow-md border border-gray-100">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center">
+                  <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
                     <Target className="w-5 h-5 text-white" />
                   </div>
                   <h3 className="text-xl font-bold text-gray-900">
                     Next Steps
                   </h3>
+                  <div className="ml-auto bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm font-semibold">
+                    {summary?.improvementPoints?.length || 0} 個
+                  </div>
                 </div>
 
                 <div className="space-y-4">
                   {summary?.improvementPoints?.map((point, index) => (
                     <div
                       key={index}
-                      className="flex items-start gap-4 p-5 bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-100 rounded-xl"
+                      className="flex items-start gap-4 p-5 bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-xl"
                     >
-                      <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+                      <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
                         {index + 1}
                       </div>
                       <p className="text-gray-800 font-medium">{point}</p>
@@ -455,49 +472,37 @@ export const Summary = ({ summary }: { summary: SummaryData | null }) => {
               </div>
 
               {/* Vocabulary Suggestions */}
-              <div className="bg-white rounded-2xl p-8 shadow-md border border-gray-100">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-8 h-8 bg-gradient-to-br from-red-500 to-pink-500 rounded-xl flex items-center justify-center">
-                    <Lightbulb className="w-5 h-5 text-white" />
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900">
-                    Vocabulary Focus
-                  </h3>
-                </div>
-
-                <div className="grid grid-cols-1 gap-3">
-                  {summary?.vocabularySuggestions?.map((word, index) => (
-                    <div
-                      key={index}
-                      className="px-5 py-4 bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-100 rounded-xl hover:shadow-md transition-all duration-200"
-                    >
-                      <span className="text-gray-900 font-semibold text-lg">
-                        {word}
-                      </span>
+              {summary?.vocabularySuggestions &&
+                summary.vocabularySuggestions.length > 0 && (
+                  <div className="bg-white rounded-2xl p-8 shadow-md border border-gray-100">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-8 h-8 bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl flex items-center justify-center">
+                        <Lightbulb className="w-5 h-5 text-white" />
+                      </div>
+                      <h3 className="text-xl font-bold text-gray-900">
+                        Vocabulary Focus
+                      </h3>
+                      <div className="ml-auto bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm font-semibold">
+                        {summary?.vocabularySuggestions?.length || 0} 個
+                      </div>
                     </div>
-                  ))}
-                </div>
-              </div>
+
+                    <div className="grid grid-cols-1 gap-3">
+                      {summary?.vocabularySuggestions?.map((word, index) => (
+                        <div
+                          key={index}
+                          className="px-5 py-4 bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200 rounded-xl hover:shadow-md transition-all duration-200"
+                        >
+                          <span className="text-gray-900 font-semibold text-lg">
+                            {word}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
             </div>
           </div>
-
-          {/* Bottom Learning Tip */}
-          {/* <div className="mt-12">
-            <div className="bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 border border-blue-100 rounded-2xl p-8 shadow-md">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
-                  <TrendingUp className="w-4 h-4 text-white" />
-                </div>
-                <span className="text-gray-900 font-bold text-lg">
-                  学習のコツ
-                </span>
-                <span className="text-gray-500 text-sm">Learning Tip</span>
-              </div>
-              <p className="text-gray-800 text-lg leading-relaxed">
-                継続は力なり！毎日の会話練習で自信をつけ、正しい文法パターンを身につけましょう。小さな積み重ねが大きな成長につながります。
-              </p>
-            </div>
-          </div> */}
         </div>
       </div>
     </div>

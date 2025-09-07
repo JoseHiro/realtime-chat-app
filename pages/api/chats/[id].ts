@@ -11,7 +11,11 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   const token = req.cookies.access_token;
 
   const decodedToken = verifyAuth(token);
-  if (!decodedToken || typeof decodedToken === "string" || !("userId" in decodedToken)) {
+  if (
+    !decodedToken ||
+    typeof decodedToken === "string" ||
+    !("userId" in decodedToken)
+  ) {
     return res.status(400).json({ message: "" });
   }
 
@@ -24,7 +28,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       include: {
         message: {
           orderBy: {
-            createdAt: "asc", // or "desc" if you want newest first
+            createdAt: "asc",
           },
         },
       },
