@@ -31,6 +31,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             createdAt: "asc",
           },
         },
+        analysis: true,
       },
     });
 
@@ -38,16 +39,16 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       return res.status(404).json({ error: "Chat not found" });
     }
 
-    const messagesWithReading = await Promise.all(
-      chat.message.map(async (msg) => ({
-        ...msg,
-        reading: await convertHira(msg.message),
-      }))
-    );
+    // const messagesWithReading = await Promise.all(
+    //   chat.message.map(async (msg) => ({
+    //     ...msg,
+    //     reading: await convertHira(msg.message),
+    //   }))
+    // );
 
     const chatWithReadings = {
       ...chat,
-      message: messagesWithReading,
+      // message: messagesWithReading,
     };
 
     return res.status(200).json(chatWithReadings);

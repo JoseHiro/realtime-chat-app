@@ -149,9 +149,9 @@ JSONのキー:
       },
     });
 
-    increaseChatCount(decodedToken.userId);
-    storeAnalysisDB(chatId, parsed);
-    storeChatTitle(chatId, parsed.title);
+    await increaseChatCount(decodedToken.userId);
+    await storeAnalysisDB(chatId, parsed);
+    await storeChatTitle(chatId, parsed.title);
 
     res.status(200).json(parsed);
   } catch (error) {
@@ -180,8 +180,10 @@ export const increaseChatCount = async (userId: string) => {
   }
 };
 
-const storeAnalysisDB = (chatId: number, analysisJson: any) => {
-  prisma.analysis.create({
+const storeAnalysisDB = async (chatId: number, analysisJson: any) => {
+  console.log(chatId, analysisJson);
+
+  await prisma.analysis.create({
     data: {
       chatId,
       result: analysisJson, // JSONオブジェクトそのまま保存

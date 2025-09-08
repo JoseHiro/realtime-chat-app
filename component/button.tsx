@@ -48,3 +48,29 @@ export const RoundedButton = ({
     </button>
   );
 };
+
+export const SummaryButton = ({
+  summary,
+  onClick,
+}: {
+  summary: any;
+  onClick: () => void;
+}) => {
+  return (
+    <button
+      className={`px-4 py-2 text-white rounded-lg transition-colors duration-200 ${
+        !summary
+          ? "bg-gray-300 cursor-not-allowed"
+          : "bg-green-500 hover:bg-green-600 cursor-pointer"
+      }`}
+      disabled={!summary}
+      onClick={() => {
+        if (summary) {
+          onClick();
+        }
+      }}
+    >
+      {summary ? "Summary" : "No Summary"}
+    </button>
+  );
+};
