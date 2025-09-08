@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import { Bot, User, Play, Pause, MessageSquare, Volume2 } from "lucide-react";
 import { LoadingMessage } from "../loading";
 import { ChatType } from "../../type/types";
+import { AssistantMessageBox, UserMessageBox } from "./Chat/Message";
 
 export const Messages = ({
   history,
@@ -15,7 +16,7 @@ export const Messages = ({
   hiraganaReadingList: string[];
 }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  // const audioRef = useRef<HTMLAudioElement | null>(null);
   const [currentPlayingId, setCurrentPlayingId] = useState<number | null>(null);
   const [displayMode, setDisplayMode] = useState<"audio" | "text">("audio");
 
@@ -29,30 +30,30 @@ export const Messages = ({
     }
   }, [history, chatLoading]);
 
-  const playAudio = (id: number) => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-    }
-    const audio = new Audio(audioList[id - 1]);
-    audioRef.current = audio;
-    audio.play();
-    setCurrentPlayingId(id);
+  // const playAudio = (id: number) => {
+  //   if (audioRef.current) {
+  //     audioRef.current.pause();
+  //     audioRef.current.currentTime = 0;
+  //   }
+  //   const audio = new Audio(audioList[id - 1]);
+  //   audioRef.current = audio;
+  //   audio.play();
+  //   setCurrentPlayingId(id);
 
-    audio.onended = () => {
-      setCurrentPlayingId(null);
-      audioRef.current = null;
-    };
-  };
+  //   audio.onended = () => {
+  //     setCurrentPlayingId(null);
+  //     audioRef.current = null;
+  //   };
+  // };
 
-  const stopAudio = () => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-      setCurrentPlayingId(null);
-      audioRef.current = null;
-    }
-  };
+  // const stopAudio = () => {
+  //   if (audioRef.current) {
+  //     audioRef.current.pause();
+  //     audioRef.current.currentTime = 0;
+  //     setCurrentPlayingId(null);
+  //     audioRef.current = null;
+  //   }
+  // };
 
   return (
     <div className="flex-1 overflow-y-auto p-4 lg:p-6 space-y-6 bg-gradient-to-b from-slate-50 to-gray-50">
@@ -93,12 +94,20 @@ export const Messages = ({
           }`}
         >
           {message.role === "assistant" && (
-            <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-green-600 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg">
-              <Bot className="w-5 h-5 text-white" />
-            </div>
+            <AssistantMessageBox
+              displayMode={displayMode}
+              text={message.content}
+              reading={hiraganaReadingList[id]}
+              currentPlayingId={currentPlayingId}
+              setCurrentPlayingId={setCurrentPlayingId}
+              id={id}
+              audioList={audioList}
+            />
           )}
-
-          <div
+          {message.role === "user" && (
+            <UserMessageBox id={id} text={message.content} />
+          )}
+          {/* <div
             className={`max-w-md lg:max-w-2xl transform transition-all duration-300 ${
               message.role === "user" ? "order-1" : ""
             }`}
@@ -109,11 +118,17 @@ export const Messages = ({
                   ? "bg-gradient-to-br from-slate-700 to-gray-800 text-white ml-auto"
                   : "bg-white text-gray-900 border border-gray-200"
               }`}
-            >
-              {displayMode === "audio" &&
+            ></div>
+            <p className="text-xs text-gray-400 mt-2 px-4">
+              {new Date().toLocaleTimeString("ja-JP", {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </p>
+          </div> */}
+          {/* {displayMode === "audio" &&
               message.role !== "user" &&
               audioList[id] ? (
-                // Audio display mode
                 <div className="flex items-center gap-3">
                   <button
                     onClick={() => {
@@ -171,13 +186,11 @@ export const Messages = ({
                   </div>
                 </div>
               ) : (
-                // Text display mode
                 <div>
                   <p className="text-sm lg:text-base leading-relaxed">
                     {message.content}
                   </p>
 
-                  {/* 読み仮名表示（assistantのメッセージのみ） */}
                   {message.role === "assistant" && hiraganaReadingList[id] && (
                     <div className="mt-2 pt-2 border-t border-gray-100">
                       <p className="text-[10px] text-gray-400 leading-relaxed font-light tracking-wide">
@@ -186,22 +199,13 @@ export const Messages = ({
                     </div>
                   )}
                 </div>
-              )}
-            </div>
+              )} */}
 
-            <p className="text-xs text-gray-400 mt-2 px-4">
-              {new Date().toLocaleTimeString("ja-JP", {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </p>
-          </div>
-
-          {message.role === "user" && (
+          {/* {message.role === "user" && (
             <div className="w-10 h-10 bg-gradient-to-br from-slate-600 to-gray-700 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg">
               <User className="w-5 h-5 text-white" />
             </div>
-          )}
+          )} */}
         </div>
       ))}
 
@@ -209,29 +213,6 @@ export const Messages = ({
       {chatLoading && <LoadingMessage />}
 
       <div ref={messagesEndRef} />
-      <style jsx>{`
-        @keyframes wave {
-          0%,
-          100% {
-            transform: scaleY(1);
-          }
-          50% {
-            transform: scaleY(1.5);
-          }
-        }
-
-        @keyframes float {
-          0%,
-          100% {
-            transform: translateY(0px) scale(1);
-            opacity: 0.6;
-          }
-          50% {
-            transform: translateY(-8px) scale(1.1);
-            opacity: 1;
-          }
-        }
-      `}</style>
     </div>
   );
 };

@@ -30,14 +30,15 @@ import { SummaryContent } from "../component/ui/SummaryContent";
 // cancel message input after chat is completed[x]
 // generate original chat title after finishing chat[x]
 // reading for the kanji[x]
-// not enough chat data and won't get the summary[]
+// not enough chat data and won't get the summary[x]
 // loading starting chat[x] loading for data fetch[]
 // display username in the conversation[x]
 // use username in the conversation[x]
 // english reading[]
 // popup message[]
-// display summary for each chat page
-// beautify chat style
+// display summary for each chat page[x]
+// beautify chat style[x]
+// header fix
 // block reloading (Prevent stopping conversation)
 //
 //
@@ -67,7 +68,7 @@ export const Chat = () => {
   const [paymentOverlay, setPaymentOverlay] = useState(false);
   const [summaryFetchLoading, setSummaryFetchLoading] = useState(false);
 
-  console.log(summary);
+  // console.log(summary);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["user"],
@@ -81,6 +82,9 @@ export const Chat = () => {
     },
     retry: false,
   });
+
+  console.log(data);
+
 
   useEffect(() => {
     if (data?.trialStatus === "ended") {
