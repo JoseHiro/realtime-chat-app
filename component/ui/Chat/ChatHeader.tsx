@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { Pen, User } from "lucide-react";
 import { StopWatch } from "./StopWatch";
 import { SummaryButton } from "../../button";
-// import { SummaryContent } from "../SummaryContent";
+import { SummaryContent } from "../SummaryContent";
+import { useSpeech } from "../../../context/SpeechContext";
 import {
   UserCheck,
   Coffee,
@@ -21,18 +22,24 @@ export const ChatHeader = ({
   level,
   politeness,
   customTheme,
-  summary,
   chatPage,
+  history,
+  analysis,
 }: {
   title: string;
   theme: string;
   level: string;
   politeness: string;
   customTheme?: string;
-  summary?: any;
   chatPage?: boolean;
+  history: any;
+  analysis: any;
 }) => {
   const [overlayOpened, setOverlayOpened] = useState(false);
+  const [summaryOpened, setSummaryOpened] = useState<boolean>(false);
+  const { summaryFetchLoading, summary } = useSpeech();
+  console.log(summary, analysis);
+
   const getLevelLabel = () => {
     const levelMap = {
       easy: "Easy",
@@ -78,17 +85,10 @@ export const ChatHeader = ({
   const ThemeIcon = themeInfo.icon;
   const PolitenessIcon = politenessInfo.icon;
 
-  console.log(typeof summary);
-
   return (
     <div className="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
       <div className="mx-auto flex justify-between items-center">
         <div className="flex items-center space-x-3">
-          {/* <button className="lg:hidden p-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200">
-                <Menu className="w-5 h-5" />
-              </button> */}
-          {/* <span className="text-lg font-semibold text-gray-900">AI</span>
-          </div> */}
           <div className="w-10 h-10 bg-gradient-to-r from-green-400 to-green-500 rounded-full flex items-center justify-center">
             <span className="text-white font-bold">AI</span>
           </div>
@@ -135,21 +135,41 @@ export const ChatHeader = ({
         </div>
 
         <div className="flex space-x-4">
-          {chatPage && <StopWatch />}
-          {!summary ? (
+          {chatPage && (
+            <StopWatch history={history} setOverlayOpened={setOverlayOpened} />
+          )}
+          {analysis ? (
             <SummaryButton
-              summary={summary}
+              summary={analysis}
               onClick={() => setOverlayOpened(true)}
             />
           ) : (
-            <p className="border py-1 px-2 border-gray-200 rounded text-gray-400 text-xs">No Summary</p>
+            <p className="border py-1 px-2 border-gray-200 rounded text-gray-400 text-xs">
+              No Summary
+            </p>
           )}
         </div>
       </div>
 
-      {overlayOpened && (
+      {!chatPage && overlayOpened && (
         <Overlay onClose={() => setOverlayOpened(false)}>
-          <Summary summary={summary} />
+          <Summary summary={analysis} />
+        </Overlay>
+      )}
+
+      {chatPage && overlayOpened && (
+        <Overlay
+          onClose={() => {
+            setOverlayOpened(false);
+            setSummaryOpened(false);
+          }}
+        >
+          <SummaryContent
+            summaryOpened={summaryOpened}
+            setSummaryOpened={setSummaryOpened}
+            summary={summary}
+            summaryFetchLoading={summaryFetchLoading}
+          />
         </Overlay>
       )}
     </div>

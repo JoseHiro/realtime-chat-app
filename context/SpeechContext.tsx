@@ -1,5 +1,5 @@
 // SpeechContext.tsx
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState } from "react";
 
 interface SpeechContextType {
   selectedLevel: string;
@@ -22,6 +22,10 @@ interface SpeechContextType {
   setUsername: React.Dispatch<React.SetStateAction<string>>;
   subscriptionPlan: string;
   setSubscriptionPlan: React.Dispatch<React.SetStateAction<string>>;
+  summary: any;
+  setSummary: React.Dispatch<React.SetStateAction<any>>;
+  summaryFetchLoading: boolean;
+  setSummaryFetchLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const SpeechContext = createContext<SpeechContextType>({
@@ -45,6 +49,10 @@ const SpeechContext = createContext<SpeechContextType>({
   setUsername: () => {},
   subscriptionPlan: "",
   setSubscriptionPlan: () => {},
+  summary: null,
+  setSummary: () => {},
+  summaryFetchLoading: false,
+  setSummaryFetchLoading: () => {},
 });
 
 export const SpeechProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -60,6 +68,8 @@ export const SpeechProvider: React.FC<{ children: React.ReactNode }> = ({
   const [chatEnded, setChatEnded] = useState<boolean>(false);
   const [username, setUsername] = useState<string>("");
   const [subscriptionPlan, setSubscriptionPlan] = useState<string>("");
+  const [summary, setSummary] = useState(null);
+  const [summaryFetchLoading, setSummaryFetchLoading] = useState(false);
 
   return (
     <SpeechContext.Provider
@@ -84,6 +94,10 @@ export const SpeechProvider: React.FC<{ children: React.ReactNode }> = ({
         setUsername,
         subscriptionPlan,
         setSubscriptionPlan,
+        summary,
+        setSummary,
+        summaryFetchLoading,
+        setSummaryFetchLoading,
       }}
     >
       {children}

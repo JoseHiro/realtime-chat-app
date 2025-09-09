@@ -2,7 +2,6 @@ import { NextApiResponse, NextApiRequest } from "next";
 import { verifyAuth } from "../../../middleware/middleware";
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
-import { convertHira } from "../../../lib/convert/convertHira";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== "GET")
@@ -38,13 +37,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     if (!chat) {
       return res.status(404).json({ error: "Chat not found" });
     }
-
-    // const messagesWithReading = await Promise.all(
-    //   chat.message.map(async (msg) => ({
-    //     ...msg,
-    //     reading: await convertHira(msg.message),
-    //   }))
-    // );
 
     const chatWithReadings = {
       ...chat,

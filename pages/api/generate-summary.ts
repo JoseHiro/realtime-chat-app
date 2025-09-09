@@ -161,6 +161,8 @@ JSONのキー:
 }
 
 export const increaseChatCount = async (userId: string) => {
+  console.log('-------------------- called');
+  
   const user = await prisma.user.findUnique({
     where: { id: userId },
   });
@@ -181,7 +183,7 @@ export const increaseChatCount = async (userId: string) => {
 };
 
 const storeAnalysisDB = async (chatId: number, analysisJson: any) => {
-  console.log(chatId, analysisJson);
+  // console.log(chatId, analysisJson);
 
   await prisma.analysis.create({
     data: {
