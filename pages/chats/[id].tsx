@@ -45,7 +45,7 @@ const ChatPage = () => {
     },
   });
 
-  console.log(chat);
+  // console.log(chat);
 
   // 音声再生機能（プレースホルダー）
   // const playAudio = (id) => {

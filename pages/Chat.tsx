@@ -3,7 +3,6 @@ import { VoiceInput } from "../component/ui/VoiceInputButton";
 import { Messages } from "../component/ui/Messages";
 import { Overlay } from "../component/overlay";
 import { Sidebar } from "../component/ui/Sidebar";
-import { Header } from "../component/ui/Header";
 import { ModeSelectScreen } from "../component/ui/ModeSelectScreen";
 import { useSpeech } from "../context/SpeechContext";
 import { SummaryData, ChatType } from "../type/types";
@@ -39,11 +38,14 @@ import { ChatHeader } from "../component/ui/Chat/ChatHeader";
 // popup message[]
 // display summary for each chat page[x]
 // beautify chat style[x]
-// header fix [x]
+// header fix [] [x]
 // selected chat bg color on the sidebar[]
-// block reloading (Prevent stopping conversation)
-//
-//
+// block reloading (Prevent stopping conversation)[]
+// homepage design[]
+// analysis design[]
+// play audio[]
+// audio sound design[]
+// generating chat design[]
 
 export const Chat = () => {
   const {
