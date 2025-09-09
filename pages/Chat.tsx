@@ -11,6 +11,7 @@ import { useQuery } from "@tanstack/react-query";
 import { PaymentPromotionContent } from "../component/ui/PaymentPromotionContent";
 import { apiRequest } from "../lib/apiRequest";
 import { SummaryContent } from "../component/ui/SummaryContent";
+import { ChatHeader } from "../component/ui/Chat/ChatHeader";
 // notes : common mistakes, tendencies,
 // vocabulary, natural word selection,
 // UI while the chat is thinking
@@ -38,7 +39,8 @@ import { SummaryContent } from "../component/ui/SummaryContent";
 // popup message[]
 // display summary for each chat page[x]
 // beautify chat style[x]
-// header fix
+// header fix [x]
+// selected chat bg color on the sidebar[]
 // block reloading (Prevent stopping conversation)
 //
 //
@@ -50,15 +52,17 @@ export const Chat = () => {
     checkGrammarMode,
     chatId,
     chatMode,
-    setChatEnded,
-    setChatId,
+    // setChatEnded,
+    // setChatId,
     setUsername,
     setSubscriptionPlan,
+    summary,
+    setSummary,
+    summaryFetchLoading,
   } = useSpeech();
 
   const [audioList, setAudioList] = useState<string[]>([]);
   const [overlayOpened, setOverlayOpened] = useState<boolean>(false);
-  const [summary, setSummary] = useState<SummaryData | null>(null);
   const [summaryOpened, setSummaryOpened] = useState<boolean>(false);
   const [chatLoading, setChatLoading] = useState<boolean>(false);
   const [hiraganaReadingList, setHiraganaReadingList] = useState<string[]>([]);
@@ -66,7 +70,6 @@ export const Chat = () => {
     []
   );
   const [paymentOverlay, setPaymentOverlay] = useState(false);
-  const [summaryFetchLoading, setSummaryFetchLoading] = useState(false);
 
   // console.log(summary);
 
@@ -82,9 +85,6 @@ export const Chat = () => {
     },
     retry: false,
   });
-
-  console.log(data);
-
 
   useEffect(() => {
     if (data?.trialStatus === "ended") {
@@ -144,38 +144,37 @@ export const Chat = () => {
   };
 
   // Create a summary of the conversation history
-  const handleCreateSummary = async () => {
-    setSummaryFetchLoading(true);
-    try {
-      const data = await apiRequest("/api/generate-summary", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          history,
-          chatId,
-          politeness: selectedPoliteness,
-        }),
-      });
+  // const handleCreateSummary = async () => {
+  //   setSummaryFetchLoading(true);
+  //   try {
+  //     const data = await apiRequest("/api/generate-summary", {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({
+  //         history,
+  //         chatId,
+  //         politeness: selectedPoliteness,
+  //       }),
+  //     });
 
-      if (data?.status === 204 || !data?.summary) {
-        setSummary(null);
-      } else {
-        setSummary(data);
-      }
-    } catch (error) {
-      console.error("Error creating summary:", error);
-    } finally {
-      setChatEnded(true);
-      setChatId(null);
-      setSummaryFetchLoading(false);
-    }
-  };
+  //     if (data?.status === 204 || !data?.summary) {
+  //       setSummary(null);
+  //     } else {
+  //       setSummary(data);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error creating summary:", error);
+  //   } finally {
+  //     setChatEnded(true);
+  //     setChatId(null);
+  //     setSummaryFetchLoading(false);
+  //   }
+  // };
 
   return (
     <div className="relative w-full h-screen flex">
       {/* サイドバー */}
       <Sidebar />
-
       {!chatMode ? (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-green-50 overflow-auto w-full">
           <ModeSelectScreen
@@ -189,10 +188,13 @@ export const Chat = () => {
         </div>
       ) : (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-green-50 w-full flex flex-col justify-between">
-          <Header
-            setOverlayOpened={setOverlayOpened}
-            summary={summary}
-            handleCreateSummary={handleCreateSummary}
+          <ChatHeader
+            title="Kaiwa Kun"
+            level="easy"
+            theme="Daily Life"
+            politeness="Casual"
+            chatPage={true}
+            history={history}
           />
           <Messages
             history={history}
