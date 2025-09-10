@@ -22,6 +22,7 @@ export const Sidebar = () => {
   const [isMuted, setIsMuted] = useState(false);
   const [activeChat, setActiveChat] = useState<number | null>(null);
   const queryClient = useQueryClient();
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -83,7 +84,6 @@ export const Sidebar = () => {
     setChatId(null);
     router.push("/chat");
   };
-
   return (
     <div className="hidden lg:flex w-80 border-r h-full border-gray-200 shadow-sm bg-white/15 backdrop-blur-xl">
       <div className="flex flex-col w-full p-6">
@@ -108,7 +108,9 @@ export const Sidebar = () => {
               {data?.chats.map((chat: ChatDataType) => (
                 <div
                   key={chat.id}
-                  className="p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors group"
+                  className={`p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors group ${
+                    Number(router.query.id) === chat.id ? "!bg-gray-200" : ""
+                  }`}
                 >
                   <div className="relative flex gap-1 items-center">
                     <div
@@ -136,7 +138,6 @@ export const Sidebar = () => {
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            // handleEdit(chat);
                           }}
                           className="cursor-pointer w-full flex items-center gap-2 px-3 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors"
                         >

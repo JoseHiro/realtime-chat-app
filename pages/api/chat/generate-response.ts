@@ -59,7 +59,7 @@ export default async function handler(
 
     const reply = completion.choices[0].message?.content ?? "";
     const reading = await addReading(reply);
-    saveMessage(chatId, "assistant", reply, reading);
+    const message = await saveMessage(chatId, "assistant", reply, reading);
 
     // 2. Azure TTS用アクセストークン取得
     const tokenUrl = `https://${serviceRegion}.api.cognitive.microsoft.com/sts/v1.0/issuetoken`;
@@ -111,6 +111,7 @@ export default async function handler(
       reply: reply,
       audio: audioBuffer.toString("base64"), // フロントでは base64 を再生用に変換
       reading: reading,
+      messageId: message.id,
     });
 
     const usage = completion.usage; // open ai usage
@@ -164,4 +165,3 @@ const addReading = async (text: string) => {
 
   return reading;
 };
-

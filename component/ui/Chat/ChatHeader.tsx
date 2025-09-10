@@ -27,18 +27,23 @@ export const ChatHeader = ({
   analysis,
 }: {
   title: string;
-  theme: string;
-  level: string;
-  politeness: string;
+  theme?: string;
+  level?: string;
+  politeness?: string;
   customTheme?: string;
   chatPage?: boolean;
-  history: any;
-  analysis: any;
+  history?: any;
+  analysis?: any;
 }) => {
   const [overlayOpened, setOverlayOpened] = useState(false);
   const [summaryOpened, setSummaryOpened] = useState<boolean>(false);
-  const { summaryFetchLoading, summary } = useSpeech();
-  console.log(summary, analysis);
+  const {
+    summaryFetchLoading,
+    summary,
+    selectedLevel,
+    selectedPoliteness,
+    selectedTheme,
+  } = useSpeech();
 
   const getLevelLabel = () => {
     const levelMap = {
@@ -46,15 +51,30 @@ export const ChatHeader = ({
       medium: "Medium",
       hard: "Hard",
     };
-    if (level in levelMap) {
-      return levelMap[level as keyof typeof levelMap];
+    if (level) {
+      if (level in levelMap) {
+        return levelMap[level as keyof typeof levelMap];
+      }
+    } else {
+      if (selectedLevel in levelMap) {
+        return levelMap[selectedLevel as keyof typeof levelMap];
+      }
     }
+
     return level;
   };
 
+  console.log(title, theme, level, politeness);
+
   const getPolitenessInfo = () => {
-    if (politeness === "casual") {
-      return { label: "Casual", icon: User };
+    if (politeness) {
+      if (politeness === "casual") {
+        return { label: "Casual", icon: User };
+      }
+    } else {
+      if (selectedPoliteness === "casual") {
+        return { label: "Casual", icon: User };
+      }
     }
     return { label: "Formal", icon: UserCheck };
   };
@@ -74,8 +94,14 @@ export const ChatHeader = ({
 
     type ThemeKey = keyof typeof themeMap;
 
-    if (theme in themeMap) {
-      return themeMap[theme as ThemeKey];
+    if (theme) {
+      if (theme in themeMap) {
+        return themeMap[theme as ThemeKey];
+      }
+    } else {
+      if (selectedTheme in themeMap) {
+        return themeMap[selectedTheme as ThemeKey];
+      }
     }
     return { label: theme, icon: Settings };
   };
@@ -98,7 +124,7 @@ export const ChatHeader = ({
               <Pen className="w-4 h-4 text-gray-400 hover:text-gray-500 cursor-pointer" />
             </div>
             <div className="flex gap-4 text-sm text-gray-600">
-              {(theme || customTheme) && (
+              {(theme || customTheme || selectedTheme) && (
                 <div className="flex items-center gap-1 px-1.5 sm:px-2 py-0.5 rounded-full bg-purple-100 text-purple-700">
                   <ThemeIcon className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                   <span className="font-medium text-xs max-w-12 sm:max-w-20 truncate">
@@ -106,12 +132,12 @@ export const ChatHeader = ({
                   </span>
                 </div>
               )}
-              {level && (
+              {(level || selectedLevel) && (
                 <span
                   className={`px-1.5 sm:px-2 py-0.5 rounded-full font-medium text-xs ${
-                    level === "easy"
+                    (level || selectedLevel) === "easy"
                       ? "bg-green-100 text-green-700"
-                      : level === "medium"
+                      : (level || selectedLevel) === "medium"
                       ? "bg-yellow-100 text-yellow-700"
                       : "bg-red-100 text-red-700"
                   }`}
@@ -119,7 +145,7 @@ export const ChatHeader = ({
                   {getLevelLabel()}
                 </span>
               )}
-              {politeness && (
+              {(politeness || selectedPoliteness) && (
                 <div className="flex items-center gap-1 px-1.5 sm:px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
                   <PolitenessIcon className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                   <span className="font-medium text-xs hidden sm:inline">
@@ -138,9 +164,9 @@ export const ChatHeader = ({
           {chatPage && (
             <StopWatch history={history} setOverlayOpened={setOverlayOpened} />
           )}
-          {analysis ? (
+          {analysis || summary ? (
             <SummaryButton
-              summary={analysis}
+              summary={analysis || summary}
               onClick={() => setOverlayOpened(true)}
             />
           ) : (

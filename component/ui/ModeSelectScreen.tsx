@@ -57,7 +57,6 @@ export const ModeSelectScreen = ({
     setChatMode,
     username,
     subscriptionPlan,
-    chatId,
   } = useSpeech();
 
   const iconMap: Record<string, React.ElementType> = {
@@ -111,7 +110,6 @@ export const ModeSelectScreen = ({
           { role: "assistant", content: data.reply },
         ]);
         setChatId(Number(data.chatId));
-
         setHiraganaReadingList((prev) => [...prev, data.reading]);
 
         if (data.audio) {

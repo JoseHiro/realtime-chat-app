@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/router";
 import { useQuery } from "@tanstack/react-query";
 import { Sidebar } from "../../component/ui/Sidebar";
-// import { Pen } from "lucide-react";
+
 import {
   AssistantMessageBox,
   UserMessageBox,
@@ -29,9 +29,6 @@ type Chat = {
 const ChatPage = () => {
   const router = useRouter();
   const { id } = router.query;
-  const [displayMode, setDisplayMode] = useState("text");
-  const [currentPlayingId, setCurrentPlayingId] = useState<null | string>(null);
-
   const {
     data: chat,
     // isLoading,
@@ -45,21 +42,10 @@ const ChatPage = () => {
     },
   });
 
-  console.log(chat);
-
-  // 音声再生機能（プレースホルダー）
-  // const playAudio = (id) => {
-  //   setCurrentPlayingId(id);
-  //   // 実際の音声再生ロジックをここに実装
-  // };
-
-  // const stopAudio = () => {
-  //   setCurrentPlayingId(null);
-  // };
-
   return (
     <div className="relative w-full h-screen flex">
       <Sidebar />
+
 
       <div className="flex-1 min-h-screen flex flex-col bg-gradient-to-br from-gray-50 to-green-50 overflow-hidden">
         {/* Header */}

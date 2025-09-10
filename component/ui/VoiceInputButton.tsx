@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Mic, Square } from "lucide-react";
 import { ChatType } from "../../type/types";
 import { useSpeech } from "../../context/SpeechContext";
+
 // Type declarations for SpeechRecognition
 declare global {
   interface Window {
@@ -19,13 +20,14 @@ export const VoiceInput = ({
   sendToAPI,
   history,
   setHiraganaReadingList,
+  setAudioList,
 }: {
   setHistory: React.Dispatch<React.SetStateAction<ChatType>>;
   sendToAPI: (text: ChatType) => Promise<void>;
   history: ChatType;
+  setAudioList: React.Dispatch<React.SetStateAction<string[]>>;
   setHiraganaReadingList: React.Dispatch<React.SetStateAction<string[]>>;
 }) => {
-
   const [isRecording, setIsRecording] = useState(false);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const [isAITalking] = useState(false);
@@ -77,6 +79,7 @@ export const VoiceInput = ({
     const newMessages = [...history, { role: "user", content: text }];
     setHiraganaReadingList((prev) => [...prev, ""]);
     setHistory(newMessages);
+    setAudioList((prev) => [...prev, ""]);
     sendToAPI(newMessages);
   };
 
@@ -86,10 +89,12 @@ export const VoiceInput = ({
     setHiraganaReadingList((prev) => [...prev, ""]);
     setHistory(newMessages);
     sendToAPI(newMessages);
+    setAudioList((prev) => [...prev, ""]);
     setText("");
   };
 
   const [text, setText] = useState("");
+
   return (
     <div className="p-4 lg:p-6 bg-white border-t border-gray-200">
       {!chatEnded ? (
