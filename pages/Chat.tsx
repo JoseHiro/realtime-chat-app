@@ -5,7 +5,7 @@ import { Overlay } from "../component/overlay";
 import { Sidebar } from "../component/ui/Sidebar";
 import { ModeSelectScreen } from "../component/ui/ModeSelectScreen";
 import { useSpeech } from "../context/SpeechContext";
-import { SummaryData, ChatType } from "../type/types";
+import { ChatType } from "../type/types";
 import { useQuery } from "@tanstack/react-query";
 import { PaymentPromotionContent } from "../component/ui/PaymentPromotionContent";
 import { apiRequest } from "../lib/apiRequest";
@@ -21,10 +21,6 @@ import { ChatHeader } from "../component/ui/Chat/ChatHeader";
 // simulation roleplay
 // cannot respond while AI talking
 
-// signin
-// chat list sidebar
-// pricing
-
 // authenticate return to login page [x]
 // payment for trial account, after payment activate[x]
 // cancel message input after chat is completed[x]
@@ -38,8 +34,8 @@ import { ChatHeader } from "../component/ui/Chat/ChatHeader";
 // popup message[]
 // display summary for each chat page[x]
 // beautify chat style[x]
-// header fix [] [x]
-// selected chat bg color on the sidebar[]
+// header fix [x]
+// selected chat bg color on the sidebar[x]
 // block reloading (Prevent stopping conversation)[]
 // homepage design[]
 // analysis design[]
@@ -54,12 +50,10 @@ export const Chat = () => {
     checkGrammarMode,
     chatId,
     chatMode,
-    // setChatEnded,
-    // setChatId,
     setUsername,
     setSubscriptionPlan,
-    summary,
     setSummary,
+    summary,
     summaryFetchLoading,
   } = useSpeech();
 
@@ -72,6 +66,8 @@ export const Chat = () => {
     []
   );
   const [paymentOverlay, setPaymentOverlay] = useState(false);
+
+  console.log(audioList);
 
   // console.log(summary);
 
@@ -145,34 +141,6 @@ export const Chat = () => {
     setHiraganaReadingList([]);
   };
 
-  // Create a summary of the conversation history
-  // const handleCreateSummary = async () => {
-  //   setSummaryFetchLoading(true);
-  //   try {
-  //     const data = await apiRequest("/api/generate-summary", {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify({
-  //         history,
-  //         chatId,
-  //         politeness: selectedPoliteness,
-  //       }),
-  //     });
-
-  //     if (data?.status === 204 || !data?.summary) {
-  //       setSummary(null);
-  //     } else {
-  //       setSummary(data);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error creating summary:", error);
-  //   } finally {
-  //     setChatEnded(true);
-  //     setChatId(null);
-  //     setSummaryFetchLoading(false);
-  //   }
-  // };
-
   return (
     <div className="relative w-full h-screen flex">
       {/* サイドバー */}
@@ -190,14 +158,7 @@ export const Chat = () => {
         </div>
       ) : (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-green-50 w-full flex flex-col justify-between">
-          <ChatHeader
-            title="Kaiwa Kun"
-            level="easy"
-            theme="Daily Life"
-            politeness="Casual"
-            chatPage={true}
-            history={history}
-          />
+          <ChatHeader title="Chat" chatPage={true} history={history} />
           <Messages
             history={history}
             audioList={audioList}
@@ -205,6 +166,7 @@ export const Chat = () => {
             hiraganaReadingList={hiraganaReadingList}
           />
           <VoiceInput
+            setAudioList={setAudioList}
             history={history}
             setHistory={setHistory}
             sendToAPI={sendToAPI}

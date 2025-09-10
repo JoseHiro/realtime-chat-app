@@ -54,8 +54,6 @@ export const Sidebar = () => {
 
   // Sample data for demonstration
   const handleSelectChat = (id: number) => {
-    console.log(id);
-
     setActiveChat((prev) => {
       return prev === id ? null : id;
     });
@@ -86,8 +84,6 @@ export const Sidebar = () => {
     setChatId(null);
     router.push("/chat");
   };
-
-  console.log(router.query.id);
   return (
     <div className="hidden lg:flex w-80 border-r h-full border-gray-200 shadow-sm bg-white/15 backdrop-blur-xl">
       <div className="flex flex-col w-full p-6">

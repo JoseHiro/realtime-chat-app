@@ -1,12 +1,11 @@
-import { Bot, User, Play, Pause, MessageSquare, Volume2 } from "lucide-react";
-import React, { useRef, useState, useEffect } from "react";
+import { Play, Pause } from "lucide-react";
+import React, { useRef, useState } from "react";
+import { SoundWave } from "./SoundWave";
 
 export const AssistantMessageBox = ({
   text,
   reading,
   displayMode,
-  currentPlayingId,
-  setCurrentPlayingId,
   audioList,
   id,
 }: {
@@ -18,6 +17,7 @@ export const AssistantMessageBox = ({
   audioList?: any;
   id: number;
 }) => {
+  const [currentPlayingId, setCurrentPlayingId] = useState<number | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const playAudio = (id: number) => {
     if (audioRef.current) {
@@ -44,6 +44,9 @@ export const AssistantMessageBox = ({
     }
   };
 
+  console.log(audioList);
+
+
   return (
     <div
       style={{ animationDelay: `${id * 0.5}s` }}
@@ -67,6 +70,7 @@ export const AssistantMessageBox = ({
               <Play className="w-5 h-5 ml-0.5" />
             )}
           </button>
+          {/* <SoundWave audioUrl={audioList[id]} /> */}
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
               <div className="flex gap-0.5">

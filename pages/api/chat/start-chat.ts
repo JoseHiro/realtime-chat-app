@@ -139,7 +139,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     });
 
     // chat message store in DB
-    await prisma.message.create({
+    const message = await prisma.message.create({
       data: {
         chatId: chat.id,
         sender: "assistant",
@@ -147,12 +147,12 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         reading: reading,
       },
     });
-    
 
     res.setHeader("Content-Type", "application/json");
     res.status(200).json({
       reply: reply,
       chatId: chat.id,
+      messageId: message.id,
       audio: audioBuffer.toString("base64"), // フロントでは base64 を再生用に変換
       reading: reading,
     });

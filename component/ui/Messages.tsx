@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
-import { Bot, User, Play, Pause, MessageSquare, Volume2 } from "lucide-react";
+import { MessageSquare, Volume2 } from "lucide-react";
 import { LoadingMessage } from "../loading";
 import { ChatType } from "../../type/types";
 import { AssistantMessageBox, UserMessageBox } from "./Chat/Message";
@@ -16,7 +16,6 @@ export const Messages = ({
   hiraganaReadingList: string[];
 }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  // const audioRef = useRef<HTMLAudioElement | null>(null);
   const [currentPlayingId, setCurrentPlayingId] = useState<number | null>(null);
   const [displayMode, setDisplayMode] = useState<"audio" | "text">("audio");
 
