@@ -6,7 +6,8 @@ export const saveMessage = async (
   chatId: number,
   sender: string,
   message: string,
-  reading?: string
+  reading?: string,
+  english?: string
 ) => {
   return await prisma.message.create({
     data: {
@@ -14,6 +15,7 @@ export const saveMessage = async (
       sender,
       message,
       reading: reading || "",
+      english: english || "",
     },
   });
 };

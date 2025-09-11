@@ -57,7 +57,9 @@ export const Chat = () => {
     summaryFetchLoading,
   } = useSpeech();
 
-  const [audioList, setAudioList] = useState<string[]>([]);
+  const [chatInfo, setChatInfo] = useState<
+    { audioUrl: string; english: string }[]
+  >([]);
   const [overlayOpened, setOverlayOpened] = useState<boolean>(false);
   const [summaryOpened, setSummaryOpened] = useState<boolean>(false);
   const [chatLoading, setChatLoading] = useState<boolean>(false);
@@ -67,7 +69,7 @@ export const Chat = () => {
   );
   const [paymentOverlay, setPaymentOverlay] = useState(false);
 
-  console.log(audioList);
+  console.log(chatInfo);
 
   // console.log(summary);
 
@@ -125,7 +127,10 @@ export const Chat = () => {
         const audioUrl = URL.createObjectURL(blob);
         const audio = new Audio(audioUrl);
         audio.play();
-        setAudioList((prev) => [...prev, audioUrl]);
+        setChatInfo((prev) => [
+          ...prev,
+          { audioUrl: audioUrl, english: data.english },
+        ]);
       }
     } catch (error) {
       console.error("sendToAPI error:", error);
@@ -135,7 +140,7 @@ export const Chat = () => {
   };
 
   const handleRefreshPreviousData = () => {
-    setAudioList([]);
+    setChatInfo([]);
     setSummary(null);
     setHistory([]);
     setHiraganaReadingList([]);
@@ -149,7 +154,7 @@ export const Chat = () => {
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-green-50 overflow-auto w-full">
           <ModeSelectScreen
             setHistory={setHistory}
-            setAudioList={setAudioList}
+            setChatInfo={setChatInfo}
             setHiraganaReadingList={setHiraganaReadingList}
             setPaymentOverlay={setPaymentOverlay}
             trialError={false}
@@ -161,12 +166,12 @@ export const Chat = () => {
           <ChatHeader title="Chat" chatPage={true} history={history} />
           <Messages
             history={history}
-            audioList={audioList}
+            chatInfo={chatInfo}
             chatLoading={chatLoading}
             hiraganaReadingList={hiraganaReadingList}
           />
           <VoiceInput
-            setAudioList={setAudioList}
+            setChatInfo={setChatInfo}
             history={history}
             setHistory={setHistory}
             sendToAPI={sendToAPI}

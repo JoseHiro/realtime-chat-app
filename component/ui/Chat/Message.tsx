@@ -1,4 +1,4 @@
-import { Play, Pause } from "lucide-react";
+import { Play, Pause, Languages } from "lucide-react";
 import React, { useRef, useState } from "react";
 import { SoundWave } from "./SoundWave";
 
@@ -6,25 +6,32 @@ export const AssistantMessageBox = ({
   text,
   reading,
   displayMode,
-  audioList,
+  chatInfo,
   id,
+  english,
 }: {
   text: string;
   reading: string;
   displayMode?: string;
-  currentPlayingId?: number | null;
-  setCurrentPlayingId?: (value: number | null) => void;
-  audioList?: any;
+  chatInfo?: { audioUrl: string; english: string }[];
   id: number;
+  english?: string;
 }) => {
   const [currentPlayingId, setCurrentPlayingId] = useState<number | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [displayEnglishSentence, setDisplayEnglishSentence] = useState<
+    null | number
+  >(null);
+
+  // Create audioList from chatInfo if available
+  // const audioList = chatInfo?.map(info => info.audioUrl) ?? [];
+
   const playAudio = (id: number) => {
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
     }
-    const audio = new Audio(audioList[id - 1]);
+    const audio = new Audio(chatInfo[id - 1].audioUrl);
     audioRef.current = audio;
     audio.play();
     setCurrentPlayingId(id);
@@ -44,8 +51,11 @@ export const AssistantMessageBox = ({
     }
   };
 
-  console.log(audioList);
+  console.log(chatInfo);
 
+  const handleDisplayEnglishSentence = (id: number) => {
+    setDisplayEnglishSentence((prev) => (id === prev ? null : id));
+  };
 
   return (
     <div
@@ -70,26 +80,13 @@ export const AssistantMessageBox = ({
               <Play className="w-5 h-5 ml-0.5" />
             )}
           </button>
-          {/* <SoundWave audioUrl={audioList[id]} /> */}
+
           <div className="flex-1">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="flex gap-0.5">
-                {Array.from({ length: 20 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className={`w-1 rounded-full transition-all duration-200 ${
-                      currentPlayingId === id + 1
-                        ? "bg-emerald-500 animate-pulse"
-                        : "bg-emerald-300"
-                    }`}
-                    style={{
-                      height: `${Math.random() * 12 + 4}px`,
-                    }}
-                  />
-                ))}
-              </div>
-            </div>
-            <p className="text-xs font-medium text-gray-500 ">
+            <SoundWave
+              currentPlayingId={!!currentPlayingId}
+              audioUrl={chatInfo[id].audioUrl}
+            />
+            <p className="text-xs font-medium text-gray-500 mt-2">
               {currentPlayingId === id + 1 ? "Playing..." : "Audio Message"}
             </p>
           </div>
@@ -97,11 +94,34 @@ export const AssistantMessageBox = ({
       ) : (
         <div className=" border-gray-100">
           <p className="text-sm lg:text-base leading-relaxed">{text}</p>
-          <div className="mt-2 pt-2 border-t border-gray-100">
-            <p className="text-[10px] text-gray-400 leading-relaxed font-light tracking-wide">
-              {reading}
-            </p>
+          <div className="flex justify-between">
+            <div className="mt-2 pt-2 border-t border-gray-100">
+              <p className="text-[10px] text-gray-400 leading-relaxed font-light tracking-wide">
+                {reading}
+              </p>
+            </div>
           </div>
+          {((chatInfo && chatInfo[id]?.english !== "") || english !== null) && (
+            <>
+              <button
+                onClick={() => handleDisplayEnglishSentence(id)}
+                className={`text-gray-500 border p-1 hover:bg-gray-100 transition flex items-center space-x-1 rounded text-xs mt-2 ${
+                  displayEnglishSentence === id
+                    ? "bg-green-50 text-green-700 border border-green-200 shadow-sm"
+                    : ""
+                }`}
+              >
+                <Languages className="w-4 h-4 text-bold" /> Show translation
+              </button>
+              {displayEnglishSentence === id && (
+                <div className="mt-1 border-gray-100">
+                  <p className="text-sm text-gray-600 italic leading-relaxed">
+                    {(chatInfo && chatInfo[id]?.english) || english}
+                  </p>
+                </div>
+              )}
+            </>
+          )}
         </div>
       )}
     </div>

@@ -67,7 +67,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
     const raw = completion.choices[0]?.message?.content ?? "";
     const reply = raw.replace(/^\d+\.\s*/, "").trim();
-    const reading = await addReading(reply);
+    const { reading, english } = await addReading(reply);
     const tokenUrl = `https://${serviceRegion}.api.cognitive.microsoft.com/sts/v1.0/issuetoken`;
     const tokenResponse = await fetch(tokenUrl, {
       method: "POST",
@@ -145,6 +145,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         sender: "assistant",
         message: reply,
         reading: reading,
+        english: english,
       },
     });
 
@@ -155,6 +156,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       messageId: message.id,
       audio: audioBuffer.toString("base64"), // フロントでは base64 を再生用に変換
       reading: reading,
+      english: english,
     });
   } catch (error) {
     console.error("OpenAI API error:", error);
@@ -164,8 +166,12 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
 // Add reading japanese since some might have kanji
 const addReading = async (text: string) => {
-  const prompt =
-    "以下の文章のひらがなの読みがなだけを返してください。句読点などはそのまま残してください。";
+  const prompt = `以下の日本語を処理してください。出力フォーマットは必ずJSONで次の形にしてください:
+{
+  "reading": "ひらがなのみで表記",
+  "english": "英訳"
+}
+`;
 
   const completion = await openai.chat.completions.create({
     model: "gpt-4o-mini",
@@ -174,6 +180,16 @@ const addReading = async (text: string) => {
       { role: "user", content: text },
     ],
   });
-  const reading = completion.choices[0]?.message?.content ?? "";
-  return reading;
+
+  const result = completion.choices[0]?.message?.content ?? "";
+
+  try {
+    const parsed = JSON.parse(result);
+    return {
+      reading: parsed.reading ?? "",
+      english: parsed.english ?? "",
+    };
+  } catch {
+    return { reading: "", english: "" }; // JSONパース失敗時のフォールバック
+  }
 };

@@ -50,6 +50,7 @@ model Message {
   sender    String
   message   String
   reading  String?
+  english  String?
   createdAt DateTime @default(now())
 }
 
