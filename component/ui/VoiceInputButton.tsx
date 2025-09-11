@@ -20,12 +20,14 @@ export const VoiceInput = ({
   sendToAPI,
   history,
   setHiraganaReadingList,
-  setAudioList,
+  setChatInfo,
 }: {
   setHistory: React.Dispatch<React.SetStateAction<ChatType>>;
   sendToAPI: (text: ChatType) => Promise<void>;
   history: ChatType;
-  setAudioList: React.Dispatch<React.SetStateAction<string[]>>;
+  setChatInfo: React.Dispatch<
+    React.SetStateAction<{ audioUrl: string; english: string }[]>
+  >;
   setHiraganaReadingList: React.Dispatch<React.SetStateAction<string[]>>;
 }) => {
   const [isRecording, setIsRecording] = useState(false);
@@ -79,7 +81,7 @@ export const VoiceInput = ({
     const newMessages = [...history, { role: "user", content: text }];
     setHiraganaReadingList((prev) => [...prev, ""]);
     setHistory(newMessages);
-    setAudioList((prev) => [...prev, ""]);
+    setChatInfo((prev) => [...prev, { audioUrl: "", english: "" }]);
     sendToAPI(newMessages);
   };
 
@@ -89,7 +91,7 @@ export const VoiceInput = ({
     setHiraganaReadingList((prev) => [...prev, ""]);
     setHistory(newMessages);
     sendToAPI(newMessages);
-    setAudioList((prev) => [...prev, ""]);
+    setChatInfo((prev) => [...prev, { audioUrl: "", english: "" }]);
     setText("");
   };
 

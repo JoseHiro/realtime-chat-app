@@ -151,6 +151,12 @@ const Index = () => {
                   ></path>
                 </svg>
               </RoundedButton>
+              <RoundedButton
+                onClick={() => router.push("/login")}
+                className="border border-green-200 text-green-600 hover:text-green-700 hover:border-green-300 hover:bg-green-50 font-medium px-6 py-3 rounded-full transition-all duration-200"
+              >
+                Already have an account? Login
+              </RoundedButton>
               {/* <button className="border-2 border-green-500 text-green-600 hover:bg-green-50 px-8 py-4 rounded-full text-lg font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg">
                 Watch Demo
               </button> */}

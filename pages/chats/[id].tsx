@@ -42,6 +42,8 @@ const ChatPage = () => {
     },
   });
 
+  console.log(chat);
+
   return (
     <div className="relative w-full h-screen flex">
       <Sidebar />
@@ -81,6 +83,7 @@ const ChatPage = () => {
                       text={message.message}
                       reading={message.reading || ""}
                       id={index}
+                      english={message.english}
                     />
                   )}
                   {message.sender === "user" && (

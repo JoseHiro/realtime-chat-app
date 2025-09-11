@@ -58,8 +58,14 @@ export default async function handler(
     });
 
     const reply = completion.choices[0].message?.content ?? "";
-    const reading = await addReading(reply);
-    const message = await saveMessage(chatId, "assistant", reply, reading);
+    const { reading, english } = await addReading(reply);
+    const message = await saveMessage(
+      chatId,
+      "assistant",
+      reply,
+      reading,
+      english
+    );
 
     // 2. Azure TTS用アクセストークン取得
     const tokenUrl = `https://${serviceRegion}.api.cognitive.microsoft.com/sts/v1.0/issuetoken`;
@@ -112,6 +118,7 @@ export default async function handler(
       audio: audioBuffer.toString("base64"), // フロントでは base64 を再生用に変換
       reading: reading,
       messageId: message.id,
+      english: english,
     });
 
     const usage = completion.usage; // open ai usage
@@ -147,11 +154,17 @@ export default async function handler(
 const addReading = async (text: string) => {
   const prompt = `以下の文章の漢字をひらがなに変換してください。
 - 元々ひらがな・カタカナの部分はそのまま残す
-- ローマ字に変換しない
 - 句読点などはそのまま残す
 - 出力は文章全体をひらがなで返す
 例: "ラーメン、美味しいよね！好きなラーメンの種類はある？"
 → "ラーメン、おいしいよね！すきならーめんのしゅるいはある？"
+
+英語の翻訳もください
+出力フォーマットは必ずJSONで次の形にしてください:
+{
+  "reading": "ひらがな文章",
+  "english": "英訳"
+}
 ;`;
 
   const completion = await openai.chat.completions.create({
@@ -161,7 +174,15 @@ const addReading = async (text: string) => {
       { role: "user", content: text },
     ],
   });
-  const reading = completion.choices[0]?.message?.content ?? "";
+  const result = completion.choices[0]?.message?.content ?? "";
 
-  return reading;
+  try {
+    const parsed = JSON.parse(result);
+    return {
+      reading: parsed.reading ?? "",
+      english: parsed.english ?? "",
+    };
+  } catch {
+    return { reading: "", english: "" };
+  }
 };

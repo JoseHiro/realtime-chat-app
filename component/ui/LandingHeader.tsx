@@ -25,7 +25,6 @@ export const LandingHeader = () => {
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <AppName />
-
           <div className="hidden md:flex items-center space-x-8">
             <a
               href="#features"
@@ -58,6 +57,18 @@ export const LandingHeader = () => {
             <div className="w-6 h-0.5 bg-gray-600 mb-1.5 transition-all duration-200"></div>
             <div className="w-6 h-0.5 bg-gray-600 transition-all duration-200"></div>
           </button>
+        </div>
+      </div>
+    </nav>
+  );
+};
+
+export const AuthHeader = () => {
+  return (
+    <nav className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white/80 backdrop-blur-md border-b border-gray-100">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
+          <AppName />
         </div>
       </div>
     </nav>

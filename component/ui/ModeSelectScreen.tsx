@@ -29,14 +29,16 @@ import { apiRequest } from "../../lib/apiRequest";
 
 export const ModeSelectScreen = ({
   setHistory,
-  setAudioList,
+  setChatInfo,
   setHiraganaReadingList,
   setPaymentOverlay,
   trialError,
   handleRefreshPreviousData,
 }: {
   setHistory: React.Dispatch<React.SetStateAction<ChatType>>;
-  setAudioList: React.Dispatch<React.SetStateAction<string[]>>;
+  setChatInfo: React.Dispatch<
+    React.SetStateAction<{ audioUrl: string; english: string }[]>
+  >;
   setHiraganaReadingList: React.Dispatch<React.SetStateAction<string[]>>;
   setPaymentOverlay: React.Dispatch<React.SetStateAction<boolean>>;
   trialError: boolean;
@@ -88,7 +90,7 @@ export const ModeSelectScreen = ({
     if (trialError) {
       setPaymentOverlay(true);
     } else {
-      if (loading) return; // prevent double click
+      if (loading) return;
       setLoading(true);
       handleRefreshPreviousData();
 
@@ -105,6 +107,8 @@ export const ModeSelectScreen = ({
           }),
         });
 
+        console.log(data);
+
         setHistory((prev) => [
           ...prev,
           { role: "assistant", content: data.reply },
@@ -120,7 +124,10 @@ export const ModeSelectScreen = ({
           const audioUrl = URL.createObjectURL(blob);
           const audio = new Audio(audioUrl);
           audio.play();
-          setAudioList((prev) => [...prev, audioUrl]);
+          setChatInfo((prev) => [
+            ...prev,
+            { audioUrl: audioUrl, english: data.english },
+          ]);
           setChatMode(true);
         }
       } catch (error) {

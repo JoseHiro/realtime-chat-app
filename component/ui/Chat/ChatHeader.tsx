@@ -64,8 +64,6 @@ export const ChatHeader = ({
     return level;
   };
 
-  console.log(title, theme, level, politeness);
-
   const getPolitenessInfo = () => {
     if (politeness) {
       if (politeness === "casual") {

@@ -6,13 +6,13 @@ import { AssistantMessageBox, UserMessageBox } from "./Chat/Message";
 
 export const Messages = ({
   history,
-  audioList,
+  chatInfo,
   chatLoading,
   hiraganaReadingList,
 }: {
   chatLoading: boolean;
   history: ChatType;
-  audioList: string[];
+  chatInfo: { audioUrl: string; english: string }[];
   hiraganaReadingList: string[];
 }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -97,10 +97,8 @@ export const Messages = ({
               displayMode={displayMode}
               text={message.content}
               reading={hiraganaReadingList[id]}
-              currentPlayingId={currentPlayingId}
-              setCurrentPlayingId={setCurrentPlayingId}
               id={id}
-              audioList={audioList}
+              chatInfo={chatInfo}
             />
           )}
           {message.role === "user" && (
