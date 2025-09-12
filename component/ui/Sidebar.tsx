@@ -164,7 +164,10 @@ export const Sidebar = () => {
         </div>
 
         <div className="flex">
-          <button className="cursor-pointer flex items-center gap-3 p-3 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors">
+          <button
+            onClick={() => router.push("/setting")}
+            className="cursor-pointer flex items-center gap-3 p-3 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors"
+          >
             <Settings className="w-5 h-5" />
             {/* 設定 */}
           </button>

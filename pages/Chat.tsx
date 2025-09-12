@@ -69,10 +69,6 @@ export const Chat = () => {
   );
   const [paymentOverlay, setPaymentOverlay] = useState(false);
 
-  console.log(chatInfo);
-
-  // console.log(summary);
-
   const { data, isLoading, error } = useQuery({
     queryKey: ["user"],
     queryFn: async () => {
@@ -85,6 +81,9 @@ export const Chat = () => {
     },
     retry: false,
   });
+
+  console.log(data);
+  
 
   useEffect(() => {
     if (data?.trialStatus === "ended") {
