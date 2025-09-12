@@ -27,6 +27,7 @@ export const AssistantMessageBox = ({
   // const audioList = chatInfo?.map(info => info.audioUrl) ?? [];
 
   const playAudio = (id: number) => {
+    if(chatInfo === undefined) return;
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;

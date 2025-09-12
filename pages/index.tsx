@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { RoundedButton } from "../component/button";
 import { LandingHeader } from "../component/ui/LandingHeader";
+import Link from "next/link";
 
 const Index = () => {
   const [currentMessage, setCurrentMessage] = useState(0);
@@ -131,7 +132,7 @@ const Index = () => {
               improve your skills in just 3-5 minutes a day.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 mb-12">
+            <div className="flex flex-col sm:flex-row gap-4 mb-12 md:mb-16 justify-center lg:justify-start">
               <RoundedButton
                 onClick={() => router.push("/signup?plan=trial")}
                 className="group bg-green-500 hover:bg-green-600 text-white px-8 py-4 text-lg font-semibold transition-all duration-300 hover:scale-105 hover:shadow-xl shadow-lg"
@@ -179,7 +180,7 @@ const Index = () => {
           </div>
 
           {/* Right Column - Chat Interface Mockup */}
-          <div className="relative">
+          <div className="relative min-h-full">
             <div className="bg-white rounded-3xl shadow-2xl p-6 mx-auto max-w-sm relative hover:shadow-3xl transition-shadow duration-300">
               {/* Chat Header */}
               <div className="flex items-center justify-between mb-6">
@@ -283,7 +284,7 @@ const Index = () => {
             </div>
 
             {/* Feedback Popup */}
-            <div className="absolute -right-4 top-1/2 transform translate-x-full -translate-y-1/2 bg-white rounded-xl shadow-lg p-4 max-w-xs border border-green-100 animate-pulse-slow hidden lg:block">
+            <div className="lg:right-0 lg:block absolute bg-white rounded-xl shadow-lg p-4 max-w-xs border border-green-100 hidden animate-pulse-slow m-auto mt-6">
               <div className="text-xs font-semibold text-green-600 mb-2">
                 Grammar Feedback
               </div>
@@ -430,7 +431,7 @@ const Index = () => {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <RoundedButton
-              onClick={() => router.push("/signin")}
+              onClick={() => router.push("/signup?plan=trial")}
               className="bg-white text-green-600 px-8 py-4 rounded-full text-lg font-semibold hover:bg-gray-50 hover:scale-105 hover:shadow-xl shadow-lg"
             >
               Start Your Free Trial
@@ -490,12 +491,12 @@ const Index = () => {
                   </a>
                 </li>
                 <li>
-                  <a
+                  <Link
                     href="/pricing"
                     className="hover:text-white transition-colors duration-200"
                   >
                     Pricing
-                  </a>
+                  </Link>
                 </li>
                 <li>
                   <a
