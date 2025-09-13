@@ -1,6 +1,7 @@
 import { Play, Pause, Languages } from "lucide-react";
 import React, { useRef, useState } from "react";
 import { SoundWave } from "./SoundWave";
+import { useSpeech } from "../../../context/SpeechContext";
 
 export const AssistantMessageBox = ({
   text,
@@ -17,16 +18,19 @@ export const AssistantMessageBox = ({
   id: number;
   english?: string;
 }) => {
+
   const [currentPlayingId, setCurrentPlayingId] = useState<number | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [displayEnglishSentence, setDisplayEnglishSentence] = useState<
     null | number
   >(null);
 
+  // const { isMuted } = useSpeech();
   // Create audioList from chatInfo if available
   // const audioList = chatInfo?.map(info => info.audioUrl) ?? [];
 
   const playAudio = (id: number) => {
+    // if(!isMuted) return;
     if(chatInfo === undefined) return;
     if (audioRef.current) {
       audioRef.current.pause();
@@ -34,6 +38,7 @@ export const AssistantMessageBox = ({
     }
     const audio = new Audio(chatInfo[id - 1].audioUrl);
     audioRef.current = audio;
+    audio.muted = true;
     audio.play();
     setCurrentPlayingId(id);
 

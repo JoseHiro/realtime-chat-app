@@ -16,10 +16,9 @@ import { apiRequest } from "../../lib/apiRequest";
 import { SidebarAppName } from "./AppName";
 
 export const Sidebar = () => {
-  const { setChatMode, setChatEnded, setChatId } = useSpeech();
+  const { setChatMode, setChatEnded, setChatId, setIsMuted, isMuted } = useSpeech();
   const router = useRouter();
   const menuRef = useRef<HTMLDivElement>(null);
-  const [isMuted, setIsMuted] = useState(false);
   const [activeChat, setActiveChat] = useState<number | null>(null);
   const queryClient = useQueryClient();
 
