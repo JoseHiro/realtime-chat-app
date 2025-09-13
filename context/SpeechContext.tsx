@@ -26,6 +26,8 @@ interface SpeechContextType {
   setSummary: React.Dispatch<React.SetStateAction<any>>;
   summaryFetchLoading: boolean;
   setSummaryFetchLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  isMuted: boolean;
+  setIsMuted: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const SpeechContext = createContext<SpeechContextType>({
@@ -53,6 +55,8 @@ const SpeechContext = createContext<SpeechContextType>({
   setSummary: () => {},
   summaryFetchLoading: false,
   setSummaryFetchLoading: () => {},
+  isMuted: false,
+  setIsMuted: () => {},
 });
 
 export const SpeechProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -70,6 +74,7 @@ export const SpeechProvider: React.FC<{ children: React.ReactNode }> = ({
   const [subscriptionPlan, setSubscriptionPlan] = useState<string>("");
   const [summary, setSummary] = useState(null);
   const [summaryFetchLoading, setSummaryFetchLoading] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
 
   return (
     <SpeechContext.Provider
@@ -98,6 +103,8 @@ export const SpeechProvider: React.FC<{ children: React.ReactNode }> = ({
         setSummary,
         summaryFetchLoading,
         setSummaryFetchLoading,
+        isMuted,
+        setIsMuted,
       }}
     >
       {children}

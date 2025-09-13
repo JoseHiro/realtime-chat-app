@@ -87,6 +87,8 @@ export const ModeSelectScreen = ({
   const handleBeginConversation = async () => {
     // if trial is ended overlay
 
+    console.log(trialError);
+    
     if (trialError) {
       setPaymentOverlay(true);
     } else {
@@ -107,7 +109,7 @@ export const ModeSelectScreen = ({
           }),
         });
 
-        console.log(data);
+        // console.log(data);
 
         setHistory((prev) => [
           ...prev,

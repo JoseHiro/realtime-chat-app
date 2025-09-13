@@ -36,12 +36,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     if (user.subscriptionStatus === "trialing") {
       const now = new Date();
       if (user.trialEndsAt && now > user.trialEndsAt) {
-        console.log("here1");
-
         trialStatus = "ended";
       } else if ((user.trialUsedChats ?? 0) >= 2) {
-        console.log("here2");
-
         trialStatus = "ended";
       } else {
         trialStatus = "active";

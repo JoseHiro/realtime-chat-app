@@ -42,6 +42,7 @@ import { ChatHeader } from "../component/ui/Chat/ChatHeader";
 // play audio[]
 // audio sound design[]
 // generating chat design[]
+// audio speed
 
 export const Chat = () => {
   const {
@@ -83,7 +84,7 @@ export const Chat = () => {
   });
 
   console.log(data);
-  
+
 
   useEffect(() => {
     if (data?.trialStatus === "ended") {
@@ -156,7 +157,7 @@ export const Chat = () => {
             setChatInfo={setChatInfo}
             setHiraganaReadingList={setHiraganaReadingList}
             setPaymentOverlay={setPaymentOverlay}
-            trialError={false}
+            trialError={data?.trialStatus === "ended"}
             handleRefreshPreviousData={handleRefreshPreviousData}
           />
         </div>

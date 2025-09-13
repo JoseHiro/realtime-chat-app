@@ -31,8 +31,9 @@ export const Overlay: React.FC<OverlayProps> = ({ children, onClose }) => {
 
 export const BlockUseOverlay = () => {
   return (
-    <div className="fixed top-0 left-0 w-full h-full bg-gray-400/50 backdrop-blur-sm z-50 flex justify-center items-center">
-      <div className="bg-white rounded-2xl p-8 shadow-xl max-w-sm w-full text-center">
+    <div className="fixed top-0 left-0 w-full h-full bg-gray-400/50 backdrop-blur-sm z-50 flex justify-center">
+      {/* Container to display  */}
+      <div className="bg-white rounded-2xl p-8 shadow-xl max-w-sm w-full text-center h-[200px] mt-[20%]">
         <h2 className="text-xl text-green-400 font-bold mb-1">
           {"Let's start your next chat!"}
         </h2>

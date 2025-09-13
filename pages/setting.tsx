@@ -2,6 +2,8 @@ import React from "react";
 import { LogOut, User, Calendar, Crown } from "lucide-react";
 import { Sidebar } from "../component/ui/Sidebar";
 import { RoundedButton } from "../component/button";
+import { apiRequest } from "../lib/apiRequest";
+import { useRouter } from "next/router";
 
 interface UserData {
   user: {
@@ -13,7 +15,8 @@ interface UserData {
   trialStatus: string;
 }
 
- const Setting = () => {
+const Setting = () => {
+  const router = useRouter()
   // Mock data - replace with your actual data fetching logic
   const userData: UserData = {
     user: {
@@ -25,9 +28,15 @@ interface UserData {
     trialStatus: "ended",
   };
 
-  const handleLogout = () => {
-    // Add your logout logic here
+  const handleLogout = async () => {
     console.log("Logging out...");
+
+    try {
+      await apiRequest("/api/auth/logout", { method: "POST" });
+      router.push("/login");
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -54,7 +63,7 @@ interface UserData {
   return (
     <div className="relative w-full h-screen flex">
       <Sidebar />
-        <div className="min-h-screen bg-gradient-to-br pt-5 from-gray-50 to-green-50 overflow-auto w-full">
+      <div className="min-h-screen bg-gradient-to-br pt-5 from-gray-50 to-green-50 overflow-auto w-full">
         <div className="max-w-2xl mx-auto">
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h1 className="text-2xl font-semibold text-gray-900 mb-6">
