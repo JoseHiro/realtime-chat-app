@@ -70,7 +70,7 @@ export const Chat = () => {
   );
   const [paymentOverlay, setPaymentOverlay] = useState(false);
 
-  const { data, isLoading, error } = useQuery({
+  const { data } = useQuery({
     queryKey: ["user"],
     queryFn: async () => {
       const response = await fetch("/api/user");
@@ -83,11 +83,17 @@ export const Chat = () => {
     retry: false,
   });
 
-  console.log(data);
-
+  // console.log(data);
 
   useEffect(() => {
+    if (!data) return;
     if (data?.trialStatus === "ended") {
+      setPaymentOverlay(true);
+    }
+    if (
+      data.user.subscriptionPlan === "pro" &&
+      data.user.subscriptionStatus !== "active"
+    ) {
       setPaymentOverlay(true);
     }
     setUsername(data?.user.username);

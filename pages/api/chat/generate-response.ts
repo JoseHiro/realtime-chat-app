@@ -123,7 +123,7 @@ export default async function handler(
 
     const usage = completion.usage; // open ai usage
     const charCount = reply.length; // azure usage
-    const openaiCost = (usage.total_tokens / 1000) * 0.015;
+    const openaiCost = usage ? (usage.total_tokens / 1000) * 0.015 : 0;
     const azureCost = (charCount / 1000000) * 16;
 
     logUsage({
@@ -133,9 +133,9 @@ export default async function handler(
       politeness,
       openai: {
         model: "gpt-4o-mini",
-        prompt_tokens: usage.prompt_tokens,
-        completion_tokens: usage.completion_tokens,
-        total_tokens: usage.total_tokens,
+        prompt_tokens: usage?.prompt_tokens ?? 0,
+        completion_tokens: usage?.completion_tokens ?? 0,
+        total_tokens: usage?.total_tokens ?? 0,
         estimated_cost_usd: openaiCost,
       },
       azure_tts: {

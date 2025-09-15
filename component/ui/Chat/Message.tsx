@@ -1,7 +1,6 @@
 import { Play, Pause, Languages } from "lucide-react";
 import React, { useRef, useState } from "react";
 import { SoundWave } from "./SoundWave";
-import { useSpeech } from "../../../context/SpeechContext";
 
 export const AssistantMessageBox = ({
   text,
@@ -90,7 +89,7 @@ export const AssistantMessageBox = ({
           <div className="flex-1">
             <SoundWave
               currentPlayingId={!!currentPlayingId}
-              audioUrl={chatInfo[id].audioUrl}
+              audioUrl={chatInfo?.[id]?.audioUrl ?? ""}
             />
             <p className="text-xs font-medium text-gray-500 mt-2">
               {currentPlayingId === id + 1 ? "Playing..." : "Audio Message"}

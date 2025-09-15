@@ -2,10 +2,11 @@ import React, { useState } from "react";
 import { useRouter } from "next/router";
 import { RoundedButton } from "../component/button";
 import { LandingHeader } from "../component/ui/LandingHeader";
+import { PricingType, FAQType } from "../type/types";
 
 const Pricing = () => {
   const router = useRouter();
-  const plans = [
+  const plans: PricingType[] = [
     {
       name: "Free Trial",
       type: "trial",
@@ -113,7 +114,7 @@ const Pricing = () => {
     },
   ];
 
-  const PricingCard = ({ plan, index }) => (
+  const PricingCard = ({ plan }: { plan: PricingType }) => (
     <div
       className={`relative ${plan.popular ? "transform scale-105 z-10" : ""}`}
     >
@@ -181,10 +182,10 @@ const Pricing = () => {
 
         <div className="space-y-4">
           <h4 className="font-semibold text-gray-900 text-lg">
-            What's included:
+            {`What's included:`}
           </h4>
           <ul className="space-y-3">
-            {plan.features.map((feature, idx) => (
+            {plan.features.map((feature, idx: number) => (
               <li key={idx} className="flex items-start">
                 <svg
                   className="w-5 h-5 text-green-500 mr-3 mt-0.5 flex-shrink-0"
@@ -210,7 +211,7 @@ const Pricing = () => {
                 Limitations:
               </h4>
               <ul className="space-y-2">
-                {plan.limitations.map((limitation, idx) => (
+                {plan.limitations.map((limitation, idx: number) => (
                   <li key={idx} className="flex items-start">
                     <svg
                       className="w-4 h-4 text-gray-400 mr-2 mt-0.5 flex-shrink-0"
@@ -236,7 +237,7 @@ const Pricing = () => {
     </div>
   );
 
-  const FAQItem = ({ faq, index }) => {
+  const FAQItem = ({ faq }: { faq: FAQType }) => {
     const [isOpen, setIsOpen] = useState(false);
 
     return (
@@ -302,8 +303,8 @@ const Pricing = () => {
       <section className="pb-20">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="grid lg:grid-cols-3 gap-8">
-            {plans.map((plan, index) => (
-              <PricingCard key={plan.name} plan={plan} index={index} />
+            {plans.map((plan) => (
+              <PricingCard key={plan.name} plan={plan} />
             ))}
           </div>
         </div>
@@ -425,7 +426,7 @@ const Pricing = () => {
 
           <div className="space-y-4">
             {faqs.map((faq, index) => (
-              <FAQItem key={index} faq={faq} index={index} />
+              <FAQItem key={index} faq={faq} />
             ))}
           </div>
         </div>

@@ -15,7 +15,6 @@ import {
   MessageSquare,
 } from "lucide-react";
 
-
 // Sample data for demonstration
 const sampleSummary = {
   score: 70,
@@ -55,11 +54,49 @@ const sampleSummary = {
   vocabularySuggestions: ["感情", "詳しく", "会話"],
 };
 
-const Skeleton = ({ className }) => (
+const Skeleton = ({ className }: { className: string }) => (
   <div className={`animate-pulse bg-gray-200 rounded ${className}`}></div>
 );
 
-export const Summary = ({ summary = sampleSummary }) => {
+type Mistake = {
+  kanji: string;
+  kana: string;
+};
+
+type SentenceUpgrade = {
+  advice: string;
+  original: {
+    kana: string;
+    kanji: string;
+  };
+  upgraded: {
+    kana: string;
+    kanji: string;
+  };
+};
+
+type SummaryType = {
+  score: number;
+  title: string;
+  summary: string;
+  mistakes: Mistake[];
+  goodPoints: string[];
+  corrections: Mistake[];
+  responseSkill: string;
+  commonMistakes: string[];
+  difficultyLevel: string;
+  difficultyReason: string;
+  sentenceUpgrades: SentenceUpgrade[];
+  topicDevelopment: string;
+  improvementPoints: string[];
+  vocabularySuggestions: string[];
+};
+
+export const Summary = ({
+  summary = sampleSummary,
+}: {
+  summary?: SummaryType;
+}) => {
   const scorePercentage = summary?.score || 0;
 
   return (
@@ -164,9 +201,7 @@ export const Summary = ({ summary = sampleSummary }) => {
                 <div className="text-2xl font-semibold text-black mb-1">
                   {stat.value}
                 </div>
-                <div className="text-sm text-gray-600">
-                  {stat.label}
-                </div>
+                <div className="text-sm text-gray-600">{stat.label}</div>
               </div>
             );
           })}
@@ -186,7 +221,11 @@ export const Summary = ({ summary = sampleSummary }) => {
               </div>
               <div className="bg-gray-50 rounded-lg p-6 border border-gray-100">
                 <p className="text-gray-800 leading-relaxed">
-                  {summary ? summary?.summary : <Skeleton className="w-full h-6" />}
+                  {summary ? (
+                    summary?.summary
+                  ) : (
+                    <Skeleton className="w-full h-6" />
+                  )}
                 </p>
               </div>
             </div>
@@ -380,9 +419,7 @@ export const Summary = ({ summary = sampleSummary }) => {
                       <div className="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center text-white text-sm font-medium flex-shrink-0">
                         {index + 1}
                       </div>
-                      <p className="text-gray-800 leading-relaxed">
-                        {mistake}
-                      </p>
+                      <p className="text-gray-800 leading-relaxed">{mistake}</p>
                     </div>
                   ))}
                 </div>
@@ -453,34 +490,33 @@ export const Summary = ({ summary = sampleSummary }) => {
             </div>
 
             {/* Vocabulary Suggestions */}
-            {summary?.vocabularySuggestions && summary.vocabularySuggestions.length > 0 && (
-              <div className="bg-white border border-gray-200 rounded-lg p-6">
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center space-x-3">
-                    <Lightbulb className="w-5 h-5 text-green-600" />
-                    <h3 className="text-lg font-semibold text-black">
-                      Vocabulary Focus
-                    </h3>
-                  </div>
-                  <span className="bg-green-600 text-white px-2 py-1 rounded text-xs">
-                    {summary?.vocabularySuggestions?.length}
-                  </span>
-                </div>
-
-                <div className="space-y-2">
-                  {summary?.vocabularySuggestions?.map((word, index) => (
-                    <div
-                      key={index}
-                      className="px-4 py-3 bg-gray-50 border border-gray-100 rounded"
-                    >
-                      <span className="text-black font-medium">
-                        {word}
-                      </span>
+            {summary?.vocabularySuggestions &&
+              summary.vocabularySuggestions.length > 0 && (
+                <div className="bg-white border border-gray-200 rounded-lg p-6">
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center space-x-3">
+                      <Lightbulb className="w-5 h-5 text-green-600" />
+                      <h3 className="text-lg font-semibold text-black">
+                        Vocabulary Focus
+                      </h3>
                     </div>
-                  ))}
+                    <span className="bg-green-600 text-white px-2 py-1 rounded text-xs">
+                      {summary?.vocabularySuggestions?.length}
+                    </span>
+                  </div>
+
+                  <div className="space-y-2">
+                    {summary?.vocabularySuggestions?.map((word, index) => (
+                      <div
+                        key={index}
+                        className="px-4 py-3 bg-gray-50 border border-gray-100 rounded"
+                      >
+                        <span className="text-black font-medium">{word}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
           </div>
         </div>
       </div>

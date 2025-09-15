@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { useRouter } from "next/router";
 import { useQuery } from "@tanstack/react-query";
 import { Sidebar } from "../../component/ui/Sidebar";
@@ -24,11 +24,16 @@ type Chat = {
   level?: string;
   politeness?: string;
   message: Message[];
+  analysis?: {
+    result?: string;
+    // Add other fields if needed
+  };
 };
 
 const ChatPage = () => {
   const router = useRouter();
   const { id } = router.query;
+
   const {
     data: chat,
     // isLoading,
@@ -42,12 +47,11 @@ const ChatPage = () => {
     },
   });
 
-  console.log(chat);
+  // console.log(chat);
 
   return (
     <div className="relative w-full h-screen flex">
       <Sidebar />
-
 
       <div className="flex-1 min-h-screen flex flex-col bg-gradient-to-br from-gray-50 to-green-50 overflow-hidden">
         {/* Header */}
@@ -83,7 +87,6 @@ const ChatPage = () => {
                       text={message.message}
                       reading={message.reading || ""}
                       id={index}
-                      english={message.english}
                     />
                   )}
                   {message.sender === "user" && (

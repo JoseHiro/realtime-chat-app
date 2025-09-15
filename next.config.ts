@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
   },
   reactStrictMode: true,
   allowedDevOrigins: [
-    "https://fd7ac7492bc9.ngrok-free.app",
+    "https://c5b4064da4d8.ngrok-free.app",
   ],
 };
 

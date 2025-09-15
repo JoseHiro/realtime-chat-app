@@ -21,12 +21,12 @@ export default async function handler(
     const user = await prisma.user.findUnique({ where: { email } });
 
     if (!user) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(401).json({ message: "Invalid email or password" });
     }
 
     const isValid = await bcrypt.compare(password, user.password);
     if (!isValid) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(401).json({ message: "Invalid email or password" });
     }
 
     const token = jwt.sign(
@@ -49,9 +49,11 @@ export default async function handler(
 
     return res.status(200).json({
       message: "Login successful",
-      user: { id: user.id  },
+      user: { id: user.id },
     });
   } catch (error) {
     return res.status(200).json;
+    console.error("Login error:", error);
+    
   }
 }

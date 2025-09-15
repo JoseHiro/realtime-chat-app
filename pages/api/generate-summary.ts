@@ -3,7 +3,7 @@ import OpenAI from "openai";
 import { logUsage } from "../../lib/loggingData/logger";
 import { verifyAuth } from "../../middleware/middleware";
 import { PrismaClient } from "@prisma/client";
-
+import { MyJwtPayload } from "../../type/types";
 const prisma = new PrismaClient();
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 
@@ -16,7 +16,7 @@ export default async function handler(
   }
 
   const token = req.cookies.access_token;
-  const decodedToken = verifyAuth(token);
+  const decodedToken = verifyAuth(token) as MyJwtPayload | null;
   if (!decodedToken) {
     return res.status(401).json({ error: "Not authenticated" });
   }
@@ -135,16 +135,16 @@ JSONのキー:
     }
 
     const usage = completion.usage; // open ai usage
-    const openaiCost = (usage.total_tokens / 1000) * 0.015;
+    const openaiCost = ((usage?.total_tokens ?? 0) / 1000) * 0.015;
 
     logUsage({
       timestamp: new Date().toISOString(),
       chatId,
       openai: {
         model: "gpt-4o-mini",
-        prompt_tokens: usage.prompt_tokens,
-        completion_tokens: usage.completion_tokens,
-        total_tokens: usage.total_tokens,
+        prompt_tokens: usage?.prompt_tokens ?? 0,
+        completion_tokens: usage?.completion_tokens ?? 0,
+        total_tokens: usage?.total_tokens ?? 0,
         estimated_cost_usd: openaiCost,
       },
     });
@@ -161,8 +161,8 @@ JSONのキー:
 }
 
 export const increaseChatCount = async (userId: string) => {
-  console.log('-------------------- called');
-  
+  console.log("-------------------- called");
+
   const user = await prisma.user.findUnique({
     where: { id: userId },
   });
