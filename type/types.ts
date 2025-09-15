@@ -1,3 +1,9 @@
+import { JwtPayload } from "jsonwebtoken";
+
+export interface MyJwtPayload extends JwtPayload {
+  userId: string;
+}
+
 // JLPT レベルの型
 export type JLPTLevel = "N5" | "N4" | "N3" | "N2" | "N1";
 
@@ -53,4 +59,25 @@ export type ChatDataType = {
   title: string;
   createdAt: string;
   message: MessageType[];
+};
+
+
+export type PricingType = {
+  name: string;
+  type: "trial" | "pro" | "premium";
+  description: string;
+  price: number | null;
+  features: string[];
+  limitations: string[];
+  buttonText: string;
+  buttonStyle: string;
+  popular: boolean;
+  color: "green" | "gray" | string;
+  badge: string | null;
+  disabled?: boolean; // Premiumだけ使ってるので optional
+};
+
+export type FAQType = {
+  question: string;
+  answer: string;
 };

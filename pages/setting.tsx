@@ -4,6 +4,7 @@ import { Sidebar } from "../component/ui/Sidebar";
 import { RoundedButton } from "../component/button";
 import { apiRequest } from "../lib/apiRequest";
 import { useRouter } from "next/router";
+import { toast } from "sonner";
 
 interface UserData {
   user: {
@@ -29,11 +30,11 @@ const Setting = () => {
   };
 
   const handleLogout = async () => {
-    console.log("Logging out...");
 
     try {
       await apiRequest("/api/auth/logout", { method: "POST" });
       router.push("/login");
+      toast.success("Successfully logged out!", { position: "top-center" });
     } catch (error) {
       console.error("Logout error:", error);
     }

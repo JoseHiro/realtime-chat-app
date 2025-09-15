@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 import { startStripeSession } from "../lib/stripe/startSession";
 import { AuthHeader } from "../component/ui/LandingHeader";
+import { toast } from "sonner";
 
 type SigninFormInputs = {
   email: string;
@@ -25,28 +26,37 @@ const Signup = () => {
       return;
     }
 
-    // Here you can call your API to signin
-    const response = await fetch("/api/auth/signup", {
-      body: JSON.stringify({
-        username: data.username,
-        password: data.password,
-        email: data.email,
-        plan,
-      }),
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-    });
+    try {
+      const response = await fetch("/api/auth/signup", {
+        body: JSON.stringify({
+          username: data.username,
+          password: data.password,
+          email: data.email,
+          plan,
+        }),
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
 
-    // const result = await response.json();
-    // const userId = result.userId;
-
-    if (plan === "trial") {
-      router.push("/chat");
-    } else {
-      startStripeSession();
+      const result = await response.json();
+      if (!response.ok) {
+        toast.error(result.message || "Signup failed", {
+          position: "top-center",
+        });
+        return;
+      } else {
+        toast.success("Successfully signed up!", {
+          position: "top-center",
+        });
+        if (plan === "trial") {
+          router.push("/chat");
+        } else {
+          startStripeSession();
+        }
+      }
+    } catch (error) {
+      console.error("Signup error:", error);
     }
-
-    // router.push("/chat");
   };
 
   return (
@@ -121,7 +131,7 @@ const Signup = () => {
             {/* Submit */}
             <button
               type="submit"
-              className="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition"
+              className="cursor-pointer w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition"
             >
               Signup
             </button>

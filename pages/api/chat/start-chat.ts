@@ -3,19 +3,23 @@ import { OpenAI } from "openai";
 import { logUsage } from "../../../lib/loggingData/logger";
 import { verifyAuth } from "../../../middleware/middleware";
 import { PrismaClient } from "@prisma/client";
+import { MyJwtPayload } from "../../../type/types";
 
 const prisma = new PrismaClient();
 const speechKey = process.env.AZURE_API_KEY || "";
 const serviceRegion = process.env.AZURE_SERVICE_REGION;
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
   const token = req.cookies.access_token;
-  const decodedToken = verifyAuth(token);
+  const decodedToken = verifyAuth(token) as MyJwtPayload | null;
   if (!decodedToken) {
     return res.status(401).json({ error: "Not authenticated" });
   }
@@ -115,7 +119,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     const audioBuffer = Buffer.from(await ttsResponse.arrayBuffer());
     const usage = completion.usage; // open ai usage
     const charCount = reply.length; // azure usage
-    const openaiCost = (usage.total_tokens / 1000) * 0.015;
+    const openaiCost = ((usage?.total_tokens ?? 0) / 1000) * 0.015;
     const azureCost = (charCount / 1000000) * 16;
 
     logUsage({
@@ -126,9 +130,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       politeness,
       openai: {
         model: "gpt-4o-mini",
-        prompt_tokens: usage.prompt_tokens,
-        completion_tokens: usage.completion_tokens,
-        total_tokens: usage.total_tokens,
+        prompt_tokens: usage?.prompt_tokens ?? 0,
+        completion_tokens: usage?.completion_tokens ?? 0,
+        total_tokens: usage?.total_tokens ?? 0,
         estimated_cost_usd: openaiCost,
       },
       azure_tts: {
@@ -162,7 +166,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     console.error("OpenAI API error:", error);
     return res.status(500).json({ error: "Failed to generate conversation" });
   }
-};
+}
 
 // Add reading japanese since some might have kanji
 const addReading = async (text: string) => {

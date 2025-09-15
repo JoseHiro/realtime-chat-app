@@ -3,9 +3,11 @@ import { useRouter } from "next/router";
 import { useQuery } from "@tanstack/react-query";
 import { RoundedButton } from "../component/button";
 
+
 const PaymentSuccess = () => {
   const router = useRouter();
   const [isRedirecting, setIsRedirecting] = useState(false);
+
   const {
     data: payment,
     isLoading,
@@ -20,8 +22,9 @@ const PaymentSuccess = () => {
     refetchInterval: (data) => {
       return data?.subscriptionStatus === "active" ? false : 3000;
     },
-    retry: 3,
+    // retry: 6,
     onSuccess: (data) => {
+      console.log("Payment data:", data);
       if (data?.subscriptionStatus === "active") {
         // 2秒後にリダイレクト
         setTimeout(() => {
@@ -31,6 +34,9 @@ const PaymentSuccess = () => {
       }
     },
   });
+
+  console.log(payment);
+
 
   // 手動でチャットに移動
   const handleStartNow = () => {
@@ -173,7 +179,7 @@ const PaymentSuccess = () => {
           {!isLoading && !error && payment?.subscriptionStatus !== "active" && (
             <div className="bg-yellow-50 rounded-xl p-4 mb-6">
               <h3 className="font-semibold text-yellow-800 mb-2">
-                What's happening:
+                {`What's happening:`}
               </h3>
               <ul className="text-sm text-yellow-700 space-y-1">
                 <li>✅ Payment confirmed</li>
@@ -212,7 +218,7 @@ const PaymentSuccess = () => {
 
         {/* Bottom decoration */}
         <div className="text-center mt-6">
-          <p className="text-sm text-gray-500">
+          {/* <p className="text-sm text-gray-500">
             {!isRedirecting && !error && (
               <p className="text-sm text-gray-500">
                 {payment?.subscriptionStatus === "active"
@@ -220,7 +226,7 @@ const PaymentSuccess = () => {
                   : "Please don't refresh the page while we set up your account."}
               </p>
             )}
-          </p>
+          </p> */}
         </div>
       </div>
 

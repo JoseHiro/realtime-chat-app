@@ -1,20 +1,27 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import Stripe from "stripe";
 import { verifyAuth } from "../../../middleware/middleware";
+import { MyJwtPayload } from "../../../type/types";
+
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 const stripe = new Stripe(process.env.TEST_STRIPE_SECRET_KEY!);
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   if (req.method !== "POST") return res.status(405).end("Method not allowed");
 
   const token = req.cookies.access_token;
-  const decodedToken = verifyAuth(token);
+  const decodedToken = verifyAuth(token) as MyJwtPayload | null;
   if (!decodedToken) {
     return res.status(401).json({ error: "Not Authenticated" });
   }
 
+  console.log('------------------------------');
+  
   try {
-    const { priceId, quantity = 1, userId } = req.body;
+    const { priceId, quantity = 1 } = req.body;
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       line_items: [
@@ -23,7 +30,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           quantity,
         },
       ],
-      metadata: { userId: decodedToken.userId},
+      metadata: { userId: decodedToken.userId },
       mode: "subscription",
       success_url: `${BASE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${BASE_URL}/cancel`,
@@ -35,4 +42,4 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     console.error("Stripe error:", err);
     res.status(500).json({ error: err.message });
   }
-};
+}

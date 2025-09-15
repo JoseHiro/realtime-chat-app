@@ -4,7 +4,10 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   if (req.method !== "GET") {
     return res.status(405).json({ error: "Method not allowed" });
   }
@@ -12,7 +15,11 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   const token = req.cookies.access_token;
   const decodedToken = verifyAuth(token);
 
-  if (!decodedToken) {
+  if (
+    !decodedToken ||
+    typeof decodedToken !== "object" ||
+    !("userId" in decodedToken)
+  ) {
     return res.status(401).json({ error: "Not authenticated" });
   }
 
@@ -44,6 +51,17 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       }
     }
 
+    // if (
+    //   user.subscriptionPlan === "pro" &&
+    //   user.subscriptionStatus !== "active"
+    // ) {
+    //   return res
+    //     .status(403)
+    //     .json({
+    //       error: "Pro subscription not active yet. Please complete payment.",
+    //     });
+    // }
+
     return res.status(200).json({
       user: {
         username: user.username,
@@ -57,4 +75,4 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     console.error(error);
     return res.status(500).json({ error: "Something went wrong" });
   }
-};
+}

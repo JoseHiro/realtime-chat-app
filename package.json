@@ -14,6 +14,8 @@
     "@stripe/stripe-js": "^7.9.0",
     "@tanstack/react-query": "^5.85.5",
     "bcryptjs": "^3.0.2",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "cookie": "^1.0.2",
     "jose": "^6.1.0",
     "jsonwebtoken": "^9.0.2",
@@ -22,11 +24,15 @@
     "micro": "^10.0.1",
     "microsoft-cognitiveservices-speech-sdk": "^1.45.0",
     "next": "15.4.6",
+    "next-themes": "^0.4.6",
     "openai": "^5.12.2",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-hook-form": "^7.62.0",
+    "react-hot-toast": "^2.6.0",
+    "sonner": "^2.0.7",
     "stripe": "^18.5.0",
+    "tailwind-merge": "^3.3.1",
     "uuid": "^11.1.0",
     "wanakana": "^5.3.1"
   },
@@ -42,7 +48,9 @@
     "eslint": "^9",
     "eslint-config-next": "15.4.6",
     "prisma": "^5.22.0",
+    "shadcn": "^3.2.1",
     "tailwindcss": "^4",
+    "tw-animate-css": "^1.3.8",
     "typescript": "^5"
   }
 }

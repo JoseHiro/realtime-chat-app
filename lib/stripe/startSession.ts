@@ -5,21 +5,28 @@ import { apiRequest } from "../apiRequest";
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_TEST_NEXT_PUBLIC_STRIPE_KEY!
 );
+
 export const startStripeSession = async () => {
+  console.log("sssssss");
+
   try {
     // Call your API to create checkout session
-    const response = await apiRequest("/api/stripe/session", {
+    const response = await fetch("/api/stripe/session", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: "include",
       body: JSON.stringify({
         priceId: process.env.NEXT_PUBLIC_TEST_STRIPE_PRICE_ID_KEY,
         quantity: 1,
       }),
     });
 
-    const { sessionId } = await response.json();
+    const data = await response.json();
+    console.log("Session response:", data);
+    const { sessionId } = data;
+    // console.log("sessionId", sessionId);
 
     // Redirect to Stripe Checkout
     const stripe = await stripePromise;

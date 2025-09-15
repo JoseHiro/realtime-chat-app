@@ -37,7 +37,7 @@ export default async function handler(
         username,
         password: hashedPassword,
         subscriptionPlan: plan,
-        subscriptionStatus: plan === "trial" ? "trialing" : "pro",
+        subscriptionStatus: plan === "trial" ? "trialing" : "pending",
         trialEndsAt,
       },
     });

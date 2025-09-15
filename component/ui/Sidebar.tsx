@@ -14,9 +14,11 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSpeech } from "../../context/SpeechContext";
 import { apiRequest } from "../../lib/apiRequest";
 import { SidebarAppName } from "./AppName";
+import { toast } from "sonner";
 
 export const Sidebar = () => {
-  const { setChatMode, setChatEnded, setChatId, setIsMuted, isMuted } = useSpeech();
+  const { setChatMode, setChatEnded, setChatId, setIsMuted, isMuted } =
+    useSpeech();
   const router = useRouter();
   const menuRef = useRef<HTMLDivElement>(null);
   const [activeChat, setActiveChat] = useState<number | null>(null);
@@ -83,6 +85,15 @@ export const Sidebar = () => {
     setChatId(null);
     router.push("/chat");
   };
+
+  const handleSetMuted = () => {
+    setIsMuted(!isMuted);
+    toast(isMuted ? "Unmuted" : "Muted", {
+      duration: 2000,
+      position: "top-center",
+    });
+  };
+
   return (
     <div className="hidden lg:flex w-80 border-r h-full border-gray-200 shadow-sm bg-white/15 backdrop-blur-xl">
       <div className="flex flex-col w-full p-6">
@@ -171,7 +182,7 @@ export const Sidebar = () => {
             {/* 設定 */}
           </button>
           <button
-            onClick={() => setIsMuted(!isMuted)}
+            onClick={() => handleSetMuted()}
             className={`cursor-pointer flex items-center gap-3 p-3 rounded-lg transition-colors ${
               isMuted
                 ? "text-red-600 bg-red-50 border border-red-200"

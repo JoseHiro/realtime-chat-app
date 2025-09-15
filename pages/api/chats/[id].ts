@@ -3,7 +3,10 @@ import { verifyAuth } from "../../../middleware/middleware";
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   if (req.method !== "GET")
     return res.status(405).end(`Method ${req.method} Not Allowed`);
   const { id } = req.query;
@@ -48,4 +51,4 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     console.error(error);
     return res.status(400).json({ error: "Failed to fetch chat" });
   }
-};
+}

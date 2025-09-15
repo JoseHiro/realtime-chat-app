@@ -3,6 +3,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 import { AuthHeader } from "../component/ui/LandingHeader";
+import { toast } from "sonner";
 
 type LoginFormInputs = {
   email: string;
@@ -20,17 +21,34 @@ const Login = () => {
 
   const onSubmit = async (data: LoginFormInputs) => {
     // Here you can call your API to signin
-    const response = await fetch("/api/auth/login", {
-      body: JSON.stringify({
-        password: data.password,
-        email: data.email,
-      }),
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-    });
+    try {
+      const response = await fetch("/api/auth/login", {
+        body: JSON.stringify({
+          password: data.password,
+          email: data.email,
+        }),
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (!response.ok) {
+        const result = await response.json();
+        return toast.error(result.message || "Login failed", {
+          position: "top-center",
+        });
+      }
+
+      toast.success("Successfully logged in!", {
+        position: "top-center",
+      });
+      router.push("/chat");
+    } catch (error: any) {
+      console.error("Login error:", error);
+
+    }
 
     // const result = await response.json();
-    router.push("/chat");
+
     // console.log(result);
   };
 
@@ -86,18 +104,21 @@ const Login = () => {
             {/* Submit */}
             <button
               type="submit"
-              className="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition"
+              className="w-full cursor-pointer bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition"
             >
               Login
             </button>
           </form>
 
           {/* Optional: forgot password link */}
-          <p className="mt-4 text-center text-gray-600 text-sm">
+          {/* <p className="mt-4 text-center text-gray-600 text-sm">
             Forgot your password?{" "}
             <a href="#" className="text-green-600 hover:underline">
               Reset here
             </a>
+          </p> */}
+          <p className="mt-4 text-center text-gray-600 text-sm">
+            Welcome back! Please enter your details.
           </p>
         </div>
       </div>
