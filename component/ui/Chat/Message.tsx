@@ -18,6 +18,8 @@ export const AssistantMessageBox = ({
   english?: string;
 }) => {
 
+  console.log(reading);
+
   const [currentPlayingId, setCurrentPlayingId] = useState<number | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [displayEnglishSentence, setDisplayEnglishSentence] = useState<
@@ -55,8 +57,6 @@ export const AssistantMessageBox = ({
       audioRef.current = null;
     }
   };
-
-  console.log(chatInfo);
 
   const handleDisplayEnglishSentence = (id: number) => {
     setDisplayEnglishSentence((prev) => (id === prev ? null : id));

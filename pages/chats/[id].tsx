@@ -16,6 +16,7 @@ type Message = {
   message: string;
   reading?: string;
   createdAt: string;
+  english?: string;
 };
 
 type Chat = {
@@ -33,6 +34,7 @@ type Chat = {
 const ChatPage = () => {
   const router = useRouter();
   const { id } = router.query;
+  console.log(id);
 
   const {
     data: chat,
@@ -47,7 +49,7 @@ const ChatPage = () => {
     },
   });
 
-  // console.log(chat);
+  console.log(chat);
 
   return (
     <div className="relative w-full h-screen flex">
@@ -86,6 +88,7 @@ const ChatPage = () => {
                     <AssistantMessageBox
                       text={message.message}
                       reading={message.reading || ""}
+                      english={message.english || ""}
                       id={index}
                     />
                   )}

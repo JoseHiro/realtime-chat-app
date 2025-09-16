@@ -26,14 +26,16 @@ import politenesses from "../../data/politenesses.json";
 import { RoundedButton } from "../button";
 import { BlockUseOverlay } from "../overlay";
 import { apiRequest } from "../../lib/apiRequest";
+import { toast } from "sonner";
 
 export const ModeSelectScreen = ({
   setHistory,
   setChatInfo,
   setHiraganaReadingList,
   setPaymentOverlay,
-  trialError,
+  needPayment,
   handleRefreshPreviousData,
+  plan,
 }: {
   setHistory: React.Dispatch<React.SetStateAction<ChatType>>;
   setChatInfo: React.Dispatch<
@@ -41,8 +43,9 @@ export const ModeSelectScreen = ({
   >;
   setHiraganaReadingList: React.Dispatch<React.SetStateAction<string[]>>;
   setPaymentOverlay: React.Dispatch<React.SetStateAction<boolean>>;
-  trialError: boolean;
+  needPayment: boolean;
   handleRefreshPreviousData: () => void;
+  plan: string;
 }) => {
   const {
     selectedPoliteness,
@@ -76,8 +79,8 @@ export const ModeSelectScreen = ({
     TreePine,
     Mountain,
   };
-  const [loading, setLoading] = useState(false);
 
+  const [loading, setLoading] = useState(false);
   const canProceed =
     selectedLevel &&
     (selectedTheme || customTheme.trim()) &&
@@ -86,11 +89,21 @@ export const ModeSelectScreen = ({
   // Start the chat
   const handleBeginConversation = async () => {
     // if trial is ended overlay
-
-    console.log(trialError);
-    
-    if (trialError) {
+    if (needPayment) {
       setPaymentOverlay(true);
+      if (plan !== "pro") {
+        toast.error("Your trial has ended. Please select a plan to continue.", {
+          position: "top-center",
+        });
+      } else {
+        toast.error(
+          "Your pro subscription is not active. Please subscribe to continue.",
+          {
+            position: "top-center",
+          }
+        );
+      }
+      return;
     } else {
       if (loading) return;
       setLoading(true);
@@ -108,8 +121,6 @@ export const ModeSelectScreen = ({
             politeness: selectedPoliteness || "polite",
           }),
         });
-
-        // console.log(data);
 
         setHistory((prev) => [
           ...prev,
@@ -538,7 +549,9 @@ export const ModeSelectScreen = ({
           </div>
         </div>
       </div>
-      {trialError && <BlockUseOverlay />}
+      {needPayment && (
+        <BlockUseOverlay plan={plan === "pro" ? "pro" : "trial"} />
+      )}
     </div>
   );
 };

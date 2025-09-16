@@ -3,40 +3,48 @@ import { useRouter } from "next/router";
 import { useQuery } from "@tanstack/react-query";
 import { RoundedButton } from "../component/button";
 
-
 const PaymentSuccess = () => {
   const router = useRouter();
   const [isRedirecting, setIsRedirecting] = useState(false);
+
+  type PaymentStatus = {
+    subscriptionStatus: "active" | "trialing" | "canceled" | "pending";
+    subscriptionPlan: string;
+  };
 
   const {
     data: payment,
     isLoading,
     error,
-  } = useQuery({
+  } = useQuery<PaymentStatus>({
     queryKey: ["payment"],
     queryFn: async () => {
       const res = await fetch("/api/stripe/status");
       if (!res.ok) throw new Error("Failed to fetch payment status");
       return res.json();
     },
-    refetchInterval: (data) => {
-      return data?.subscriptionStatus === "active" ? false : 3000;
+   refetchInterval: (query) => {
+      // 型安全にアクセス
+      if (query.state.status === 'success' && query.state.data) {
+        const data = query.state.data as PaymentStatus;
+        return data.subscriptionStatus === "active" ? false : 3000;
+      }
+      return 3000;
     },
     // retry: 6,
-    onSuccess: (data) => {
-      console.log("Payment data:", data);
-      if (data?.subscriptionStatus === "active") {
-        // 2秒後にリダイレクト
-        setTimeout(() => {
-          setIsRedirecting(true);
-          router.push("/chat");
-        }, 2000);
-      }
-    },
+    // onSuccess: (data) => {
+    //   console.log("Payment data:", data);
+    //   if (data?.subscriptionStatus === "active") {
+    //     // 2秒後にリダイレクト
+    //     setTimeout(() => {
+    //       setIsRedirecting(true);
+    //       router.push("/chat");
+    //     }, 2000);
+    //   }
+    // },
   });
 
   console.log(payment);
-
 
   // 手動でチャットに移動
   const handleStartNow = () => {

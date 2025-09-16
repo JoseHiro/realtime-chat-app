@@ -3,9 +3,23 @@ import { startStripeSession } from "../../lib/stripe/startSession";
 
 export const PaymentPromotionContent = ({
   onClose,
+  isPro = false,
 }: {
   onClose: () => void;
+  isPro?: boolean;
 }) => {
+  const display = [
+    {
+      title: "🎯 Trial Limit Reached!",
+      messageFirst: "You've used all ",
+      messageSecond: "2 free conversations",
+    },
+    {
+      title: "🚀 Subscription Inactive",
+      messageFirst: "Finish payment to unlock ",
+      messageSecond: "all Pro features.",
+    },
+  ];
   return (
     <div className="text-center py-4">
       {/* Header Icon */}
@@ -29,14 +43,15 @@ export const PaymentPromotionContent = ({
 
       {/* Title */}
       <h2 className="text-2xl font-bold text-gray-900 mb-3">
-        🎯 Trial Limit Reached!
+        {isPro ? display[1].title : display[0].title}
+        {/* 🎯 Trial Limit Reached! */}
       </h2>
 
       {/* Message */}
       <p className="text-gray-600 mb-2 text-lg">
-        {"You've used all "}
+        {isPro ? display[1].messageFirst : display[0].messageFirst}
         <span className="font-semibold text-green-600">
-          2 free conversations
+          {isPro ? display[1].messageSecond : display[0].messageSecond}
         </span>
       </p>
       <p className="text-gray-500 mb-6">
@@ -48,24 +63,6 @@ export const PaymentPromotionContent = ({
         <h3 className="font-semibold text-gray-800 mb-3">
           ✨ Upgrade to Premium
         </h3>
-        {/* <div className="grid grid-cols-2 gap-3 text-sm">
-          <div className="flex items-center text-green-700">
-            <span className="mr-2">🚀</span>
-            Unlimited conversations
-          </div>
-          <div className="flex items-center text-blue-700">
-            <span className="mr-2">🎯</span>
-            All difficulty levels
-          </div>
-          <div className="flex items-center text-purple-700">
-            <span className="mr-2">📊</span>
-            Progress tracking
-          </div>
-          <div className="flex items-center text-indigo-700">
-            <span className="mr-2">🗣️</span>
-            Voice practice
-          </div>
-        </div> */}
       </div>
 
       {/* Pricing */}
