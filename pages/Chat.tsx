@@ -163,7 +163,12 @@ export const Chat = () => {
             setChatInfo={setChatInfo}
             setHiraganaReadingList={setHiraganaReadingList}
             setPaymentOverlay={setPaymentOverlay}
-            trialError={data?.trialStatus === "ended"}
+            needPayment={
+              data?.trialStatus === "ended" ||
+              (data?.user.subscriptionPlan === "pro" &&
+                data?.user.subscriptionStatus !== "active")
+            }
+            plan={data?.user.subscriptionPlan === "pro" ? "pro" : "trial"}
             handleRefreshPreviousData={handleRefreshPreviousData}
           />
         </div>
@@ -205,7 +210,10 @@ export const Chat = () => {
 
       {paymentOverlay && (
         <Overlay onClose={() => setPaymentOverlay(false)}>
-          <PaymentPromotionContent onClose={() => setPaymentOverlay(false)} />
+          <PaymentPromotionContent
+            isPro={data.user.subscriptionPlan === "pro"}
+            onClose={() => setPaymentOverlay(false)}
+          />
         </Overlay>
       )}
     </div>

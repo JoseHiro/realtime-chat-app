@@ -29,7 +29,7 @@ export const Overlay: React.FC<OverlayProps> = ({ children, onClose }) => {
   );
 };
 
-export const BlockUseOverlay = () => {
+export const BlockUseOverlay = ({ plan }: { plan: string }) => {
   return (
     <div className="fixed top-0 left-0 w-full h-full bg-gray-400/50 backdrop-blur-sm z-50 flex justify-center">
       {/* Container to display  */}
@@ -37,7 +37,11 @@ export const BlockUseOverlay = () => {
         <h2 className="text-xl text-green-500 font-bold mb-1">
           {"Let's start your next chat!"}
         </h2>
-        <p className="mb-6 text-gray-400">Please subscribe to continue.</p>
+        <p className="mb-6 text-gray-400">
+          {plan === "pro"
+            ? "Your subscription is not active. Please subscribe to continue."
+            : "Your trial has ended."}{" "}
+        </p>
         <button
           onClick={() => startStripeSession()}
           className="cursor-pointer px-4 py-2 bg-green-500 rounded-xl hover:bg-gray-300"

@@ -21,10 +21,12 @@ export default async function handler(
     return res.status(400).json({ message: "" });
   }
 
+  console.log(id);
+
   try {
     const chat = await prisma.chat.findUnique({
       where: {
-        id: Number(id), // convert string to number
+        id: Number(id),
         userId: (decodedToken as any).userId,
       },
       include: {

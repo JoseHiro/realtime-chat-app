@@ -44,7 +44,7 @@ export const Sidebar = () => {
     };
   }, [activeChat]);
 
-  const { data, isLoading, error } = useQuery({
+  const { data } = useQuery({
     queryKey: ["chats"],
     queryFn: async () => {
       const data = await apiRequest("/api/chats/get");
@@ -97,7 +97,7 @@ export const Sidebar = () => {
   return (
     <div className="hidden lg:flex w-80 border-r h-full border-gray-200 shadow-sm bg-white/15 backdrop-blur-xl">
       <div className="flex flex-col w-full p-6">
-        <SidebarAppName />
+        <SidebarAppName onClick={handleGoToSelectMode} />
 
         <button
           onClick={() => handleGoToSelectMode()}
