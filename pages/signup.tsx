@@ -5,12 +5,38 @@ import { useRouter } from "next/router";
 import { startStripeSession } from "../lib/stripe/startSession";
 import { AuthHeader } from "../component/ui/LandingHeader";
 import { toast } from "sonner";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 
-type SigninFormInputs = {
-  email: string;
-  password: string;
-  username: string;
-};
+// type SigninFormInputs = {
+//   email: string;
+//   password: string;
+//   username: string;
+// };
+
+const signupSchema = z.object({
+  email: z
+    .string()
+    .min(1, { message: "Email is required" })
+    .email({ message: "Invalid email address" }),
+  password: z
+    .string()
+    .min(1, { message: "Password is required" })
+    .min(6, { message: "Password must be at least 6 characters" })
+    .regex(/[A-Z]/, {
+      message: "Password must contain at least one uppercase letter",
+    })
+    .regex(/[0-9]/, { message: "Password must contain at least one number" })
+    .regex(/[@$!%*?&]/, {
+      message: "Password must contain at least one special character",
+    }),
+  username: z
+    .string()
+    .min(1, { message: "Username is required" })
+    .min(3, { message: "Username must be at least 3 characters" }),
+});
+
+type SigninFormInputs = z.infer<typeof signupSchema>;
 
 const Signup = () => {
   const router = useRouter();
@@ -18,7 +44,7 @@ const Signup = () => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<SigninFormInputs>();
+  } = useForm<SigninFormInputs>({ resolver: zodResolver(signupSchema) });
 
   const { plan } = router.query;
   const onSubmit = async (data: SigninFormInputs) => {
@@ -77,7 +103,7 @@ const Signup = () => {
               <input
                 placeholder="you@example.com"
                 type="email"
-                {...register("email", { required: "Email is required" })}
+                {...register("email")}
                 className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-400 text-black ${
                   errors.email ? "border-red-500" : "border-gray-300"
                 }`}
@@ -95,15 +121,15 @@ const Signup = () => {
               </label>
               <input
                 type="text"
-                {...register("username", { required: "Username is required" })}
-                placeholder="We will call with you this name!"
+                {...register("username")}
+                placeholder="Username"
                 className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-400 text-black ${
-                  errors.email ? "border-red-500" : "border-gray-300"
+                  errors.username ? "border-red-500" : "border-gray-300"
                 }`}
               />
-              {errors.email && (
+              {errors.username && (
                 <p className="text-red-500 text-sm mt-1">
-                  {errors.email.message}
+                  {errors.username.message}
                 </p>
               )}
             </div>
@@ -149,5 +175,4 @@ const Signup = () => {
     </>
   );
 };
-
 export default Signup;
