@@ -122,25 +122,25 @@ export default async function handler(
     const openaiCost = ((usage?.total_tokens ?? 0) / 1000) * 0.015;
     const azureCost = (charCount / 1000000) * 16;
 
-    logUsage({
-      chatId: chat.id,
-      timestamp: new Date().toISOString(),
-      level,
-      theme,
-      politeness,
-      openai: {
-        model: "gpt-4o-mini",
-        prompt_tokens: usage?.prompt_tokens ?? 0,
-        completion_tokens: usage?.completion_tokens ?? 0,
-        total_tokens: usage?.total_tokens ?? 0,
-        estimated_cost_usd: openaiCost,
-      },
-      azure_tts: {
-        voice: "ja-JP-NanamiNeural",
-        characters: charCount,
-        estimated_cost_usd: azureCost,
-      },
-    });
+    // logUsage({
+    //   chatId: chat.id,
+    //   timestamp: new Date().toISOString(),
+    //   level,
+    //   theme,
+    //   politeness,
+    //   openai: {
+    //     model: "gpt-4o-mini",
+    //     prompt_tokens: usage?.prompt_tokens ?? 0,
+    //     completion_tokens: usage?.completion_tokens ?? 0,
+    //     total_tokens: usage?.total_tokens ?? 0,
+    //     estimated_cost_usd: openaiCost,
+    //   },
+    //   azure_tts: {
+    //     voice: "ja-JP-NanamiNeural",
+    //     characters: charCount,
+    //     estimated_cost_usd: azureCost,
+    //   },
+    // });
 
     // chat message store in DB
     const message = await prisma.message.create({
