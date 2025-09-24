@@ -52,6 +52,8 @@ const Signup = () => {
       return;
     }
 
+    console.log(data);
+
     try {
       const response = await fetch("/api/auth/signup", {
         body: JSON.stringify({
@@ -66,7 +68,7 @@ const Signup = () => {
 
       const result = await response.json();
       if (!response.ok) {
-        toast.error(result.message || "Signup failed", {
+        toast.error(result.error || "Signup failed", {
           position: "top-center",
         });
         return;
