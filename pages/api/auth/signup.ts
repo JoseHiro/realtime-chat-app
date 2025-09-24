@@ -4,8 +4,8 @@ import bcrypt from "bcryptjs";
 import { serialize } from "cookie"; // helper for cookies
 import jwt from "jsonwebtoken";
 import type { SignOptions, Algorithm } from "jsonwebtoken";
-const prisma = new PrismaClient();
 
+const prisma = new PrismaClient();
 const jwtKey = "secretChatKey";
 const jwtOptions: SignOptions = {
   algorithm: "HS256" as Algorithm,
@@ -60,7 +60,7 @@ export default async function handler(
   } catch (error: any) {
     console.error(error);
     if (error.code === "P2002") {
-      return res.status(400).json({ error: "Email already exists" });
+      return res.status(400).json({ error: "Email already taken" });
     }
     return res.status(500).json({ error: "Something went wrong" });
   }

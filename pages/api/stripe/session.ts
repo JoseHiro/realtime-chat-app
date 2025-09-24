@@ -18,8 +18,6 @@ export default async function handler(
     return res.status(401).json({ error: "Not Authenticated" });
   }
 
-  console.log('------------------------------');
-  
   try {
     const { priceId, quantity = 1 } = req.body;
     const session = await stripe.checkout.sessions.create({

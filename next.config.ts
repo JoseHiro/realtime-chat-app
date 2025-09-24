@@ -8,6 +8,7 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   allowedDevOrigins: [
     "https://c5b4064da4d8.ngrok-free.app",
+    "https://realtime-chat-app-five-steel.vercel.app",
   ],
 };
 
