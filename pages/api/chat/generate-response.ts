@@ -1,7 +1,7 @@
 // Generate response for a chat application using OpenAI and Azure TTS
 import type { NextApiRequest, NextApiResponse } from "next";
 import { OpenAI } from "openai";
-import { logUsage } from "../../../lib/loggingData/logger";
+// import { logUsage } from "../../../lib/loggingData/logger";
 import { saveMessage } from "../../../lib/message/messageService";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
@@ -18,7 +18,7 @@ export default async function handler(
   }
 
   try {
-    const { messages, politeness, level, history, checkGrammarMode, chatId } =
+    const { messages, politeness, level, checkGrammarMode, chatId } =
       req.body;
 
     saveMessage(chatId, "user", messages[messages.length - 1].content);
@@ -45,9 +45,10 @@ export default async function handler(
       `,
     };
 
+    console.log(messages);
+    
     const messagesWithInstruction = [
       systemMessage,
-      ...(history || []), // これまでの会話
       ...(messages || []), // 今回のやり取り
     ];
 
@@ -121,29 +122,33 @@ export default async function handler(
       english: english,
     });
 
+    // if(process.env === 'development'){
+
+    // }
+
     const usage = completion.usage; // open ai usage
     const charCount = reply.length; // azure usage
     const openaiCost = usage ? (usage.total_tokens / 1000) * 0.015 : 0;
     const azureCost = (charCount / 1000000) * 16;
 
-    logUsage({
-      timestamp: new Date().toISOString(),
-      chatId,
-      level,
-      politeness,
-      openai: {
-        model: "gpt-4o-mini",
-        prompt_tokens: usage?.prompt_tokens ?? 0,
-        completion_tokens: usage?.completion_tokens ?? 0,
-        total_tokens: usage?.total_tokens ?? 0,
-        estimated_cost_usd: openaiCost,
-      },
-      azure_tts: {
-        voice: "ja-JP-NanamiNeural",
-        characters: charCount,
-        estimated_cost_usd: azureCost,
-      },
-    });
+    // logUsage({
+    //   timestamp: new Date().toISOString(),
+    //   chatId,
+    //   level,
+    //   politeness,
+    //   openai: {
+    //     model: "gpt-4o-mini",
+    //     prompt_tokens: usage?.prompt_tokens ?? 0,
+    //     completion_tokens: usage?.completion_tokens ?? 0,
+    //     total_tokens: usage?.total_tokens ?? 0,
+    //     estimated_cost_usd: openaiCost,
+    //   },
+    //   azure_tts: {
+    //     voice: "ja-JP-NanamiNeural",
+    //     characters: charCount,
+    //     estimated_cost_usd: azureCost,
+    //   },
+    // });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to process request" });

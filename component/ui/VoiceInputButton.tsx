@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Mic, Square } from "lucide-react";
 import { ChatType } from "../../type/types";
 import { useSpeech } from "../../context/SpeechContext";
+import { toast } from "sonner";
 
 // Type declarations for SpeechRecognition
 declare global {
@@ -34,64 +35,109 @@ export const VoiceInput = ({
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const [isAITalking] = useState(false);
   const { chatEnded } = useSpeech();
-  useEffect(() => {
+
+  const initRecognition = () => {
+    if (recognitionRef.current) return recognitionRef.current;
+    if (typeof window === "undefined") return null;
+
     const SpeechRecognition =
       window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      alert("ブラウザが音声認識に対応していません");
-      return;
+      toast.error("ブラウザが音声認識に対応していません");
+      return null;
     }
 
     const recognition = new SpeechRecognition();
     recognition.lang = "ja-JP";
     recognition.interimResults = true;
-
     recognition.onresult = (event: any) => {
       const lastResult = event.results[event.results.length - 1];
-      const transcriptText = lastResult[0].transcript;
-
-      // 確定したときだけ送信
       if (lastResult.isFinal) {
-        // console.log("Transcript:", transcriptText);
-        handleSubmitAudio(transcriptText);
+        handleDemoSubmit(lastResult[0].transcript);
       }
     };
-
-    recognition.onend = () => {
-      setIsRecording(false);
-    };
+    recognition.onend = () => setIsRecording(false);
 
     recognitionRef.current = recognition;
-  }, []);
+    return recognition;
+  };
+  // useEffect(() => {
+  //   if (typeof window === "undefined") return;
+  //   if (recognitionRef.current) return;
+
+  //   const SpeechRecognition =
+  //     window.SpeechRecognition || window.webkitSpeechRecognition;
+  //   if (!SpeechRecognition) {
+  //     toast.error("ブラウザが音声認識に対応していません");
+  //     return;
+  //   }
+
+  //   const recognition = new SpeechRecognition();
+  //   recognition.lang = "ja-JP";
+  //   recognition.interimResults = true;
+
+  //   recognition.onresult = (event: any) => {
+  //     const lastResult = event.results[event.results.length - 1];
+  //     const transcriptText = lastResult[0].transcript;
+
+  //     // 確定したときだけ送信
+  //     if (lastResult.isFinal) {
+  //       handleDemoSubmit(transcriptText);
+  //     }
+  //   };
+
+  //   recognition.onend = () => {
+  //     setIsRecording(false);
+  //   };
+
+  //   recognitionRef.current = recognition;
+  // }, []);
 
   const startRecording = () => {
-    if (!recognitionRef.current) return;
-    if (isRecording) return;
+    const recognition = initRecognition();
+    if (!recognition || isRecording) return;
     setIsRecording(true);
-    recognitionRef.current.start();
+    recognition.start();
   };
+  // const startRecording = () => {
+  //   if (!recognitionRef.current) return;
+  //   if (isRecording) return;
+  //   setIsRecording(true);
+  //   recognitionRef.current.start();
+  // };
 
   const stopRecording = () => {
     if (!recognitionRef.current) return;
     recognitionRef.current.stop();
   };
 
+  // voice input
   const handleSubmitAudio = async (text: string) => {
     if (!text.trim()) return;
-    const newMessages = [...history, { role: "user", content: text }];
+    const latesMessageHistory = [...history, { role: "user", content: text }];
+
+    // setHistory((prev) => [...prev, { role: "user", content: text }]);
+    setHistory(latesMessageHistory);
     setHiraganaReadingList((prev) => [...prev, ""]);
-    setHistory(newMessages);
     setChatInfo((prev) => [...prev, { audioUrl: "", english: "" }]);
-    sendToAPI(newMessages);
+
+    // 最新の state を sendToAPI 側で使うのでここは引数不要
+    sendToAPI(latesMessageHistory);
   };
 
+  // text input
   const handleDemoSubmit = (text: string) => {
     if (!text.trim()) return;
-    const newMessages = [...history, { role: "user", content: text }];
+
+    const latesMessageHistory = [...history, { role: "user", content: text }];
+
+    // setHistory((prev) => [...prev, { role: "user", content: text }]);
+        setHistory(latesMessageHistory);
     setHiraganaReadingList((prev) => [...prev, ""]);
-    setHistory(newMessages);
-    sendToAPI(newMessages);
     setChatInfo((prev) => [...prev, { audioUrl: "", english: "" }]);
+
+    // 最新の state を sendToAPI 側で使うのでここは引数不要
+    sendToAPI(latesMessageHistory);
     setText("");
   };
 
@@ -101,24 +147,28 @@ export const VoiceInput = ({
     <div className="p-4 lg:p-6 bg-white border-t border-gray-200">
       {!chatEnded ? (
         <>
-          <input
-            type="text"
-            value={text}
-            className="border border-gray-300 rounded-lg p-2 w-full mb-4 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="音声入力はボタンを押して開始"
-            onChange={(e) => setText(e.target.value)}
-            onFocus={() => {
-              if (isRecording) {
-                stopRecording();
-              }
-            }}
-          />
-          <button
-            onClick={() => handleDemoSubmit(text)}
-            className="border rounded-lg p-2 text-black"
-          >
-            Submit
-          </button>
+          {process.env.NODE_ENV === "development" && (
+            <>
+              <input
+                type="text"
+                value={text}
+                className="border border-gray-300 rounded-lg p-2 w-full mb-4 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="音声入力はボタンを押して開始"
+                onChange={(e) => setText(e.target.value)}
+                onFocus={() => {
+                  if (isRecording) {
+                    stopRecording();
+                  }
+                }}
+              />
+              <button
+                onClick={() => handleDemoSubmit(text)}
+                className="border rounded-lg p-2 text-black"
+              >
+                Submit
+              </button>
+            </>
+          )}
           <div className="max-w-4xl mx-auto flex items-center justify-center flex-col space-y-4">
             <button
               onMouseDown={startRecording}
@@ -152,12 +202,6 @@ export const VoiceInput = ({
           <p className="text-gray-600">
             Thank you for chatting. Hope you enjoyed the conversation!
           </p>
-          {/* <button
-            onClick={startNewChat} // 新しいチャットを始める関数
-            className="mt-4 px-6 py-3 bg-green-500 hover:bg-green-600 text-white text-lg font-medium rounded-xl shadow transition-all"
-          >
-            Start a New Chat
-          </button> */}
         </div>
       )}
     </div>

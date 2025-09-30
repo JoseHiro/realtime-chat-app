@@ -20,6 +20,7 @@ type Message = {
 };
 
 type Chat = {
+  id: number;
   title?: string;
   theme?: string;
   level?: string;
@@ -34,22 +35,15 @@ type Chat = {
 const ChatPage = () => {
   const router = useRouter();
   const { id } = router.query;
-  console.log(id);
-
-  const {
-    data: chat,
-    // isLoading,
-    // error,
-  } = useQuery<Chat>({
+  const { data: chat } = useQuery<Chat>({
     queryKey: ["chat", id],
     queryFn: async () => {
       const res = await fetch(`/api/chats/${id}`);
       if (!res.ok) throw new Error("Failed to fetch chats");
       return res.json();
     },
+    enabled: !!id,
   });
-
-  console.log(chat);
 
   return (
     <div className="relative w-full h-screen flex">
@@ -58,6 +52,7 @@ const ChatPage = () => {
       <div className="flex-1 min-h-screen flex flex-col bg-gradient-to-br from-gray-50 to-green-50 overflow-hidden">
         {/* Header */}
         <ChatHeader
+          id={typeof id === "string" ? id : undefined}
           title={chat?.title || ""}
           theme={chat?.theme || ""}
           politeness={chat?.politeness || ""}

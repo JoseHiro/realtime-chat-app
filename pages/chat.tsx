@@ -82,7 +82,9 @@ export const Chat = () => {
     },
     retry: false,
   });
-
+  useEffect(() => {
+    console.log("History updated:", history);
+  }, [history]);
   // console.log(data);
 
   useEffect(() => {
@@ -101,24 +103,69 @@ export const Chat = () => {
   }, [data]);
 
   // Send messages to the API and get the response and audio
-  const sendToAPI = async (messages: ChatType) => {
+  // const sendToAPI = async (messages: ChatType) => {
+  //   setChatLoading(true);
+
+  //   try {
+  //     const data = await apiRequest("/api/chat/generate-response", {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({
+  //         messages,
+  //         politeness: selectedPoliteness,
+  //         level: selectedLevel,
+  //         // history,
+  //         checkGrammarMode,
+  //         chatId,
+  //       }),
+  //     });
+  //     setHistory((prev) => [
+  //       ...prev,
+  //       { role: "assistant", content: data.reply },
+  //     ]);
+  //     setChatLoading(false);
+  //     setHiraganaReadingList((prev) => [...prev, data.reading]);
+
+  //     if (data.audio) {
+  //       const audioBuffer = Uint8Array.from(atob(data.audio), (c) =>
+  //         c.charCodeAt(0)
+  //       );
+  //       const blob = new Blob([audioBuffer], { type: "audio/mpeg" });
+  //       const audioUrl = URL.createObjectURL(blob);
+  //       const audio = new Audio(audioUrl);
+  //       audio.play();
+  //       setChatInfo((prev) => [
+  //         ...prev,
+  //         { audioUrl: audioUrl, english: data.english },
+  //       ]);
+  //     }
+  //   } catch (error) {
+  //     console.error("sendToAPI error:", error);
+  //   } finally {
+  //     setChatLoading(false);
+  //   }
+  // };
+
+  const sendToAPI = async (latestMessages) => {
     setChatLoading(true);
 
     try {
+      // ここで最新の history を参照
+      // const latestMessages = [...history];
+      // console.log(latestMessages);
+
       const data = await apiRequest("/api/chat/generate-response", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          messages,
+          messages: latestMessages,
           politeness: selectedPoliteness,
           level: selectedLevel,
-          history,
           checkGrammarMode,
           chatId,
         }),
       });
 
-      setChatLoading(false);
       setHistory((prev) => [
         ...prev,
         { role: "assistant", content: data.reply },
@@ -131,8 +178,8 @@ export const Chat = () => {
         );
         const blob = new Blob([audioBuffer], { type: "audio/mpeg" });
         const audioUrl = URL.createObjectURL(blob);
-        const audio = new Audio(audioUrl);
-        audio.play();
+        new Audio(audioUrl).play();
+
         setChatInfo((prev) => [
           ...prev,
           { audioUrl: audioUrl, english: data.english },

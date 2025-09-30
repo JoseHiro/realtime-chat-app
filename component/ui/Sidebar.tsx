@@ -88,7 +88,7 @@ export const Sidebar = () => {
 
   const handleSetMuted = () => {
     setIsMuted(!isMuted);
-    toast(isMuted ? "Unmuted" : "Muted", {
+    toast(isMuted ? "Unmuted mode" : "Muted mode", {
       duration: 2000,
       position: "top-center",
     });

@@ -10,6 +10,12 @@ export default async function handler(
   if (req.method !== "GET")
     return res.status(405).end(`Method ${req.method} Not Allowed`);
   const { id } = req.query;
+  console.log(id);
+
+  if (!id || isNaN(Number(id))) {
+    return res.status(400).json({ error: "Invalid chat id" });
+  }
+
   const token = req.cookies.access_token;
 
   const decodedToken = verifyAuth(token);
@@ -21,10 +27,8 @@ export default async function handler(
     return res.status(400).json({ message: "" });
   }
 
-  console.log(id);
-
   try {
-    const chat = await prisma.chat.findUnique({
+    const chat = await prisma.chat.findFirst({
       where: {
         id: Number(id),
         userId: (decodedToken as any).userId,

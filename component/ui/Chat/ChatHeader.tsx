@@ -15,6 +15,9 @@ import {
 } from "lucide-react";
 import { Overlay } from "../../overlay";
 import { Summary } from "../Summary";
+import { apiRequest } from "../../../lib/apiRequest";
+import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const ChatHeader = ({
   title,
@@ -25,6 +28,7 @@ export const ChatHeader = ({
   chatPage,
   history,
   analysis,
+  id,
 }: {
   title: string;
   theme?: string;
@@ -34,9 +38,12 @@ export const ChatHeader = ({
   chatPage?: boolean;
   history?: any;
   analysis?: any;
+  id?: string;
 }) => {
   const [overlayOpened, setOverlayOpened] = useState(false);
   const [summaryOpened, setSummaryOpened] = useState<boolean>(false);
+  const [isEditingChatTitle, setIsEditingChatTitle] = useState(false);
+  const queryClient = useQueryClient();
   const {
     summaryFetchLoading,
     summary,
@@ -109,6 +116,34 @@ export const ChatHeader = ({
   const ThemeIcon = themeInfo.icon;
   const PolitenessIcon = politenessInfo.icon;
 
+  // edit chat title
+  const handleSaveNewChatTitle = async (value: string) => {
+    const newTitle = value.trim();
+    if (newTitle.length === 0) {
+      toast.error("You need to set title");
+      return;
+    }
+
+    try {
+      await apiRequest("/api/chat/edit-title", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chatId: Number(id),
+          newTitle: newTitle,
+        }),
+      });
+
+      toast.success("You have changed the chat title");
+      setIsEditingChatTitle(false);
+      queryClient.invalidateQueries({ queryKey: ["chat", id] });
+      queryClient.invalidateQueries({ queryKey: ["chats"] });
+    } catch (error) {
+      toast.error("We couldn't change the title");
+      console.log(error);
+    }
+  };
+
   return (
     <div className="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
       <div className="mx-auto flex justify-between items-center">
@@ -117,10 +152,42 @@ export const ChatHeader = ({
             <span className="text-white font-bold">AI</span>
           </div>
           <div className="space-y-1">
-            <div className="flex space-x-2">
-              <h2 className="text-lg font-bold text-gray-900">{title}</h2>
-              <Pen className="w-4 h-4 text-gray-400 hover:text-gray-500 cursor-pointer" />
-            </div>
+            {isEditingChatTitle ? (
+              <div className="flex items-center space-x-2">
+                <input
+                  className="border rounded-md px-2 py-1 text-sm w-48 text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-400"
+                  defaultValue={title}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter")
+                      handleSaveNewChatTitle(
+                        (e.target as HTMLInputElement).value
+                      );
+                  }}
+                />
+                <button
+                  onClick={() =>
+                    handleSaveNewChatTitle(
+                      (document.querySelector("input") as HTMLInputElement)
+                        ?.value || ""
+                    )
+                  }
+                  className="cursor-pointer px-3 py-1 text-sm rounded-md bg-green-500 text-white hover:bg-green-600 transition"
+                >
+                  Save
+                </button>
+              </div>
+            ) : (
+              <div className="flex space-x-2">
+                <h2 className="text-lg font-bold text-gray-900">{title}</h2>
+                {id && (
+                  <Pen
+                    onClick={() => setIsEditingChatTitle(true)}
+                    className="w-2 h-2 text-gray-400 hover:text-gray-500 cursor-pointer"
+                  />
+                )}
+              </div>
+            )}
+
             <div className="flex gap-4 text-sm text-gray-600">
               {(theme || customTheme || selectedTheme) && (
                 <div className="flex items-center gap-1 px-1.5 sm:px-2 py-0.5 rounded-full bg-purple-100 text-purple-700">
