@@ -16,7 +16,7 @@ export const Messages = ({
   hiraganaReadingList: string[];
 }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [currentPlayingId, setCurrentPlayingId] = useState<number | null>(null);
+  // const [currentPlayingId, setCurrentPlayingId] = useState<number | null>(null);
   const [displayMode, setDisplayMode] = useState<"audio" | "text">("audio");
 
   // Auto-scroll when new messages arrive

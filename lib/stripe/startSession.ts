@@ -7,7 +7,6 @@ const stripePromise = loadStripe(
 );
 
 export const startStripeSession = async () => {
-  console.log("sssssss");
 
   try {
     // Call your API to create checkout session
@@ -24,7 +23,7 @@ export const startStripeSession = async () => {
     });
 
     const data = await response.json();
-    console.log("Session response:", data);
+    // console.log("Session response:", data);
     const { sessionId } = data;
     // console.log("sessionId", sessionId);
 

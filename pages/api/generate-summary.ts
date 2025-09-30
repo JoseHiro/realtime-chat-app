@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import OpenAI from "openai";
-import { logUsage } from "../../lib/loggingData/logger";
+// import { logUsage } from "../../lib/loggingData/logger";
 import { verifyAuth } from "../../middleware/middleware";
 import { PrismaClient } from "@prisma/client";
 import { MyJwtPayload } from "../../type/types";
@@ -134,20 +134,22 @@ JSONのキー:
       parsed = { summary: raw, mistakes: [], goodPoints: [] };
     }
 
-    const usage = completion.usage; // open ai usage
-    const openaiCost = ((usage?.total_tokens ?? 0) / 1000) * 0.015;
+    // if (process.env.NODE_ENV === "development") {
+    //   const usage = completion.usage; // open ai usage
+    //   const openaiCost = ((usage?.total_tokens ?? 0) / 1000) * 0.015;
 
-    logUsage({
-      timestamp: new Date().toISOString(),
-      chatId,
-      openai: {
-        model: "gpt-4o-mini",
-        prompt_tokens: usage?.prompt_tokens ?? 0,
-        completion_tokens: usage?.completion_tokens ?? 0,
-        total_tokens: usage?.total_tokens ?? 0,
-        estimated_cost_usd: openaiCost,
-      },
-    });
+    //   logUsage({
+    //     timestamp: new Date().toISOString(),
+    //     chatId,
+    //     openai: {
+    //       model: "gpt-4o-mini",
+    //       prompt_tokens: usage?.prompt_tokens ?? 0,
+    //       completion_tokens: usage?.completion_tokens ?? 0,
+    //       total_tokens: usage?.total_tokens ?? 0,
+    //       estimated_cost_usd: openaiCost,
+    //     },
+    //   });
+    // }
 
     await increaseChatCount(decodedToken.userId);
     await storeAnalysisDB(chatId, parsed);
@@ -161,8 +163,6 @@ JSONのキー:
 }
 
 export const increaseChatCount = async (userId: string) => {
-  console.log("-------------------- called");
-
   const user = await prisma.user.findUnique({
     where: { id: userId },
   });

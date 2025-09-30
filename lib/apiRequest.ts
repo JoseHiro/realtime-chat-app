@@ -13,6 +13,9 @@ export const apiRequest = async (url: string, options: RequestInit = {}) => {
       return { status: 204, message: "No content" };
     }
 
+
+    // console.log(res.json());
+
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
       throw new Error(data.error || `Request failed with ${res.status}`);

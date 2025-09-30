@@ -3,6 +3,7 @@ import Stripe from "stripe";
 import { verifyAuth } from "../../../middleware/middleware";
 import { MyJwtPayload } from "../../../type/types";
 
+
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 const stripe = new Stripe(process.env.TEST_STRIPE_SECRET_KEY!);
 
