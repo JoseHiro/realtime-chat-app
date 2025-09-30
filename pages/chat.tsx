@@ -146,14 +146,10 @@ export const Chat = () => {
   //   }
   // };
 
-  const sendToAPI = async (latestMessages) => {
+  const sendToAPI = async (latestMessages: ChatType) => {
     setChatLoading(true);
 
     try {
-      // ここで最新の history を参照
-      // const latestMessages = [...history];
-      // console.log(latestMessages);
-
       const data = await apiRequest("/api/chat/generate-response", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
