@@ -116,8 +116,7 @@ export const VoiceInput = ({
     if (!text.trim()) return;
     const latesMessageHistory = [...history, { role: "user", content: text }];
 
-    // setHistory((prev) => [...prev, { role: "user", content: text }]);
-    setHistory(latesMessageHistory);
+    setHistory((prev) => [...prev, { role: "user", content: text }]);
     setHiraganaReadingList((prev) => [...prev, ""]);
     setChatInfo((prev) => [...prev, { audioUrl: "", english: "" }]);
 
@@ -131,8 +130,7 @@ export const VoiceInput = ({
 
     const latesMessageHistory = [...history, { role: "user", content: text }];
 
-    // setHistory((prev) => [...prev, { role: "user", content: text }]);
-        setHistory(latesMessageHistory);
+    setHistory((prev) => [...prev, { role: "user", content: text }]);
     setHiraganaReadingList((prev) => [...prev, ""]);
     setChatInfo((prev) => [...prev, { audioUrl: "", english: "" }]);
 
