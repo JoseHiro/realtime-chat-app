@@ -1,7 +1,7 @@
 type SelectModeButtonType = {
   children: any;
-  className: string;
-  onClick: () => void;
+  className?: string;
+  onClick?: () => void;
   disabled?: boolean;
   loading?: boolean;
 };

@@ -1,9 +1,10 @@
 // pages/signin.tsx
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 import { AuthHeader } from "../component/ui/LandingHeader";
 import { toast } from "sonner";
+import { RoundedButton } from "../component/button";
 
 type LoginFormInputs = {
   email: string;
@@ -12,6 +13,7 @@ type LoginFormInputs = {
 };
 
 const Login = () => {
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const {
     register,
@@ -19,8 +21,10 @@ const Login = () => {
     formState: { errors },
   } = useForm<LoginFormInputs>();
 
+
   const onSubmit = async (data: LoginFormInputs) => {
     // Here you can call your API to signin
+    setLoading(true);
     try {
       const response = await fetch("/api/auth/login", {
         body: JSON.stringify({
@@ -44,7 +48,8 @@ const Login = () => {
       router.push("/chat");
     } catch (error: any) {
       console.error("Login error:", error);
-
+    } finally {
+      setLoading(false);
     }
 
     // const result = await response.json();
@@ -102,12 +107,13 @@ const Login = () => {
             </div>
 
             {/* Submit */}
-            <button
-              type="submit"
+            <RoundedButton
+              // type="submit"
+              loading={loading}
               className="w-full cursor-pointer bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition"
             >
               Login
-            </button>
+            </RoundedButton>
           </form>
 
           {/* Optional: forgot password link */}

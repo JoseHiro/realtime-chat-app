@@ -1,5 +1,5 @@
 // pages/signin.tsx
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 import { startStripeSession } from "../lib/stripe/startSession";
@@ -7,6 +7,7 @@ import { AuthHeader } from "../component/ui/LandingHeader";
 import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { RoundedButton } from "../component/button";
 
 // type SigninFormInputs = {
 //   email: string;
@@ -39,6 +40,7 @@ const signupSchema = z.object({
 type SigninFormInputs = z.infer<typeof signupSchema>;
 
 const Signup = () => {
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const {
     register,
@@ -49,10 +51,11 @@ const Signup = () => {
   const { plan } = router.query;
   const onSubmit = async (data: SigninFormInputs) => {
     if (!plan) {
+      toast.error("Plan is not selected");
       return;
     }
 
-    console.log(data);
+    setLoading(true);
 
     try {
       const response = await fetch("/api/auth/signup", {
@@ -68,14 +71,10 @@ const Signup = () => {
 
       const result = await response.json();
       if (!response.ok) {
-        toast.error(result.error || "Signup failed", {
-          position: "top-center",
-        });
+        toast.error(result.error || "Signup failed");
         return;
       } else {
-        toast.success("Successfully signed up!", {
-          position: "top-center",
-        });
+        toast.success("Successfully signed up!");
         if (plan === "trial") {
           router.push("/chat");
         } else {
@@ -84,6 +83,8 @@ const Signup = () => {
       }
     } catch (error) {
       console.error("Signup error:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -157,12 +158,13 @@ const Signup = () => {
             </div>
 
             {/* Submit */}
-            <button
-              type="submit"
+            <RoundedButton
+              // type="submit"
+              loading={loading}
               className="cursor-pointer w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition"
             >
               Signup
-            </button>
+            </RoundedButton>
           </form>
 
           {/* Optional: forgot password link */}

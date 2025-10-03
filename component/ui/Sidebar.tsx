@@ -64,7 +64,7 @@ export const Sidebar = () => {
     if (id === null) return;
 
     try {
-      await apiRequest("/api/chat/delete", {
+      const response = await apiRequest("/api/chat/delete", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -72,8 +72,11 @@ export const Sidebar = () => {
         }),
       });
 
-      setActiveChat(null);
-      queryClient.invalidateQueries({ queryKey: ["chats"] });
+      if (response) {
+        toast.success("Chat deleted successfully ✅");
+        setActiveChat(null);
+        queryClient.invalidateQueries({ queryKey: ["chats"] });
+      }
     } catch (error) {
       console.error(error);
     }

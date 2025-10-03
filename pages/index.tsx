@@ -253,7 +253,7 @@ const Index = () => {
                         style={{ animationDelay: "0.2s" }}
                       ></div>
                     </div>
-                    <span className="text-xs">AI is typing...</span>
+                    <span className="text-xs">AI is thinking...</span>
                   </div>
                 )}
               </div>

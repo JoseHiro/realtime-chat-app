@@ -57,7 +57,7 @@ export const Messages = ({
   return (
     <div className="flex-1 overflow-y-auto p-4 lg:p-6 space-y-6 bg-gradient-to-b from-slate-50 to-gray-50">
       {/* Display Mode Toggle */}
-      <div className="flex justify-center mb-4">
+      <div className="sticky top-0 z-10 flex justify-center mb-4 from-slate-50 to-gray-50">
         <div className="bg-white rounded-xl border border-gray-200 p-1 flex shadow-sm">
           <button
             onClick={() => setDisplayMode("audio")}
