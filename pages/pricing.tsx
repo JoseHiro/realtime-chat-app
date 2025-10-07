@@ -14,15 +14,15 @@ const Pricing = () => {
       price: 0,
       features: [
         "2 conversation sessions",
-        "Basic grammar feedback",
+        "Grammar feedback",
+        "Conversation skill feedback",
         "All difficulty levels",
         "Standard conversation themes",
-        "Mobile app access",
       ],
       limitations: [
         "Limited to 2 conversations total",
         "No advanced analytics",
-        "Standard AI response speed",
+        "Limited Conversation themes",
       ],
       buttonText: "Start Free Trial",
       buttonStyle: "border-2 border-green-500 text-green-600 hover:bg-green-50",
@@ -37,16 +37,12 @@ const Pricing = () => {
       price: 15,
       features: [
         "Unlimited conversations",
-        "Advanced grammar feedback",
+        "Grammar feedback",
+        "Conversation skill feedback",
         "All difficulty levels",
-        "50+ conversation themes",
-        "Detailed progress analytics",
-        "Priority AI responses",
+        "Various conversation themes",
         "Custom conversation scenarios",
-        "Voice practice mode",
         "Mistake pattern analysis",
-        "Mobile + web access",
-        "Priority customer support",
       ],
       limitations: [],
       buttonText: "Subscribe Now",
@@ -63,13 +59,13 @@ const Pricing = () => {
       features: [
         "Everything in Pro",
         "Business Japanese scenarios",
-        "JLPT exam preparation",
-        "1-on-1 live tutoring sessions",
-        "Custom AI personality",
-        "Advanced cultural context",
-        "Keigo (honorific) training",
-        "Industry-specific vocabulary",
-        "Early access to new features",
+        "Job interview preparation",
+        "Realistic situation role plays",
+        "Anki Deck flashcard download",
+        "Pronunciation Practice",
+        "Grammar Exercises",
+        "Grammar Explanations",
+        "Different AI voices Selection",
       ],
       limitations: [],
       buttonText: "Coming Soon",
@@ -98,14 +94,13 @@ const Pricing = () => {
         "After your free trial, you'll need to subscribe to the Pro plan for $15/month to continue having unlimited conversations.",
     },
     {
-      question: "Do you offer student discounts?",
+      question: "What kind of feedbacks do you get after each chat?",
       answer:
-        "Yes! Students get 50% off the Pro plan with a valid student ID. Contact our support team to apply your discount.",
+        "After each chat, you receive a personalized summary that includes your score, a title, and a short overview. It highlights your strengths, points out common mistakes, and suggests improvements. You’ll also get example sentence upgrades, vocabulary suggestions, and advice to help develop your conversational skills step by step.",
     },
     {
       question: "What payment methods do you accept?",
-      answer:
-        "We accept all major credit cards, PayPal, and Apple Pay. All payments are processed securely.",
+      answer: "We accept accept credit cards.",
     },
     {
       question: "When will Premium features be available?",
@@ -119,7 +114,7 @@ const Pricing = () => {
       className={`relative ${plan.popular ? "transform scale-105 z-10" : ""}`}
     >
       {plan.badge && (
-        <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+        <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-50">
           <span
             className={`px-4 py-2 rounded-full text-sm font-semibold shadow-lg ${
               plan.badge === "Most Popular"
@@ -311,7 +306,7 @@ const Pricing = () => {
       </section>
 
       {/* Features Comparison */}
-      <section className="py-20 bg-gray-50">
+      {/* <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">What You Get</h2>
@@ -410,7 +405,7 @@ const Pricing = () => {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* FAQ Section */}
       <section className="py-20">

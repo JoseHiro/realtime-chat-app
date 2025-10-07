@@ -29,31 +29,6 @@ export const Messages = ({
     }
   }, [history, chatLoading]);
 
-  // const playAudio = (id: number) => {
-  //   if (audioRef.current) {
-  //     audioRef.current.pause();
-  //     audioRef.current.currentTime = 0;
-  //   }
-  //   const audio = new Audio(audioList[id - 1]);
-  //   audioRef.current = audio;
-  //   audio.play();
-  //   setCurrentPlayingId(id);
-
-  //   audio.onended = () => {
-  //     setCurrentPlayingId(null);
-  //     audioRef.current = null;
-  //   };
-  // };
-
-  // const stopAudio = () => {
-  //   if (audioRef.current) {
-  //     audioRef.current.pause();
-  //     audioRef.current.currentTime = 0;
-  //     setCurrentPlayingId(null);
-  //     audioRef.current = null;
-  //   }
-  // };
-
   return (
     <div className="flex-1 overflow-y-auto p-4 lg:p-6 space-y-6 bg-gradient-to-b from-slate-50 to-gray-50">
       {/* Display Mode Toggle */}

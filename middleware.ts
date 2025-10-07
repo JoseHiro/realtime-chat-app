@@ -34,5 +34,11 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL("/chat", req.url));
   }
 
+
+  // 未ログイン状態でsignupページに行こうとするとプラン選択ページに戻る
+  if (path === "/signup" && !isLoggedIn) {
+    return NextResponse.redirect(new URL("/pricing", req.url));
+  }
+
   return NextResponse.next();
 }
