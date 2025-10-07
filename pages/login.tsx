@@ -1,5 +1,5 @@
 // pages/signin.tsx
-import React, { useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 import { AuthHeader } from "../component/ui/LandingHeader";
@@ -20,7 +20,6 @@ const Login = () => {
     handleSubmit,
     formState: { errors },
   } = useForm<LoginFormInputs>();
-
 
   const onSubmit = async (data: LoginFormInputs) => {
     // Here you can call your API to signin
@@ -60,7 +59,6 @@ const Login = () => {
   return (
     <>
       <AuthHeader />
-
       <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="w-full max-w-md p-8 border border-gray-200 rounded-lg shadow-lg">
           <h1 className="text-2xl font-bold mb-6 text-green-600 text-center">

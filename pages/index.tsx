@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { RoundedButton } from "../component/button";
 import { LandingHeader } from "../component/ui/LandingHeader";
 import Link from "next/link";
+import { Mic, Square } from "lucide-react";
 
 const Index = () => {
   const [currentMessage, setCurrentMessage] = useState(0);
@@ -259,27 +260,12 @@ const Index = () => {
               </div>
 
               {/* Input Area */}
-              <div className="flex items-center space-x-2 bg-gray-50 rounded-full px-4 py-2">
-                <input
-                  type="text"
-                  placeholder="Type your response..."
-                  className="flex-1 bg-transparent text-sm outline-none placeholder-gray-400"
-                />
-                <button className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center hover:bg-green-600 transition-colors duration-200 hover:scale-110">
-                  <svg
-                    className="w-4 h-4 text-white"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-                    ></path>
-                  </svg>
-                </button>
+              <div className="pt-4 bg-white border-t border-gray-200">
+                <div className="max-w-4xl mx-auto flex items-center justify-center flex-col space-y-4">
+                  <p className="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg cursor-pointer bg-green-500 hover:bg-green-600 shadow-green-500/30">
+                    <Mic className="w-4 h-4 text-white" />
+                  </p>
+                </div>
               </div>
             </div>
 
