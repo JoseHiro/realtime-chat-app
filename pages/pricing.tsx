@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { RoundedButton } from "../component/button";
 import { LandingHeader } from "../component/ui/LandingHeader";
 import { PricingType, FAQType } from "../type/types";
+import { LandingFooter } from "../component/ui/LandingFooter";
 
 const Pricing = () => {
   const router = useRouter();
@@ -163,6 +164,8 @@ const Pricing = () => {
           <RoundedButton
             onClick={() => {
               if (!plan.disabled) {
+                console.log("hellooooo");
+                
                 router.push(`/signup?plan=${plan.type}`);
               }
             }}
@@ -305,108 +308,6 @@ const Pricing = () => {
         </div>
       </section>
 
-      {/* Features Comparison */}
-      {/* <section className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">What You Get</h2>
-            <p className="text-xl text-gray-600">
-              Compare features across our plans
-            </p>
-          </div>
-
-          <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-4 text-left font-semibold text-gray-900">
-                      Features
-                    </th>
-                    <th className="px-6 py-4 text-center font-semibold text-gray-900">
-                      Free Trial
-                    </th>
-                    <th className="px-6 py-4 text-center font-semibold text-gray-900 bg-green-50">
-                      Pro
-                    </th>
-                    <th className="px-6 py-4 text-center font-semibold text-gray-900">
-                      Premium
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {[
-                    {
-                      feature: "Conversation sessions",
-                      trial: "2 total",
-                      pro: "Unlimited",
-                      premium: "Coming Soon",
-                    },
-                    {
-                      feature: "Grammar feedback",
-                      trial: "Basic",
-                      pro: "Advanced",
-                      premium: "Coming Soon",
-                    },
-                    {
-                      feature: "Difficulty levels",
-                      trial: "All levels",
-                      pro: "All levels",
-                      premium: "Coming Soon",
-                    },
-                    {
-                      feature: "Conversation themes",
-                      trial: "Standard",
-                      pro: "50+ themes",
-                      premium: "Coming Soon",
-                    },
-                    {
-                      feature: "Voice practice",
-                      trial: "❌",
-                      pro: "✅",
-                      premium: "Coming Soon",
-                    },
-                    {
-                      feature: "Progress analytics",
-                      trial: "❌",
-                      pro: "Detailed",
-                      premium: "Coming Soon",
-                    },
-                    {
-                      feature: "Priority support",
-                      trial: "❌",
-                      pro: "✅",
-                      premium: "Coming Soon",
-                    },
-                    {
-                      feature: "Live tutoring",
-                      trial: "❌",
-                      pro: "❌",
-                      premium: "Coming Soon",
-                    },
-                  ].map((row, index) => (
-                    <tr key={index} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 font-medium text-gray-900">
-                        {row.feature}
-                      </td>
-                      <td className="px-6 py-4 text-center text-gray-600">
-                        {row.trial}
-                      </td>
-                      <td className="px-6 py-4 text-center text-gray-900 bg-green-50/50">
-                        {row.pro}
-                      </td>
-                      <td className="px-6 py-4 text-center text-gray-500">
-                        {row.premium}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </section> */}
-
       {/* FAQ Section */}
       <section className="py-20">
         <div className="max-w-4xl mx-auto px-6 lg:px-8">
@@ -456,88 +357,7 @@ const Pricing = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-16">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div className="col-span-2">
-              <div className="flex items-center space-x-2 mb-6">
-                <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-green-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">日</span>
-                </div>
-                <span className="text-xl font-bold">Kaiwa Kun</span>
-              </div>
-              <p className="text-gray-400 mb-6 max-w-md">
-                The most natural way to learn Japanese through AI-powered
-                conversations. Practice anytime, anywhere.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="font-semibold mb-4">Product</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li>
-                  <a
-                    href="#"
-                    className="hover:text-white transition-colors duration-200"
-                  >
-                    Features
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="hover:text-white transition-colors duration-200"
-                  >
-                    Pricing
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="hover:text-white transition-colors duration-200"
-                  >
-                    Reviews
-                  </a>
-                </li>
-              </ul>
-            </div>
-
-            <div>
-              <h3 className="font-semibold mb-4">Support</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li>
-                  <a
-                    href="#"
-                    className="hover:text-white transition-colors duration-200"
-                  >
-                    Help Center
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="hover:text-white transition-colors duration-200"
-                  >
-                    Contact Us
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="hover:text-white transition-colors duration-200"
-                  >
-                    Privacy Policy
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
-            <p>&copy; 2025 Kaiwa Kun. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
+      <LandingFooter />
     </div>
   );
 };

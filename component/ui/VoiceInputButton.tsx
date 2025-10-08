@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
 import { Mic, Square } from "lucide-react";
 import { ChatType } from "../../type/types";
 import { useSpeech } from "../../context/SpeechContext";

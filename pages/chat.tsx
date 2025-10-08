@@ -30,19 +30,19 @@ import { ChatHeader } from "../component/ui/Chat/ChatHeader";
 // loading starting chat[x] loading for data fetch[]
 // display username in the conversation[x]
 // use username in the conversation[x]
-// english reading[]
-// popup message[]
+// english reading[x]
+// popup message[x]
 // display summary for each chat page[x]
 // beautify chat style[x]
 // header fix [x]
 // selected chat bg color on the sidebar[x]
 // block reloading (Prevent stopping conversation)[]
-// homepage design[]
+// homepage design[x]
 // analysis design[]
 // play audio[]
 // audio sound design[]
 // generating chat design[]
-// audio speed
+// audio speed []
 
 export const Chat = () => {
   const {
