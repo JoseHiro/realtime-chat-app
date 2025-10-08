@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { RoundedButton } from "../component/button";
 import { LandingHeader } from "../component/ui/LandingHeader";
-import Link from "next/link";
-import { Mic, Square } from "lucide-react";
+import { Mic } from "lucide-react";
+import { LandingFooter } from "../component/ui/LandingFooter";
+import { FeatureBody } from "../component/ui/LandingPage/FeatureBody";
 
 const Index = () => {
   const [currentMessage, setCurrentMessage] = useState(0);
@@ -34,45 +35,6 @@ const Index = () => {
     }, 4000);
     return () => clearInterval(interval);
   }, []);
-
-  const FeatureCard = ({
-    icon,
-    title,
-    description,
-    highlight,
-  }: {
-    icon: React.ReactNode;
-    title: string;
-    description: string;
-    highlight: string;
-  }) => (
-    <div className="group bg-gradient-to-br from-green-50 to-white p-8 rounded-2xl border border-green-100 transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-green-100/50 cursor-pointer">
-      <div className="w-16 h-16 bg-green-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-        {icon}
-      </div>
-      <h3 className="text-xl font-bold mb-4 text-gray-900">{title}</h3>
-      <p className="text-gray-600 mb-6 leading-relaxed">{description}</p>
-      <div className="text-sm text-green-600 font-medium">{highlight}</div>
-    </div>
-  );
-
-  const StepCard = ({
-    number,
-    title,
-    description,
-  }: {
-    number: string;
-    title: string;
-    description: string;
-  }) => (
-    <div className="text-center group">
-      <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6 text-white text-2xl font-bold group-hover:scale-110 transition-transform duration-300 shadow-lg">
-        {number}
-      </div>
-      <h3 className="text-xl font-bold mb-4 text-gray-900">{title}</h3>
-      <p className="text-gray-600 leading-relaxed">{description}</p>
-    </div>
-  );
 
   return (
     <div className="bg-white text-gray-900 overflow-x-hidden">
@@ -108,7 +70,7 @@ const Index = () => {
         <div className="max-w-7xl mx-auto px-6 lg:px-8 grid lg:grid-cols-2 gap-12 items-center relative z-10">
           {/* Left Column */}
           <div className="text-center lg:text-left">
-            <div className="inline-flex items-center bg-green-50 px-4 py-2 rounded-full text-green-700 text-sm font-medium mb-8 animate-bounce">
+            <div className="inline-flex items-center bg-green-50 px-4 py-2 rounded-full text-green-700 text-sm font-medium mb-8 animate-bounce mt-5">
               <span className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-ping"></span>
               AI-Powered Japanese Learning
             </div>
@@ -287,266 +249,10 @@ const Index = () => {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">
-              Why Choose{" "}
-              <span className="bg-gradient-to-r from-green-500 to-green-600 bg-clip-text text-transparent">
-                Kaiwa Kun?
-              </span>
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Experience the most natural way to learn Japanese through
-              AI-powered conversations that adapt to your skill level and
-              interests.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            <FeatureCard
-              icon={
-                <svg
-                  className="w-8 h-8 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                  ></path>
-                </svg>
-              }
-              title="Real-Time Conversations"
-              description="Engage in natural Japanese conversations with AI that understands context and responds like a native speaker."
-              highlight="3-5 minute sessions"
-            />
-
-            <FeatureCard
-              icon={
-                <svg
-                  className="w-8 h-8 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  ></path>
-                </svg>
-              }
-              title="Instant Grammar Feedback"
-              description="Get detailed grammar analysis and corrections immediately after each conversation to accelerate your learning."
-              highlight="Personalized insights"
-            />
-
-            <FeatureCard
-              icon={
-                <svg
-                  className="w-8 h-8 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"
-                  ></path>
-                </svg>
-              }
-              title="Custom Difficulty & Themes"
-              description="Choose your skill level and practice topics that interest you, from daily life to business conversations."
-              highlight="Beginner to Advanced"
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works Section */}
-      <section
-        id="how-it-works"
-        className="py-20 bg-gradient-to-br from-green-50/50 to-white"
-      >
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">How It Works</h2>
-            <p className="text-xl text-gray-600">
-              Start improving your Japanese in just three simple steps
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            <StepCard
-              number="1"
-              title="Choose Your Level"
-              description="Select your Japanese proficiency level and pick a conversation theme that interests you."
-            />
-
-            <StepCard
-              number="2"
-              title="Start Chatting"
-              description="Have a natural 3-5 minute conversation with our AI teacher in Japanese."
-            />
-
-            <StepCard
-              number="3"
-              title="Get Feedback"
-              description="Receive detailed grammar feedback and tips to improve your Japanese skills."
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-green-600 to-green-400 text-white relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-green-600 to-green-400 opacity-90"></div>
-        <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center relative z-10">
-          <h2 className="text-4xl font-bold mb-6">Ready to Master Japanese?</h2>
-          <p className="text-xl mb-8 text-green-100">
-            Join thousands of learners who are improving their Japanese skills
-            with AI-powered conversations.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <RoundedButton
-              onClick={() => router.push("/signup?plan=trial")}
-              className="bg-white text-green-600 px-8 py-4 rounded-full text-lg font-semibold hover:bg-gray-50 hover:scale-105 hover:shadow-xl shadow-lg"
-            >
-              Start Your Free Trial
-            </RoundedButton>
-            <RoundedButton
-              onClick={() => {}}
-              className="border-2 border-white text-white hover:bg-white hover:text-green-600 px-8 py-4 rounded-full text-lg font-semibold hover:scale-105"
-            >
-              Learn More
-            </RoundedButton>
-          </div>
-        </div>
-      </section>
+      <FeatureBody />
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-16">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div className="col-span-2">
-              <div className="flex items-center space-x-2 mb-6">
-                <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-green-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">日</span>
-                </div>
-                <span className="text-xl font-bold">Kaiwa Kun</span>
-              </div>
-              <p className="text-gray-400 mb-6 max-w-md">
-                The most natural way to learn Japanese through AI-powered
-                conversations. Practice anytime, anywhere, and improve your
-                skills faster than ever.
-              </p>
-              <div className="flex space-x-4">
-                <a
-                  href="#"
-                  className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-green-500 transition-colors duration-200"
-                >
-                  <span className="sr-only">Twitter</span>
-                  <svg
-                    className="w-5 h-5"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path d="M6.29 18.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0020 3.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.073 4.073 0 01.8 7.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 010 16.407a11.616 11.616 0 006.29 1.84"></path>
-                  </svg>
-                </a>
-              </div>
-            </div>
-
-            <div>
-              <h3 className="font-semibold mb-4">Product</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li>
-                  <a
-                    href="#"
-                    className="hover:text-white transition-colors duration-200"
-                  >
-                    Features
-                  </a>
-                </li>
-                <li>
-                  <Link
-                    href="/pricing"
-                    className="hover:text-white transition-colors duration-200"
-                  >
-                    Pricing
-                  </Link>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="hover:text-white transition-colors duration-200"
-                  >
-                    Reviews
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="hover:text-white transition-colors duration-200"
-                  >
-                    Updates
-                  </a>
-                </li>
-              </ul>
-            </div>
-
-            <div>
-              <h3 className="font-semibold mb-4">Support</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li>
-                  <a
-                    href="#"
-                    className="hover:text-white transition-colors duration-200"
-                  >
-                    Help Center
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="hover:text-white transition-colors duration-200"
-                  >
-                    Contact Us
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="hover:text-white transition-colors duration-200"
-                  >
-                    Privacy Policy
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="hover:text-white transition-colors duration-200"
-                  >
-                    Terms of Service
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
-            <p>&copy; 2025 Kaiwa Kun. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
+      <LandingFooter />
 
       <style>{`
         @keyframes float {

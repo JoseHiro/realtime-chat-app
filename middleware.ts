@@ -9,6 +9,8 @@ export async function middleware(req: NextRequest) {
   const authPages = ["/login", "/signup"];
   const secret = new TextEncoder().encode(process.env.JWT_SECRET);
   const path = req.nextUrl.pathname;
+  const url = req.nextUrl;
+  const plan = url.searchParams.get("plan");
   // ログインしているか確認
   let isLoggedIn = false;
   if (token) {
@@ -34,9 +36,8 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL("/chat", req.url));
   }
 
-
   // 未ログイン状態でsignupページに行こうとするとプラン選択ページに戻る
-  if (path === "/signup" && !isLoggedIn) {
+  if (path === "/signup" && !isLoggedIn && !plan) {
     return NextResponse.redirect(new URL("/pricing", req.url));
   }
 
