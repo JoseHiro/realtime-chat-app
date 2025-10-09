@@ -82,10 +82,8 @@ export const Chat = () => {
     },
     retry: false,
   });
-  useEffect(() => {
-    console.log("History updated:", history);
-  }, [history]);
-  // console.log(data);
+
+  console.log(data);
 
   useEffect(() => {
     if (!data) return;
