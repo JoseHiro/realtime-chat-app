@@ -39,27 +39,16 @@ export default async function handler(
 
     // console.log(user);
 
-    let trialStatus: "active" | "ended" | null = null;
-    if (user.subscriptionStatus === "trialing") {
-      const now = new Date();
-      if (user.trialEndsAt && now > user.trialEndsAt) {
-        trialStatus = "ended";
-      } else if ((user.trialUsedChats ?? 0) >= 2) {
-        trialStatus = "ended";
-      } else {
-        trialStatus = "active";
-      }
-    }
-
-    // if (
-    //   user.subscriptionPlan === "pro" &&
-    //   user.subscriptionStatus !== "active"
-    // ) {
-    //   return res
-    //     .status(403)
-    //     .json({
-    //       error: "Pro subscription not active yet. Please complete payment.",
-    //     });
+    // let trialStatus: "active" | "ended" | null = null;
+    // if (user.subscriptionStatus === "trialing") {
+    //   const now = new Date();
+    //   if (user.trialEndsAt && now > user.trialEndsAt) {
+    //     trialStatus = "ended";
+    //   } else if ((user.trialUsedChats ?? 0) >= 2) {
+    //     trialStatus = "ended";
+    //   } else {
+    //     trialStatus = "active";
+    //   }
     // }
 
     return res.status(200).json({

@@ -10,7 +10,7 @@ export const StopWatch = ({
   history: any;
   setOverlayOpened: (value: boolean) => void;
 }) => {
-  const [timeLeft, setTimeLeft] = useState(3 * 60);
+  const [timeLeft, setTimeLeft] = useState(30);
   const [isActive, setIsActive] = useState(true);
   const summaryCreatedRef = useRef(false);
 
@@ -83,10 +83,13 @@ export const StopWatch = ({
         }),
       });
 
+      console.log(data);
+
       if (data?.status === 204 || !data?.summary) {
         setSummary(null);
       } else {
         setSummary(data);
+        console.log(data);
       }
     } catch (error) {
       console.error("Error creating summary:", error);
