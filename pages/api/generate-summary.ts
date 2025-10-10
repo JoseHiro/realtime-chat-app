@@ -42,69 +42,182 @@ export default async function handler(
       )
       .join("\n");
 
-    const prompt = `あなたは日本語教師です。以下の会話を分析し、学習者にフィードバックを与えてください。
+    //     const prompt = `あなたは日本語教師です。以下の会話を分析し、学習者にフィードバックを与えてください。
+    // 会話は「${politeness}」な話し方で行われています。
+    // 提示する corrections, sentenceUpgrades はこの politeness（話し方のレベル）を保つようにしてください。
+    // 必ず次のJSON形式で出力してください。
+
+    // JSONのキー:
+    // - title : 内容によるこの会話のタイトル名
+    // - summary: 会話全体の簡潔な要約（英語で）
+    // - mistakes: 学習者が犯した文法的な間違い（オブジェクト配列形式、各要素は { "kanji": "漢字を含む文", "kana": "ひらがなの読み" }）
+    // - corrections: mistakes に対応する訂正例（mistakes と同じ順序で対応、オブジェクト配列形式、各要素は { "kanji": "訂正後の文", "kana": "ひらがなの読み" }）
+    // - goodPoints: 学習者がよくできている点（英語の文字列配列）
+    // - difficultyLevel: 学習者の日本語レベル（N5, N4, N3, N2, N1 のいずれか）
+    // - improvementPoints: 改善すべき点（英語の文字列配列）
+    // - commonMistakes: 学習者が繰り返しやすい典型的な間違い（英語の文字列配列）
+    // - sentenceUpgrades: 学習者の現在のレベル（difficultyLevel）を踏まえ、そこから一段階上の自然な表現を提示してください。さらにより良くするためのアドバイスも付けてください。
+    //   （例: N5ならN4程度、N4ならN3程度、N3ならN2程度を目安にしてください）
+    //   各要素は { "original": { "kanji": "...", "kana": "..." }, "upgraded": { "kanji": "...", "kana": "..." }, "advice": "..." } の形式で出力してください。
+    // - topicDevelopment: 話題を広げる能力の評価（英語で、簡潔に）
+    // - responseSkill: 相槌・反応スキルの評価（英語で、簡潔に）
+    // - score (0-100): 学習者の会話の総合的なスコア（0-100の整数）
+    // - difficultyReason: なぜその difficultyLevel と判定したのか、その具体的理由（英語で）
+
+    // 出力例:
+    // {
+    //   "title": "Chat title",
+    //   "summary": "English summary here",
+    //   "mistakes": [
+    //     { "kanji": "映画見ました", "kana": "えいが みました" }
+    //   ],
+    //   "corrections": [
+    //     { "kanji": "映画を見ました", "kana": "えいが を みました" }
+    //   ],
+    //   "goodPoints": ["Good point 1"],
+    //   "difficultyLevel": "N4",
+    //   "improvementPoints": ["Improvement point 1"],
+    //   "commonMistakes": ["よくする間違い1"],
+    //   "sentenceUpgrades":  [
+    //     {
+    //       "original": { "kanji": "映画見ました", "kana": "えいが みました" },
+    //       "upgraded": { "kanji": "昨日久しぶりに友達と映画を見ました", "kana": "きのう ひさしぶりに ともだちと えいが を みました" },
+    //       "advice": "Added context and time expressions to make the sentence more descriptive. You can also add extra details to enrich the sentence."
+    //     },
+    //     {
+    //       "original": { "kanji": "私は寿司が好きじゃないです", "kana": "わたしは すし が すきじゃないです。" },
+    //       "upgraded": { "kanji": "実は私は寿司が好きじゃないですが、今日の寿司は特別でした", "kana": "じつは わたしは すし が すきじゃないですが、きょうの すし は とくべつでした" },
+    //       "advice": "Added contrast and extra detail to make the sentence more interesting and natural."
+    //     }
+    //   ],
+    //   "topicDevelopment": "The learner can expand on basic topics but struggles with transitions.",
+    //   "responseSkill": "The learner uses basic backchanneling but sometimes misses natural timing.",
+    //   "score": 85,
+    //   "difficultyReason": "Why the score is that score"
+    // }
+
+    // 注意:
+    // - mistakes, corrections, sentenceUpgrades は必ず { "kanji": "...", "kana": "..." } を含む形式で出力してください。
+    // - sentenceUpgrades は飛躍的に難しい表現にせず、学習者が現実的にすぐ使えるレベルの自然な日本語にしてください。
+    // - 出力は余計な説明を加えず、純粋なJSONのみ返してください。
+    // - Only include sentences in "mistakes" and "corrections" if there is a grammatical or usage error.
+    // - Sentences that are already correct, even if slightly informal or casual, should NOT appear in "mistakes" or "corrections".
+    // - For "sentenceUpgrades", only suggest more advanced but realistic expressions, keeping the politeness style.
+    // - "mistakes" と "corrections" には、文法や使い方の誤りがある文のみを含めること。
+    //   自然で正しい文（カジュアルでも可）は含めないでください。
+    // `;
+
+    const prompt = `
+あなたは日本語教師であり、言語学習者の会話を分析する専門家です。
+以下の会話内容を分析し、学習者に改善点と良い点の両方をわかりやすく伝えるための
+フィードバックJSONを生成してください。
+
 会話は「${politeness}」な話し方で行われています。
-提示する corrections, sentenceUpgrades はこの politeness（話し方のレベル）を保つようにしてください。
-必ず次のJSON形式で出力してください。
+提示する corrections や sentenceUpgrades は必ずこの politeness（話し方のレベル）を保ってください。
+
+出力は **必ず次のJSON形式** に従ってください。
+出力は純粋なJSONのみで、説明文やコメントは含めないでください。
 
 JSONのキー:
-- title : 内容によるこの会話のタイトル名
+- title : 内容によるこの会話のタイトル名（例: "Casual Check-In"）
 - summary: 会話全体の簡潔な要約（英語で）
 - mistakes: 学習者が犯した文法的な間違い（オブジェクト配列形式、各要素は { "kanji": "漢字を含む文", "kana": "ひらがなの読み" }）
 - corrections: mistakes に対応する訂正例（mistakes と同じ順序で対応、オブジェクト配列形式、各要素は { "kanji": "訂正後の文", "kana": "ひらがなの読み" }）
 - goodPoints: 学習者がよくできている点（英語の文字列配列）
 - difficultyLevel: 学習者の日本語レベル（N5, N4, N3, N2, N1 のいずれか）
+- difficultyReason: なぜその difficultyLevel と判定したのか、その具体的理由（英語で）
+- score (0-100): 学習者の会話の総合的なスコア（整数）
 - improvementPoints: 改善すべき点（英語の文字列配列）
 - commonMistakes: 学習者が繰り返しやすい典型的な間違い（英語の文字列配列）
-- sentenceUpgrades: 学習者の現在のレベル（difficultyLevel）を踏まえ、そこから一段階上の自然な表現を提示してください。さらにより良くするためのアドバイスも付けてください。
-  （例: N5ならN4程度、N4ならN3程度、N3ならN2程度を目安にしてください）
-  各要素は { "original": { "kanji": "...", "kana": "..." }, "upgraded": { "kanji": "...", "kana": "..." }, "advice": "..." } の形式で出力してください。
+- sentenceUpgrades: 学習者の現在のレベル（difficultyLevel）を踏まえ、そこから一段階上の自然な表現を提示してください。
+  各要素は以下の形式で:
+  {
+    "original": { "kanji": "...", "kana": "..." },
+    "upgraded": { "kanji": "...", "kana": "..." },
+    "advice": "より自然な表現にするためのアドバイス（英語）"
+  }
 - topicDevelopment: 話題を広げる能力の評価（英語で、簡潔に）
-- responseSkill: 相槌・反応スキルの評価（英語で、簡潔に）
-- score (0-100): 学習者の会話の総合的なスコア（0-100の整数）
-- difficultyReason: なぜその difficultyLevel と判定したのか、その具体的理由（英語で）
+- responseSkill: 相槌・反応スキルや流暢さの評価（英語で、簡潔に）
 
 出力例:
 {
-  "title": "Chat title",
-  "summary": "English summary here",
-  "mistakes": [
-    { "kanji": "映画見ました", "kana": "えいが みました" }
-  ],
-  "corrections": [
-    { "kanji": "映画を見ました", "kana": "えいが を みました" }
-  ],
-  "goodPoints": ["Good point 1"],
-  "difficultyLevel": "N4",
-  "improvementPoints": ["Improvement point 1"],
-  "commonMistakes": ["よくする間違い1"],
-  "sentenceUpgrades":  [
-    {
-      "original": { "kanji": "映画見ました", "kana": "えいが みました" },
-      "upgraded": { "kanji": "昨日久しぶりに友達と映画を見ました", "kana": "きのう ひさしぶりに ともだちと えいが を みました" },
-      "advice": "Added context and time expressions to make the sentence more descriptive. You can also add extra details to enrich the sentence."
+  "meta": {
+    "title": "この会話のタイトル（例: Casual Check-In）",
+    "topic": "会話テーマ（例: Daily Feelings）",
+    "level": "日本語レベル（N5〜N1）",
+    "conversationLength": {
+      "totalWords": 合計発話単語数,
+      "uniqueWords": ユニーク単語数
     },
-    {
-      "original": { "kanji": "私は寿司が好きじゃないです", "kana": "わたしは すし が すきじゃないです。" },
-      "upgraded": { "kanji": "実は私は寿司が好きじゃないですが、今日の寿司は特別でした", "kana": "じつは わたしは すし が すきじゃないですが、きょうの すし は とくべつでした" },
-      "advice": "Added contrast and extra detail to make the sentence more interesting and natural."
+    "time": 会話時間（分単位で推定可）
+  },
+
+  "evaluation": {
+    "summary": "英語で会話全体の要約",
+    "responseSkill": {
+      "overall": "回答の全体評価（英語）",
+      "conversationFlow": "会話の流れ・自然さの評価（英語）",
+      "comprehension": "理解力の評価（英語）",
+      "example": "問題となった具体的なやり取り（英語）"
+    },
+    "accuracy": {
+      "grammarMistakes": 文法誤りの数,
+      "examples": [
+        {
+          "original": "誤りのある文（漢字）",
+          "correction": "訂正後の正しい文（漢字）",
+          "note": "英語でなぜ誤りか説明"
+        }
+      ]
+    },
+    "vocabularyRange": {
+      "rating": "Limited / Moderate / Rich など",
+      "comment": "語彙力に関するコメント（英語）"
     }
-  ],
-  "topicDevelopment": "The learner can expand on basic topics but struggles with transitions.",
-  "responseSkill": "The learner uses basic backchanneling but sometimes misses natural timing.",
-  "score": 85,
-  "difficultyReason": "Why the score is that score"
+  },
+
+  "feedback": {
+    "goodPoints": ["良かった点（英語配列）"],
+    "commonMistakes": ["繰り返しがちな誤り（英語配列）"],
+    "corrections": [
+      {
+        "advice": "どのように直すとよいか（英語）",
+        "before": "誤り文（漢字）",
+        "after": "修正文（漢字）"
+      }
+    ],
+    "sentenceUpgrades": [
+      {
+        "advice": "改善のアドバイス（英語）",
+        "original": { "kanji": "短い・単純な文", "kana": "かなよみ" },
+        "upgraded": { "kanji": "より自然で豊かな文", "kana": "かなよみ" }
+      }
+    ],
+    "topicDevelopment": "話題展開力の評価（英語）",
+    "improvementPoints": [
+      "改善提案（英語）"
+    ],
+    "vocabularySuggestions": ["学習すべき語彙候補（日本語配列）"]
+  },
+
+  "growth": {
+    "milestone": "現在の達成段階（英語）",
+    "currentAbility": "現在の能力を英語で説明",
+    "nextLevelGoal": "次のレベルに上がるための具体的目標（英語）",
+    "strengthEnhancement": [
+      "強みをさらに伸ばすための具体的行動（英語配列）"
+    ]
+  }
 }
 
-注意:
-- mistakes, corrections, sentenceUpgrades は必ず { "kanji": "...", "kana": "..." } を含む形式で出力してください。
-- sentenceUpgrades は飛躍的に難しい表現にせず、学習者が現実的にすぐ使えるレベルの自然な日本語にしてください。
-- 出力は余計な説明を加えず、純粋なJSONのみ返してください。
-- Only include sentences in "mistakes" and "corrections" if there is a grammatical or usage error.
-- Sentences that are already correct, even if slightly informal or casual, should NOT appear in "mistakes" or "corrections".
-- For "sentenceUpgrades", only suggest more advanced but realistic expressions, keeping the politeness style.
-- "mistakes" と "corrections" には、文法や使い方の誤りがある文のみを含めること。
-  自然で正しい文（カジュアルでも可）は含めないでください。
+---
+
+指示:
+- 「sentenceUpgrades」「corrections」は politeness（${politeness}）に合わせてください。
+- 文法的に正しい文は「mistake」として扱わないでください。
+- 文法・語彙・理解力・発音・流暢さの各観点から総合評価を行ってください。
+- 出力は **純粋なJSON形式のみ** にしてください。説明文やコメントを追加しないでください。
+- 実際に使える自然な文・アドバイス・語彙を提示してください。
 `;
 
     const completion = await openai.chat.completions.create({
@@ -122,6 +235,8 @@ JSONのキー:
     });
 
     const raw = completion.choices[0]?.message?.content ?? "";
+    console.log(raw);
+
     const jsonMatch = raw.match(/\{[\s\S]*\}/);
     let parsed;
     if (jsonMatch) {
@@ -155,7 +270,7 @@ JSONのキー:
     await storeAnalysisDB(chatId, parsed);
     await storeChatTitle(chatId, parsed.title);
 
-    res.status(200).json(parsed);
+    return res.status(200).json(parsed);
   } catch (error) {
     console.error("Summarization error:", error);
     res.status(500).json({ error: "Failed to summarize text" });

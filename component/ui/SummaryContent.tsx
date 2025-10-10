@@ -15,7 +15,6 @@ export const SummaryContent = ({
   summaryFetchLoading: boolean;
 }) => {
   return (
-
       <>
         {!summaryOpened ? (
           summaryFetchLoading ? (
