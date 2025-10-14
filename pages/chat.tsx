@@ -70,6 +70,7 @@ export const Chat = () => {
   );
   const [paymentOverlay, setPaymentOverlay] = useState(false);
 
+
   const { data } = useQuery({
     queryKey: ["user"],
     queryFn: async () => {
