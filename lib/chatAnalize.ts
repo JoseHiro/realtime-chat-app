@@ -25,39 +25,31 @@ function mapPosToKey(pos) {
   return "other";
 }
 
-// 助詞などを除外し、基本形と読みを返す
+
+
 function normalize(token) {
   const exclude = ["助詞", "助動詞", "記号"];
   if (exclude.includes(token.pos)) return null;
 
-  const word = token.basic_form === "*" ? token.surface_form : token.basic_form;
   const posKey = mapPosToKey(token.pos);
+  console.log(posKey, '0000000000');
 
-  // 読みは basic_form の表層をカタカナとして取得
-  // Kuromoji は読みがない場合もあるので surface_form fallback
-  let reading = token.reading || token.surface_form;
 
-  // 動詞・形容詞・形容動詞は必ず basic_form を使う
-  if (["動詞", "形容詞", "形容動詞"].some(p => token.pos.startsWith(p))) {
-    reading = word;
-  }
+  // ✅ 基本形（例: "楽しい", "行く"）を使う
+  const basic = token.basic_form === "*" ? token.surface_form : token.basic_form;
 
-  // カタカナに変換されている場合もあるのでひらがな化
-  reading = wanakana.toHiragana(reading);
+  // ✅ 読み（カタカナ）をひらがなに変換
+  const rawReading = token.reading || token.surface_form;
+  const readingHira = wanakana.toHiragana(rawReading);
 
-  // 数字などもひらがな化した方が安全
-  reading = reading.replace(/\d/g, d => {
-    const digitsMap = { '0':'ぜろ','1':'いち','2':'に','3':'さん','4':'よん','5':'ご','6':'ろく','7':'なな','8':'はち','9':'きゅう' };
-    return digitsMap[d] || d;
-  });
+  // ✅ word（基本形）もひらがな化（例: "楽しい" → "たのしい"）
+  const wordHira = wanakana.toHiragana(basic);
 
-  // ローマ字変換
-  const romaji = wanakana.toRomaji(reading);
+  // ✅ ローマ字
+  const romaji = wanakana.toRomaji(readingHira);
 
-  return { word, reading, romaji, posKey };
+  return { word: wordHira, reading: readingHira, romaji, posKey };
 }
-
-
 
 async function analyzeUserVocabulary(history) {
   const tokenizer = await buildTokenizer();

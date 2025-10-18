@@ -16,125 +16,246 @@ import {
 } from "lucide-react";
 
 // Sample data for demonstration
+// const sampleSummary = {
+//   meta: {
+//     title: "Travel Talk in Japan",
+//     level: {
+//       label: "N4",
+//       reason:
+//         "Learner can use past tense and descriptive expressions with fair accuracy, but sentence connectors and topic elaboration are limited. This corresponds to N4 ability, where learners can handle everyday topics with simple grammar.",
+//     },
+//     conversationLength: {
+//       totalWords: 1,
+//       uniqueWords: 2,
+//     },
+//   },
+//   evaluation: {
+//     summary:
+//       "The learner discusses a recent trip to Kyoto, describing temples, food, and personal impressions. Responses are enthusiastic but sometimes lack grammatical accuracy and cohesive flow.",
+//     responseSkill: {
+//       overall:
+//         "The learner actively participates, providing relevant answers and showing interest in the topic.",
+//       reason:
+//         "Responses directly addressed the partner’s questions but were often short, with few follow-up questions or elaboration.",
+//       example:
+//         "When asked 'どんなところが一番好きでしたか？', the learner responded 'きんかくじです！とてもきれいでした。' — a clear and natural answer, though not expanded upon.",
+//     },
+//     conversationFlow: {
+//       rating: "Moderate",
+//       reason:
+//         "Conversation progressed smoothly, but transitions between ideas were abrupt (e.g., jumping from temples to food without connectors).",
+//       example:
+//         "The learner said 'てらをたくさんみました。たべものはおいしかったです。' — good content, but could be improved with 'それから'.",
+//     },
+//     accuracy: {
+//       grammarMistakes: 4,
+//       reason:
+//         "Common mistakes included incorrect conjunctions and adjective conjugations, which are typical at the N4 level.",
+//       examples: [
+//         {
+//           original: "たべものはおいしいでした。",
+//           correction: "たべものはおいしかったです。",
+//           note: "Incorrect adjective conjugation; 'おいしい' should become 'おいしかった' in past tense.",
+//         },
+//       ],
+//     },
+//     vocabularyRange: {
+//       rating: "Moderate to Good",
+//       comment:
+//         "Uses relevant travel-related words ('てら', 'しょくじ', 'おまもり'), but tends to repeat common adjectives like 'たのしい' and 'おいしい'.",
+//       reason:
+//         "Shows awareness of topic-specific vocabulary, but limited variation and nuance.",
+//     },
+//     vocabularyAnalysis: {
+//       commonWords: [
+//         { word: "たのしい", count: 5 },
+//         { word: "きれい", count: 3 },
+//         { word: "すごい", count: 2 },
+//       ],
+//       rareWords: [
+//         { word: "おまもり", count: 1 },
+//         { word: "しょくじ", count: 1 },
+//       ],
+//       words: [{}], // 代わりに使える自然な単語
+//       comment:
+//         "Frequent use of emotional adjectives like 'たのしい' and 'きれい' shows positivity, but limited diversity in descriptive language.",
+//     },
+//   },
+//   feedback: {
+//     goodPoints: [
+//       "Strong enthusiasm when describing personal experiences.",
+//       "Clear understanding of questions about travel and sightseeing.",
+//       "Good control of basic past tense forms.",
+//     ],
+//     commonMistakes: [
+//       "Incorrect conjunctions ('から' instead of 'ので').",
+//       "Frequent omission of natural connectors between sentences.",
+//     ],
+//     corrections: [
+//       {
+//         advice: "Review 'て' and 'ので' forms to connect ideas naturally.",
+//         before: "たのしかったですから、またいきたいです。",
+//         after: "たのしかったので、またいきたいです。",
+//       },
+//     ],
+//     sentenceUpgrades: [
+//       {
+//         advice: "Add emotional reaction to sound more natural and expressive.",
+//         original: {
+//           kanji: "きんかくじはきれいでした。",
+//           kana: "きんかくじ は きれい でした",
+//         },
+//         upgraded: {
+//           kanji: "きんかくじはとてもきれいで、びっくりしました！",
+//           kana: "きんかくじ は とても きれい で、びっくり しました！",
+//         },
+//         reason:
+//           "Adds a personal emotional element, making the response more engaging.",
+//       },
+//     ],
+//     topicDevelopment: {
+//       rating: "Developing",
+//       reason:
+//         "Can answer questions clearly, but doesn’t expand the conversation by adding new related details or questions.",
+//     },
+//     improvementPoints: [
+//       "Practice combining short sentences with connectors like 'それから', 'そして'.",
+//       "Use more descriptive adjectives and adverbs to add emotion and detail.",
+//       "Try explaining *why* you liked or disliked something.",
+//     ],
+//   },
+//   growth: {
+//     milestone: "Able to describe travel experiences with basic accuracy.",
+//     currentAbility:
+//       "Can form complete sentences and recall key vocabulary but still sounds mechanical when connecting ideas.",
+//     nextLevelGoal:
+//       "Develop natural transitions and express feelings/opinions more vividly.",
+//     strengthEnhancement: [
+//       "Listen to native travel vloggers and note how they connect topics.",
+//       "Shadow phrases that express surprise or emotion ('びっくりしました', 'すごかったです').",
+//     ],
+//     reflectionQuestions: [
+//       "What surprised you the most during your trip?",
+//       "Can you describe a moment using feelings and senses (sight, sound, smell)?",
+//     ],
+//   },
+// };
+
 const sampleSummary = {
   meta: {
-    title: "Travel Talk in Japan",
-    topic: "Travel and Tourism",
+    title: "Casual Weekend Reflection",
     level: {
       label: "N4",
       reason:
         "Learner can use past tense and descriptive expressions with fair accuracy, but sentence connectors and topic elaboration are limited. This corresponds to N4 ability, where learners can handle everyday topics with simple grammar.",
     },
-    time: 6,
+    conversationLength: {
+      totalWords: 158,
+      uniqueWords: 84,
+    },
+    selectedLevel: "easy",
+    selectedTopic: "daily",
+    chatDuration: 1,
   },
   evaluation: {
     summary:
-      "The learner discusses a recent trip to Kyoto, describing temples, food, and personal impressions. Responses are enthusiastic but sometimes lack grammatical accuracy and cohesive flow.",
+      "The conversation reflects a casual check-in about the learner's day at the park. They shared their activities and experiences in a relaxed manner.",
     responseSkill: {
       overall:
-        "The learner actively participates, providing relevant answers and showing interest in the topic.",
-      reason:
-        "Responses directly addressed the partner’s questions but were often short, with few follow-up questions or elaboration.",
+        "The learner responds to prompts well but occasionally struggles with fluidity and complexity.",
+      conversationFlow:
+        "The dialogue is generally smooth; however, some responses could be expanded for better flow.",
+      comprehension:
+        "The learner demonstrates good understanding and engagement throughout the conversation.",
       example:
-        "When asked 'どんなところが一番好きでしたか？', the learner responded 'きんかくじです！とてもきれいでした。' — a clear and natural answer, though not expanded upon.",
-    },
-    conversationFlow: {
-      rating: "Moderate",
-      reason:
-        "Conversation progressed smoothly, but transitions between ideas were abrupt (e.g., jumping from temples to food without connectors).",
-      example:
-        "The learner said 'てらをたくさんみました。たべものはおいしかったです。' — good content, but could be improved with 'それから'.",
+        "The interaction about picnic activities was engaging and relevant.",
     },
     accuracy: {
-      grammarMistakes: 4,
-      reason:
-        "Common mistakes included incorrect conjunctions and adjective conjugations, which are typical at the N4 level.",
+      grammarMistakes: 1,
       examples: [
         {
-          original: "たべものはおいしいでした。",
-          correction: "たべものはおいしかったです。",
-          note: "Incorrect adjective conjugation; 'おいしい' should become 'おいしかった' in past tense.",
+          original: "私はサッカー下手から、すぐ疲れた。",
+          correction: "私はサッカーが下手だから、すぐ疲れた。",
+          note: "The particle 'が' is needed here to connect the subject and the adjective properly, and 'から' should be replaced with 'だから' for clarity.",
         },
       ],
     },
     vocabularyRange: {
-      rating: "Moderate to Good",
+      rating: "Limited",
       comment:
-        "Uses relevant travel-related words ('てら', 'しょくじ', 'おまもり'), but tends to repeat common adjectives like 'たのしい' and 'おいしい'.",
-      reason:
-        "Shows awareness of topic-specific vocabulary, but limited variation and nuance.",
+        "The vocabulary is simple and appropriate for the conversation, but there is little variation in word choice.",
     },
     vocabularyAnalysis: {
-      commonWords: [
-        { word: "たのしい", count: 5 },
-        { word: "きれい", count: 3 },
-        { word: "すごい", count: 2 },
+      frequentWords: [
+        {
+          word: "楽しい",
+        },
+        {
+          word: "美味しい",
+        },
       ],
       rareWords: [
-        { word: "おまもり", count: 1 },
-        { word: "しょくじ", count: 1 },
+        {
+          word: "サンドイッチ",
+        },
+        {
+          word: "フルーツ",
+        },
       ],
-      wordDiversity: 0.58,
+      upgradedWords: [
+        {
+          word: "楽しい",
+          alternatives: ["愉快", "面白い"],
+        },
+      ],
       comment:
-        "Frequent use of emotional adjectives like 'たのしい' and 'きれい' shows positivity, but limited diversity in descriptive language.",
+        "Frequent use of basic adjectives suggests a positive tone, yet there is a noticeable lack of variety.",
     },
   },
   feedback: {
     goodPoints: [
-      "Strong enthusiasm when describing personal experiences.",
-      "Clear understanding of questions about travel and sightseeing.",
-      "Good control of basic past tense forms.",
+      "The learner expresses enjoyment and enthusiasm effectively.",
+      "Responses are well-structured and relevant to the conversation.",
     ],
     commonMistakes: [
-      "Incorrect conjunctions ('から' instead of 'ので').",
-      "Frequent omission of natural connectors between sentences.",
+      "Issues with grammatical particles.",
+      "Limited expansion on topics.",
     ],
     corrections: [
       {
-        advice: "Review 'て' and 'ので' forms to connect ideas naturally.",
-        before: "たのしかったですから、またいきたいです。",
-        after: "たのしかったので、またいきたいです。",
+        advice: "Use appropriate particles to create clearer sentences.",
+        before: "私はサッカー下手から、すぐ疲れた。",
+        after: "私はサッカーが下手だから、すぐ疲れた。",
       },
     ],
     sentenceUpgrades: [
       {
-        advice: "Add emotional reaction to sound more natural and expressive.",
+        advice: "Add more details to create a richer narrative.",
         original: {
-          kanji: "きんかくじはきれいでした。",
-          kana: "きんかくじ は きれい でした",
+          kanji: "また来週も行きたい思います！",
+          kana: "またらいしゅうもいきたいおもいます！",
         },
         upgraded: {
-          kanji: "きんかくじはとてもきれいで、びっくりしました！",
-          kana: "きんかくじ は とても きれい で、びっくり しました！",
+          kanji: "また来週もぜひ行きたいと思います！",
+          kana: "またらいしゅうもぜひいきたいおもいます！",
         },
-        reason:
-          "Adds a personal emotional element, making the response more engaging.",
       },
     ],
-    topicDevelopment: {
-      rating: "Developing",
-      reason:
-        "Can answer questions clearly, but doesn’t expand the conversation by adding new related details or questions.",
-    },
+    topicDevelopment:
+      "Encouraged to elaborate more on experiences and opinions to enhance engagement.",
     improvementPoints: [
-      "Practice combining short sentences with connectors like 'それから', 'そして'.",
-      "Use more descriptive adjectives and adverbs to add emotion and detail.",
-      "Try explaining *why* you liked or disliked something.",
+      "Practice using varied vocabulary to enhance expression.",
+      "Focus on correct usage of particles and conjunctions.",
     ],
   },
   growth: {
-    milestone: "Able to describe travel experiences with basic accuracy.",
+    milestone:
+      "Learner is able to communicate basic experiences and feelings effectively.",
     currentAbility:
-      "Can form complete sentences and recall key vocabulary but still sounds mechanical when connecting ideas.",
-    nextLevelGoal:
-      "Develop natural transitions and express feelings/opinions more vividly.",
+      "The learner can engage in simple conversations with a good understanding of context but needs to refine grammatical structures.",
+    nextLevelGoal: "To use more complex sentences and better connect ideas.",
     strengthEnhancement: [
-      "Listen to native travel vloggers and note how they connect topics.",
-      "Shadow phrases that express surprise or emotion ('びっくりしました', 'すごかったです').",
-    ],
-    reflectionQuestions: [
-      "What surprised you the most during your trip?",
-      "Can you describe a moment using feelings and senses (sight, sound, smell)?",
+      "Encourage engagement in conversations with varied topics to practice language skills.",
     ],
   },
 };
@@ -202,7 +323,10 @@ export const Summary = ({ summary = sampleSummary }) => {
                   {summary?.meta?.title || "Learning Summary"}
                 </h1>
                 <p className="text-sm text-gray-500 mt-0.5">
-                  {summary?.meta?.topic || "Conversation"} •{" "}
+                  {summary?.meta?.selectedTopic ||
+                    summary?.meta?.topic ||
+                    "Conversation"}{" "}
+                  •{" "}
                   {typeof summary?.meta?.level === "object"
                     ? summary.meta.level.label
                     : summary?.meta?.level || "N5"}{" "}
@@ -213,7 +337,7 @@ export const Summary = ({ summary = sampleSummary }) => {
             <div className="flex items-center space-x-2">
               <Award className="w-5 h-5 text-gray-400" />
               <span className="text-sm font-medium text-gray-600">
-                {summary?.meta?.time || 0} min
+                {summary?.meta?.chatDuration || summary?.meta?.time || 0} min
               </span>
             </div>
           </div>
@@ -262,16 +386,42 @@ export const Summary = ({ summary = sampleSummary }) => {
                     <div>
                       <div className="text-sm text-gray-500 mb-2">Topic</div>
                       <div className="text-lg text-gray-900 font-medium">
-                        {summary?.meta?.topic || "General Conversation"}
+                        {summary?.meta?.selectedTopic ||
+                          summary?.meta?.topic ||
+                          "General Conversation"}
                       </div>
                     </div>
                     <div>
                       <div className="text-sm text-gray-500 mb-2">Duration</div>
                       <div className="text-lg text-gray-900 font-medium">
-                        {summary?.meta?.time || 0} minutes
+                        {summary?.meta?.chatDuration ||
+                          summary?.meta?.time ||
+                          0}{" "}
+                        minutes
                       </div>
                     </div>
                   </div>
+
+                  {summary?.meta?.conversationLength && (
+                    <div className="grid md:grid-cols-2 gap-6 mt-6 pt-6 border-t border-gray-200">
+                      <div>
+                        <div className="text-sm text-gray-500 mb-2">
+                          Total Words
+                        </div>
+                        <div className="text-lg text-gray-900 font-medium">
+                          {summary.meta.conversationLength.totalWords || 0}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-sm text-gray-500 mb-2">
+                          Unique Words
+                        </div>
+                        <div className="text-lg text-gray-900 font-medium">
+                          {summary.meta.conversationLength.uniqueWords || 0}
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Level Assessment */}
@@ -374,6 +524,30 @@ export const Summary = ({ summary = sampleSummary }) => {
                               "N/A"}
                           </p>
                         </div>
+                        {summary?.evaluation?.responseSkill
+                          ?.conversationFlow && (
+                          <div className="bg-gray-50 rounded-lg p-4">
+                            <div className="text-xs text-gray-500 mb-1">
+                              Conversation Flow
+                            </div>
+                            <p className="text-sm text-gray-800 leading-relaxed">
+                              {
+                                summary.evaluation.responseSkill
+                                  .conversationFlow
+                              }
+                            </p>
+                          </div>
+                        )}
+                        {summary?.evaluation?.responseSkill?.comprehension && (
+                          <div className="bg-gray-50 rounded-lg p-4">
+                            <div className="text-xs text-gray-500 mb-1">
+                              Comprehension
+                            </div>
+                            <p className="text-sm text-gray-800 leading-relaxed">
+                              {summary.evaluation.responseSkill.comprehension}
+                            </p>
+                          </div>
+                        )}
                         {summary?.evaluation?.responseSkill?.reason && (
                           <div className="bg-blue-50 border border-blue-100 rounded-lg p-4">
                             <div className="text-xs text-gray-600 mb-1">
@@ -626,9 +800,65 @@ export const Summary = ({ summary = sampleSummary }) => {
                                       <span className="text-sm font-medium text-gray-900">
                                         {item.word}
                                       </span>
-                                      <span className="text-xs text-gray-600 ml-2">
-                                        ×{item.count}
+                                      {item.count && (
+                                        <span className="text-xs text-gray-600 ml-2">
+                                          ×{item.count}
+                                        </span>
+                                      )}
+                                    </div>
+                                  )
+                                )}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Frequent Words */}
+                          {summary.evaluation.vocabularyAnalysis.frequentWords
+                            ?.length > 0 && (
+                            <div>
+                              <div className="text-xs font-medium text-gray-600 mb-2">
+                                Frequently Used Words
+                              </div>
+                              <div className="flex flex-wrap gap-2">
+                                {summary.evaluation.vocabularyAnalysis.frequentWords.map(
+                                  (item, index) => (
+                                    <div
+                                      key={index}
+                                      className="px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg"
+                                    >
+                                      <span className="text-sm font-medium text-gray-900">
+                                        {item.word}
                                       </span>
+                                    </div>
+                                  )
+                                )}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Upgraded Words */}
+                          {summary.evaluation.vocabularyAnalysis.upgradedWords
+                            ?.length > 0 && (
+                            <div>
+                              <div className="text-xs font-medium text-gray-600 mb-2">
+                                Vocabulary Upgrades
+                              </div>
+                              <div className="space-y-3">
+                                {summary.evaluation.vocabularyAnalysis.upgradedWords.map(
+                                  (item, index) => (
+                                    <div
+                                      key={index}
+                                      className="bg-green-50 border border-green-200 rounded-lg p-3"
+                                    >
+                                      <div className="flex items-center space-x-2 mb-2">
+                                        <span className="text-sm font-medium text-gray-900">
+                                          {item.word}
+                                        </span>
+                                        <ArrowRight className="w-4 h-4 text-gray-400" />
+                                        <span className="text-sm text-gray-700">
+                                          {item.alternatives?.join(", ")}
+                                        </span>
+                                      </div>
                                     </div>
                                   )
                                 )}

@@ -10,7 +10,7 @@ export const StopWatch = ({
   history: any;
   setOverlayOpened: (value: boolean) => void;
 }) => {
-  const [timeLeft, setTimeLeft] = useState(30);
+  const [timeLeft, setTimeLeft] = useState(1);
   const [isActive, setIsActive] = useState(true);
   const summaryCreatedRef = useRef(false);
 
@@ -85,7 +85,8 @@ export const StopWatch = ({
 
       console.log(data);
 
-      if (data?.status === 204 || !data?.summary) {
+      if (data?.status === 204 || !data) {
+
         setSummary(null);
       } else {
         setSummary(data);
