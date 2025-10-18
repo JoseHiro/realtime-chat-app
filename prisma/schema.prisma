@@ -39,6 +39,7 @@ model Chat {
   theme    String?
   politeness String?
   level    String?
+  time     Int?
   createdAt DateTime @default(now())
   analysis   Analysis?
 }

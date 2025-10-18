@@ -57,6 +57,7 @@ export default async function handler(
         theme: theme,
         politeness: politeness,
         level: level,
+        time: 1,
       },
     });
 

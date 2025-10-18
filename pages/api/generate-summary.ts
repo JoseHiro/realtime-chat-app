@@ -4,6 +4,7 @@ import OpenAI from "openai";
 import { verifyAuth } from "../../middleware/middleware";
 import { PrismaClient } from "@prisma/client";
 import { MyJwtPayload } from "../../type/types";
+
 const prisma = new PrismaClient();
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 
@@ -21,7 +22,43 @@ export default async function handler(
     return res.status(401).json({ error: "Not authenticated" });
   }
 
-  const { history, chatId, politeness } = req.body;
+  const { chatId, politeness } = req.body; // history later
+
+  const history = [
+    { role: "assistant", content: "こんにちは！今日はどこか行った？" },
+    {
+      role: "user",
+      content: "うん、今日は山の公園へ行きました。天気がとてもきれいだった！",
+    },
+    { role: "assistant", content: "いいね〜。公園で何をしたの？" },
+    {
+      role: "user",
+      content:
+        "友達とピクニックをしたり、少しサッカーをしました。でも私はサッカー下手から、すぐ疲れた。",
+    },
+    { role: "assistant", content: "そうなんだ（笑）。お弁当は食べた？" },
+    {
+      role: "user",
+      content:
+        "はい、サンドイッチを作った。ちょっと塩っぱいでしたけど、美味しかった！サッカーは楽しかったよ。",
+    },
+    { role: "assistant", content: "手作りなんてすごい！どんなサンドイッチ？" },
+    {
+      role: "user",
+      content: "たまごとハムのサンド。あとフルーツも持ってた、りんごとバナナ。",
+    },
+    { role: "assistant", content: "健康的だね！何時間くらい公園にいたの？" },
+    {
+      role: "user",
+      content:
+        "たぶん４時間ぐらい。でも帰りのバスが遅くて、家に着いたは７時くらい。",
+    },
+    { role: "assistant", content: "なるほど〜。いい一日だったね！" },
+    {
+      role: "user",
+      content: "はい、とても楽しかったです。また来週も行きたい思います！",
+    },
+  ];
 
   if (!history || !chatId || !politeness) {
     return res.status(400).json({ error: "No data provided" });
@@ -42,7 +79,8 @@ export default async function handler(
       )
       .join("\n");
 
-    //     const prompt = `あなたは日本語教師です。以下の会話を分析し、学習者にフィードバックを与えてください。
+
+    // const prompt = `あなたは日本語教師です。以下の会話を分析し、学習者にフィードバックを与えてください。
     // 会話は「${politeness}」な話し方で行われています。
     // 提示する corrections, sentenceUpgrades はこの politeness（話し方のレベル）を保つようにしてください。
     // 必ず次のJSON形式で出力してください。
@@ -108,117 +146,112 @@ export default async function handler(
     // `;
 
     const prompt = `
-あなたは日本語教師であり、言語学習者の会話を分析する専門家です。
-以下の会話内容を分析し、学習者に改善点と良い点の両方をわかりやすく伝えるための
-フィードバックJSONを生成してください。
+    You are a Japanese teacher and conversation evaluator.
+    Analyze the following learner conversation and return the analysis as a single valid JSON object.
 
-会話は「${politeness}」な話し方で行われています。
-提示する corrections や sentenceUpgrades は必ずこの politeness（話し方のレベル）を保ってください。
+    Instructions:
+    - You MUST output ONLY one valid JSON object.
+    - Do NOT include any explanations, text, comments, markdown, or backticks.
+    - Do NOT wrap JSON inside any key like "result" or "data".
+    - Output must be **machine-parseable JSON only**.
+    - Maintain politeness level: "${politeness}"
 
-出力は **必ず次のJSON形式** に従ってください。
-出力は純粋なJSONのみで、説明文やコメントは含めないでください。
 
-JSONのキー:
-- title : 内容によるこの会話のタイトル名（例: "Casual Check-In"）
-- summary: 会話全体の簡潔な要約（英語で）
-- mistakes: 学習者が犯した文法的な間違い（オブジェクト配列形式、各要素は { "kanji": "漢字を含む文", "kana": "ひらがなの読み" }）
-- corrections: mistakes に対応する訂正例（mistakes と同じ順序で対応、オブジェクト配列形式、各要素は { "kanji": "訂正後の文", "kana": "ひらがなの読み" }）
-- goodPoints: 学習者がよくできている点（英語の文字列配列）
-- difficultyLevel: 学習者の日本語レベル（N5, N4, N3, N2, N1 のいずれか）
-- difficultyReason: なぜその difficultyLevel と判定したのか、その具体的理由（英語で）
-- score (0-100): 学習者の会話の総合的なスコア（整数）
-- improvementPoints: 改善すべき点（英語の文字列配列）
-- commonMistakes: 学習者が繰り返しやすい典型的な間違い（英語の文字列配列）
-- sentenceUpgrades: 学習者の現在のレベル（difficultyLevel）を踏まえ、そこから一段階上の自然な表現を提示してください。
-  各要素は以下の形式で:
-  {
-    "original": { "kanji": "...", "kana": "..." },
-    "upgraded": { "kanji": "...", "kana": "..." },
-    "advice": "より自然な表現にするためのアドバイス（英語）"
-  }
-- topicDevelopment: 話題を広げる能力の評価（英語で、簡潔に）
-- responseSkill: 相槌・反応スキルや流暢さの評価（英語で、簡潔に）
-
-出力例:
-{
-  "meta": {
-    "title": "この会話のタイトル（例: Casual Check-In）",
-    "topic": "会話テーマ（例: Daily Feelings）",
-    "level": "日本語レベル（N5〜N1）",
-    "conversationLength": {
-      "totalWords": 合計発話単語数,
-      "uniqueWords": ユニーク単語数
-    },
-    "time": 会話時間（分単位で推定可）
-  },
-
-  "evaluation": {
-    "summary": "英語で会話全体の要約",
-    "responseSkill": {
-      "overall": "回答の全体評価（英語）",
-      "conversationFlow": "会話の流れ・自然さの評価（英語）",
-      "comprehension": "理解力の評価（英語）",
-      "example": "問題となった具体的なやり取り（英語）"
-    },
-    "accuracy": {
-      "grammarMistakes": 文法誤りの数,
-      "examples": [
-        {
-          "original": "誤りのある文（漢字）",
-          "correction": "訂正後の正しい文（漢字）",
-          "note": "英語でなぜ誤りか説明"
+    Schema:
+    {
+      "meta": {
+        "title": "Conversation title (e.g., Casual Check-In)",
+        "level": {
+          label: "N5-N1",
+          reason:
+            "Learner can use past tense and descriptive expressions with fair accuracy, but sentence connectors and topic elaboration are limited. This corresponds to N4 ability, where learners can handle everyday topics with simple grammar.",
+        },
+        "conversationLength": {
+          "totalWords": 0,
+          "uniqueWords": 0
         }
-      ]
-    },
-    "vocabularyRange": {
-      "rating": "Limited / Moderate / Rich など",
-      "comment": "語彙力に関するコメント（英語）"
+      },
+      "evaluation": {
+        "summary": "Overall summary of the conversation in English",
+        "responseSkill": {
+          "overall": "Overall assessment of the learner's responses (English)",
+          "conversationFlow": "Evaluation of the smoothness and naturalness of conversation (English)",
+          "comprehension": "Evaluation of the learner's understanding (English)",
+          "example": "Example of a notable interaction (English)"
+        },
+        "accuracy": {
+          "grammarMistakes": 0,
+          "examples": [
+            {
+              "original": "Incorrect learner sentence in Japanese",
+              "correction": "Corrected sentence in Japanese",
+              "note": "Why it was incorrect (English)"
+            }
+          ]
+        },
+        "vocabularyRange": {
+          "rating": "Limited / Moderate / Rich",
+          "comment": "Comment on vocabulary usage (English)"
+        },
+        "vocabularyAnalysis": {
+          "frequentWords": [
+            { "word": "たのしい" },
+            { "word": "きれい" },
+          ],
+          "rareWords": [
+            { "word": "おまもり"},
+            { "word": "しょくじ"},
+          ],
+          "upgradedWords": [{"word": "たのしい", "alternatives": ["愉快", "面白い"]}],
+          "comment":
+            "Frequent use of emotional adjectives like 'たのしい' and 'きれい' shows positivity, but limited diversity in descriptive language.",
+        },
+      },
+      "feedback": {
+        "goodPoints": [
+          "Strengths of the learner (English array)"
+        ],
+        "commonMistakes": [
+          "Typical repeated errors (English array)"
+        ],
+        "corrections": [
+          {
+            "advice": "How to correct the mistake (English)",
+            "before": "Incorrect sentence in Japanese",
+            "after": "Corrected sentence in Japanese"
+          }
+        ],
+        "sentenceUpgrades": [
+          {
+            "advice": "Advice to make expression more natural (English)",
+            "original": { "kanji": "Original short/simple sentence", "kana": "かな読み" },
+            "upgraded": { "kanji": "Improved, more natural sentence", "kana": "かな読み" }
+          }
+        ],
+        "topicDevelopment": "Assessment of ability to expand conversation topics (English)",
+        "improvementPoints": [
+          "Suggestions to improve conversation skills (English array)"
+        ]
+      },
+
+      "growth": {
+        "milestone": "Current achievement level (English)",
+        "currentAbility": "Description of current ability (English)",
+        "nextLevelGoal": "Specific next goal for improvement (English)",
+        "strengthEnhancement": [
+          "Actions to enhance learner's strengths (English array)"
+        ]
+      }
     }
-  },
 
-  "feedback": {
-    "goodPoints": ["良かった点（英語配列）"],
-    "commonMistakes": ["繰り返しがちな誤り（英語配列）"],
-    "corrections": [
-      {
-        "advice": "どのように直すとよいか（英語）",
-        "before": "誤り文（漢字）",
-        "after": "修正文（漢字）"
-      }
-    ],
-    "sentenceUpgrades": [
-      {
-        "advice": "改善のアドバイス（英語）",
-        "original": { "kanji": "短い・単純な文", "kana": "かなよみ" },
-        "upgraded": { "kanji": "より自然で豊かな文", "kana": "かなよみ" }
-      }
-    ],
-    "topicDevelopment": "話題展開力の評価（英語）",
-    "improvementPoints": [
-      "改善提案（英語）"
-    ],
-    "vocabularySuggestions": ["学習すべき語彙候補（日本語配列）"]
-  },
-
-  "growth": {
-    "milestone": "現在の達成段階（英語）",
-    "currentAbility": "現在の能力を英語で説明",
-    "nextLevelGoal": "次のレベルに上がるための具体的目標（英語）",
-    "strengthEnhancement": [
-      "強みをさらに伸ばすための具体的行動（英語配列）"
-    ]
-  }
-}
-
----
-
-指示:
-- 「sentenceUpgrades」「corrections」は politeness（${politeness}）に合わせてください。
-- 文法的に正しい文は「mistake」として扱わないでください。
-- 文法・語彙・理解力・発音・流暢さの各観点から総合評価を行ってください。
-- 出力は **純粋なJSON形式のみ** にしてください。説明文やコメントを追加しないでください。
-- 実際に使える自然な文・アドバイス・語彙を提示してください。
-`;
+    Rules:
+    - Japanese examples (original, correction, upgrade) must respect the politeness level.
+    - Only include Japanese sentences with grammatical errors or unnatural expressions. Do not include correct sentences or stylistic variations.
+    - Provide detailed, specific feedback, not vague comments.
+    - All evaluations and explanations are in English except the Japanese learner sentences.
+    - Japanese sentence corrections must preserve the indicated politeness (casual/formal).
+    - vocabularySuggestions: include words the learner should learn or use more frequently.
+    `;
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
@@ -235,19 +268,46 @@ JSONのキー:
     });
 
     const raw = completion.choices[0]?.message?.content ?? "";
-    console.log(raw);
-
+    const createFallbackSummary = (raw: string) => ({
+      meta: {
+        title: "",
+        level: { label: "", reason: "" },
+        conversationLength: { totalWords: 0, uniqueWords: 0 },
+      },
+      evaluation: { summary: raw },
+      feedback: {
+        goodPoints: [],
+        commonMistakes: [],
+        corrections: [],
+        sentenceUpgrades: [],
+      },
+      growth: {},
+    });
     const jsonMatch = raw.match(/\{[\s\S]*\}/);
+    console.log(jsonMatch, "-----------");
+
     let parsed;
+
     if (jsonMatch) {
       try {
         parsed = JSON.parse(jsonMatch[0]);
-      } catch {
-        parsed = { summary: raw, mistakes: [], goodPoints: [] };
+      } catch (error) {
+        parsed = createFallbackSummary(raw);
       }
     } else {
-      parsed = { summary: raw, mistakes: [], goodPoints: [] };
+      parsed = createFallbackSummary(raw);
     }
+
+    const chat = await storeChatTitle(chatId, parsed.title); // store new title
+    const { level, theme, time } = chat;
+
+    if (parsed.meta) {
+      parsed.meta.selectedLevel = level;
+      parsed.meta.selectedTopic = theme;
+      parsed.meta.chatDuration = time;
+      console.log("Parsed summary:", parsed);
+    }
+    console.log(parsed);
 
     // if (process.env.NODE_ENV === "development") {
     //   const usage = completion.usage; // open ai usage
@@ -268,7 +328,7 @@ JSONのキー:
 
     await increaseChatCount(decodedToken.userId);
     await storeAnalysisDB(chatId, parsed);
-    await storeChatTitle(chatId, parsed.title);
+    // await storeChatTitle(chatId, parsed.title);
 
     return res.status(200).json(parsed);
   } catch (error) {
@@ -309,8 +369,10 @@ const storeAnalysisDB = async (chatId: number, analysisJson: any) => {
 };
 
 const storeChatTitle = async (chatId: number, title: string) => {
-  await prisma.chat.update({
+  const chat = await prisma.chat.update({
     where: { id: chatId },
     data: { title }, // ← data の中に更新内容を入れる
   });
+
+  return chat;
 };
