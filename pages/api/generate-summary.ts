@@ -4,6 +4,7 @@ import OpenAI from "openai";
 import { verifyAuth } from "../../middleware/middleware";
 import { PrismaClient } from "@prisma/client";
 import { MyJwtPayload } from "../../type/types";
+import { wordAnalyzer } from "../../lib/chatAnalize";
 
 const prisma = new PrismaClient();
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
@@ -60,6 +61,9 @@ export default async function handler(
     },
   ];
 
+  const wordData = await wordAnalyzer(history);
+  console.log(wordData);
+
   if (!history || !chatId || !politeness) {
     return res.status(400).json({ error: "No data provided" });
   }
@@ -78,7 +82,6 @@ export default async function handler(
           `${msg.role === "user" ? "User" : "Assistant"}: ${msg.content}`
       )
       .join("\n");
-
 
     // const prompt = `あなたは日本語教師です。以下の会話を分析し、学習者にフィードバックを与えてください。
     // 会話は「${politeness}」な話し方で行われています。
@@ -156,7 +159,6 @@ export default async function handler(
     - Output must be **machine-parseable JSON only**.
     - Maintain politeness level: "${politeness}"
 
-
     Schema:
     {
       "meta": {
@@ -189,23 +191,6 @@ export default async function handler(
             }
           ]
         },
-        "vocabularyRange": {
-          "rating": "Limited / Moderate / Rich",
-          "comment": "Comment on vocabulary usage (English)"
-        },
-        "vocabularyAnalysis": {
-          "frequentWords": [
-            { "word": "たのしい" },
-            { "word": "きれい" },
-          ],
-          "rareWords": [
-            { "word": "おまもり"},
-            { "word": "しょくじ"},
-          ],
-          "upgradedWords": [{"word": "たのしい", "alternatives": ["愉快", "面白い"]}],
-          "comment":
-            "Frequent use of emotional adjectives like 'たのしい' and 'きれい' shows positivity, but limited diversity in descriptive language.",
-        },
       },
       "feedback": {
         "goodPoints": [
@@ -233,7 +218,6 @@ export default async function handler(
           "Suggestions to improve conversation skills (English array)"
         ]
       },
-
       "growth": {
         "milestone": "Current achievement level (English)",
         "currentAbility": "Description of current ability (English)",
@@ -284,7 +268,6 @@ export default async function handler(
       growth: {},
     });
     const jsonMatch = raw.match(/\{[\s\S]*\}/);
-    console.log(jsonMatch, "-----------");
 
     let parsed;
 
@@ -305,9 +288,43 @@ export default async function handler(
       parsed.meta.selectedLevel = level;
       parsed.meta.selectedTopic = theme;
       parsed.meta.chatDuration = time;
-      console.log("Parsed summary:", parsed);
     }
-    console.log(parsed);
+
+    if (parsed.evaluation) {
+      const verbsArray = Array.isArray(wordData.verb) ? wordData.verb : [];
+      const adjectivesArray = Array.isArray(wordData.adjective)
+        ? wordData.adjective
+        : [];
+      const adverbsArray = Array.isArray(wordData.adverb)
+        ? wordData.adverb
+        : [];
+      const conjunctionsArray = Array.isArray(wordData.conjunction)
+        ? wordData.conjunction
+        : [];
+      const nounsArray = Array.isArray(wordData.noun) ? wordData.noun : [];
+
+      const vocabularyAnalysis = {
+        verbs: verbsArray.slice(0, 3),
+        adjectives: adjectivesArray.slice(0, 3),
+        adverbs: adverbsArray.slice(0, 3),
+        conjunctions: conjunctionsArray.slice(0, 3),
+        counts: {
+          verb: verbsArray.length,
+          adjective: adjectivesArray.length,
+          adverb: adverbsArray.length,
+          conjunction: conjunctionsArray.length,
+          noun: nounsArray.length,
+          total:
+            verbsArray.length +
+            adjectivesArray.length +
+            adverbsArray.length +
+            conjunctionsArray.length +
+            nounsArray.length,
+        },
+      };
+      parsed.evaluation.vocabularyAnalysis = vocabularyAnalysis;
+      console.log(parsed, "--------------------------------------");
+    }
 
     // if (process.env.NODE_ENV === "development") {
     //   const usage = completion.usage; // open ai usage
