@@ -2,7 +2,7 @@ import kuromoji from "kuromoji";
 import wanakana from "wanakana";
 
 // 辞書ビルド
-function buildTokenizer() {
+const buildTokenizer = () => {
   return new Promise((resolve, reject) => {
     kuromoji
       .builder({ dicPath: "node_modules/kuromoji/dict" })
@@ -11,7 +11,7 @@ function buildTokenizer() {
         resolve(tokenizer);
       });
   });
-}
+};
 
 // 日本語の品詞を英語のキーに変換
 const mapPosToKey = (pos: string) => {
