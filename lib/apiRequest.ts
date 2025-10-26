@@ -3,6 +3,7 @@ import { toast } from "sonner";
 export const apiRequest = async (url: string, options: RequestInit = {}) => {
   try {
     const res = await fetch(url, options);
+    
 
     if (res.status === 401) {
       if (typeof window !== "undefined") {
