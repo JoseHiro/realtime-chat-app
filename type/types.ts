@@ -7,12 +7,6 @@ export interface MyJwtPayload extends JwtPayload {
 // JLPT レベルの型
 export type JLPTLevel = "N5" | "N4" | "N3" | "N2" | "N1";
 
-// 文章アップグレードの型
-export type SentenceUpgrade = {
-  original: string;
-  upgraded: string;
-};
-
 // 拡張サマリー型（新しいタイプ）
 export type SummaryData = {
   summary: string;
@@ -80,4 +74,94 @@ export type PricingType = {
 export type FAQType = {
   question: string;
   answer: string;
+};
+
+export type SentenceUpgrade = {
+  advice: string;
+  original: {
+    kana: string;
+    kanji: string;
+  };
+  upgraded: {
+    kana: string;
+    kanji: string;
+  };
+};
+
+export type SummaryType = {
+  meta: Meta;
+  analysis: Analysis;
+  feedback: Feedback;
+  milestone: Milestone;
+};
+
+export type Meta = {
+  title: string;
+  level: {
+    label: string;
+    reason: string;
+  };
+  summary: string;
+  selectedLevel: string;
+  selectedTopic: string;
+  chatDuration: number;
+};
+
+export type Analysis = {
+  overview: string;
+  skills: {
+    flow: string;
+    comprehension: string;
+    development: string;
+    example: string;
+  };
+  vocabulary: {
+    verbs: {
+      word: string;
+      reading: string;
+      romaji: string;
+      count: number;
+    }[];
+    adjectives: {
+      word: string;
+      reading: string;
+      romaji: string;
+      count: number;
+    }[];
+    adverbs: {
+      word: string;
+      reading: string;
+      romaji: string;
+      count: number;
+    }[];
+    conjunctions: {
+      word: string;
+      reading: string;
+      romaji: string;
+      count: number;
+    }[];
+  };
+};
+
+export type Feedback = {
+  strengths: string[];
+  improvements: string[];
+  commonMistakes: string[];
+  corrections: {
+    advice: string;
+    before: string;
+    after: string;
+  }[];
+  enhancements: SentenceUpgrade[];
+};
+
+export type Milestone = {
+  current: {
+    milestone: string;
+    ability: string;
+  };
+  next: {
+    goal: string;
+    steps: string[];
+  };
 };

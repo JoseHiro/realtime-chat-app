@@ -9,11 +9,12 @@ import {
   CheckCircle,
   Lightbulb,
   TrendingUp,
-  HelpCircle,
   BookText,
   MessageCircle,
   BarChart3,
+  BookOpen,
 } from "lucide-react";
+import { SummaryType } from "../../type/types";
 
 // Sample data for demonstration
 // const sampleSummary = {
@@ -141,171 +142,14 @@ import {
 //   },
 // };
 
-const sampleSummary = {
-  meta: {
-    title: "Casual Weekend Reflection",
-    level: {
-      label: "N4",
-      reason:
-        "Learner can use past tense and descriptive expressions with fair accuracy, but sentence connectors and topic elaboration are limited. This corresponds to N4 ability, where learners can handle everyday topics with simple grammar.",
-    },
-    conversationLength: {
-      totalWords: 158,
-      uniqueWords: 84,
-    },
-    selectedLevel: "easy",
-    selectedTopic: "daily",
-    chatDuration: 1,
-  },
-  evaluation: {
-    summary:
-      "The conversation reflects a casual check-in about the learner's day at the park. They shared their activities and experiences in a relaxed manner.",
-    responseSkill: {
-      overall:
-        "The learner responds to prompts well but occasionally struggles with fluidity and complexity.",
-      conversationFlow:
-        "The dialogue is generally smooth; however, some responses could be expanded for better flow.",
-      comprehension:
-        "The learner demonstrates good understanding and engagement throughout the conversation.",
-      example:
-        "The interaction about picnic activities was engaging and relevant.",
-    },
-    accuracy: {
-      grammarMistakes: 1,
-      examples: [
-        {
-          original: "私はサッカー下手から、すぐ疲れた。",
-          correction: "私はサッカーが下手だから、すぐ疲れた。",
-          note: "The particle 'が' is needed here to connect the subject and the adjective properly, and 'から' should be replaced with 'だから' for clarity.",
-        },
-      ],
-    },
-    vocabularyRange: {
-      rating: "Limited",
-      comment:
-        "The vocabulary is simple and appropriate for the conversation, but there is little variation in word choice.",
-    },
-    vocabularyAnalysis: {
-      frequentWords: [
-        {
-          word: "楽しい",
-        },
-        {
-          word: "美味しい",
-        },
-      ],
-      rareWords: [
-        {
-          word: "サンドイッチ",
-        },
-        {
-          word: "フルーツ",
-        },
-      ],
-      upgradedWords: [
-        {
-          word: "楽しい",
-          alternatives: ["愉快", "面白い"],
-        },
-      ],
-      comment:
-        "Frequent use of basic adjectives suggests a positive tone, yet there is a noticeable lack of variety.",
-    },
-  },
-  feedback: {
-    goodPoints: [
-      "The learner expresses enjoyment and enthusiasm effectively.",
-      "Responses are well-structured and relevant to the conversation.",
-    ],
-    commonMistakes: [
-      "Issues with grammatical particles.",
-      "Limited expansion on topics.",
-    ],
-    corrections: [
-      {
-        advice: "Use appropriate particles to create clearer sentences.",
-        before: "私はサッカー下手から、すぐ疲れた。",
-        after: "私はサッカーが下手だから、すぐ疲れた。",
-      },
-    ],
-    sentenceUpgrades: [
-      {
-        advice: "Add more details to create a richer narrative.",
-        original: {
-          kanji: "また来週も行きたい思います！",
-          kana: "またらいしゅうもいきたいおもいます！",
-        },
-        upgraded: {
-          kanji: "また来週もぜひ行きたいと思います！",
-          kana: "またらいしゅうもぜひいきたいおもいます！",
-        },
-      },
-    ],
-    topicDevelopment:
-      "Encouraged to elaborate more on experiences and opinions to enhance engagement.",
-    improvementPoints: [
-      "Practice using varied vocabulary to enhance expression.",
-      "Focus on correct usage of particles and conjunctions.",
-    ],
-  },
-  growth: {
-    milestone:
-      "Learner is able to communicate basic experiences and feelings effectively.",
-    currentAbility:
-      "The learner can engage in simple conversations with a good understanding of context but needs to refine grammatical structures.",
-    nextLevelGoal: "To use more complex sentences and better connect ideas.",
-    strengthEnhancement: [
-      "Encourage engagement in conversations with varied topics to practice language skills.",
-    ],
-  },
-};
-
-// const Skeleton = ({ className }: { className: string }) => (
-//   <div className={`animate-pulse bg-gray-200 rounded ${className}`}></div>
-// );
-
-type Mistake = {
-  kanji: string;
-  kana: string;
-};
-
-type SentenceUpgrade = {
-  advice: string;
-  original: {
-    kana: string;
-    kanji: string;
-  };
-  upgraded: {
-    kana: string;
-    kanji: string;
-  };
-};
-
-type SummaryType = {
-  score: number;
-  title: string;
-  summary: string;
-  mistakes: Mistake[];
-  goodPoints: string[];
-  corrections: Mistake[];
-  responseSkill: string;
-  commonMistakes: string[];
-  difficultyLevel: string;
-  difficultyReason: string;
-  sentenceUpgrades: SentenceUpgrade[];
-  topicDevelopment: string;
-  improvementPoints: string[];
-  vocabularySuggestions: string[];
-};
-
-export const Summary = ({ summary = sampleSummary }) => {
+export const Summary = ({ summary }: { summary: SummaryType }) => {
   const [activeTab, setActiveTab] = useState("info");
 
   const tabs = [
     { id: "info", label: "Conversation Info", icon: MessageCircle },
-    { id: "evaluation", label: "Evaluation Report", icon: BarChart3 },
+    { id: "analysis", label: "Analysis", icon: Target },
     { id: "feedback", label: "Feedback & Corrections", icon: AlertCircle },
-    { id: "growth", label: "Growth Path", icon: TrendingUp },
+    { id: "milestone", label: "Growth Path", icon: TrendingUp },
   ];
 
   return (
@@ -323,10 +167,7 @@ export const Summary = ({ summary = sampleSummary }) => {
                   {summary?.meta?.title || "Learning Summary"}
                 </h1>
                 <p className="text-sm text-gray-500 mt-0.5">
-                  {summary?.meta?.selectedTopic ||
-                    summary?.meta?.topic ||
-                    "Conversation"}{" "}
-                  •{" "}
+                  {summary?.meta?.selectedTopic || "Conversation"} •{" "}
                   {typeof summary?.meta?.level === "object"
                     ? summary.meta.level.label
                     : summary?.meta?.level || "N5"}{" "}
@@ -337,7 +178,7 @@ export const Summary = ({ summary = sampleSummary }) => {
             <div className="flex items-center space-x-2">
               <Award className="w-5 h-5 text-gray-400" />
               <span className="text-sm font-medium text-gray-600">
-                {summary?.meta?.chatDuration || summary?.meta?.time || 0} min
+                {summary?.meta?.chatDuration || 0} min
               </span>
             </div>
           </div>
@@ -382,46 +223,30 @@ export const Summary = ({ summary = sampleSummary }) => {
                     Conversation Information
                   </h2>
 
-                  <div className="grid md:grid-cols-2 gap-6">
+                  <div className="grid md:grid-cols-2 gap-6 mb-6">
                     <div>
                       <div className="text-sm text-gray-500 mb-2">Topic</div>
                       <div className="text-lg text-gray-900 font-medium">
-                        {summary?.meta?.selectedTopic ||
-                          summary?.meta?.topic ||
-                          "General Conversation"}
+                        {summary?.meta?.selectedTopic || "General Conversation"}
                       </div>
                     </div>
                     <div>
                       <div className="text-sm text-gray-500 mb-2">Duration</div>
                       <div className="text-lg text-gray-900 font-medium">
-                        {summary?.meta?.chatDuration ||
-                          summary?.meta?.time ||
-                          0}{" "}
-                        minutes
+                        {summary?.meta?.chatDuration || 0} minutes
                       </div>
                     </div>
                   </div>
 
-                  {summary?.meta?.conversationLength && (
-                    <div className="grid md:grid-cols-2 gap-6 mt-6 pt-6 border-t border-gray-200">
-                      <div>
-                        <div className="text-sm text-gray-500 mb-2">
-                          Total Words
-                        </div>
-                        <div className="text-lg text-gray-900 font-medium">
-                          {summary.meta.conversationLength.totalWords || 0}
-                        </div>
-                      </div>
-                      <div>
-                        <div className="text-sm text-gray-500 mb-2">
-                          Unique Words
-                        </div>
-                        <div className="text-lg text-gray-900 font-medium">
-                          {summary.meta.conversationLength.uniqueWords || 0}
-                        </div>
-                      </div>
+                  {/* Overall Summary */}
+                  <div className="pt-6 border-t border-gray-200">
+                    <h3 className="text-base font-semibold text-gray-900 mb-4">
+                      Overall Summary
+                    </h3>
+                    <div className="bg-gray-50 rounded-lg p-4 text-sm text-gray-800 leading-relaxed">
+                      {summary?.meta?.summary || "No summary available."}
                     </div>
-                  )}
+                  </div>
                 </div>
 
                 {/* Level Assessment */}
@@ -453,14 +278,6 @@ export const Summary = ({ summary = sampleSummary }) => {
                   <div className="space-y-3">
                     <div className="flex justify-between items-center py-3 border-b border-gray-100">
                       <span className="text-sm text-gray-600">
-                        Grammar Mistakes
-                      </span>
-                      <span className="text-lg font-semibold text-gray-900">
-                        {summary?.evaluation?.accuracy?.grammarMistakes || 0}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center py-3 border-b border-gray-100">
-                      <span className="text-sm text-gray-600">
                         Corrections Made
                       </span>
                       <span className="text-lg font-semibold text-gray-900">
@@ -472,15 +289,7 @@ export const Summary = ({ summary = sampleSummary }) => {
                         Sentence Upgrades
                       </span>
                       <span className="text-lg font-semibold text-gray-900">
-                        {summary?.feedback?.sentenceUpgrades?.length || 0}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center py-3">
-                      <span className="text-sm text-gray-600">
-                        Vocabulary Range
-                      </span>
-                      <span className="text-lg font-semibold text-gray-900">
-                        {summary?.evaluation?.vocabularyRange?.rating || "N/A"}
+                        {summary?.feedback?.enhancements?.length || 0}
                       </span>
                     </div>
                   </div>
@@ -488,391 +297,133 @@ export const Summary = ({ summary = sampleSummary }) => {
               </div>
             )}
 
-            {/* Evaluation Report Tab */}
-            {activeTab === "evaluation" && (
+            {/* Analysis Tab - Response Skill, Conversation Flow, Accuracy, Vocabulary */}
+            {activeTab === "analysis" && (
               <div className="space-y-6">
                 <div className="bg-white rounded-lg border border-gray-200 p-6">
                   <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
                     <BarChart3 className="w-5 h-5 mr-2 text-gray-600" />
-                    Evaluation Report
+                    Performance Analysis
                   </h2>
 
                   <div className="space-y-6">
-                    {/* Overall Summary */}
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-700 mb-3">
-                        Overall Summary
-                      </h3>
-                      <div className="bg-gray-50 rounded-lg p-4 text-sm text-gray-800 leading-relaxed">
-                        {summary?.evaluation?.summary ||
-                          "No summary available."}
-                      </div>
+                    <h3 className="text-sm font-medium text-gray-700 mb-3">
+                      Overall Assessment
+                    </h3>
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <p className="text-sm text-gray-800 leading-relaxed">
+                        {summary.analysis.overview}
+                      </p>
                     </div>
 
-                    {/* Response Skill */}
                     <div>
                       <h3 className="text-sm font-medium text-gray-700 mb-3">
-                        Response Skill
+                        Skills Assessment
                       </h3>
                       <div className="space-y-3">
                         <div className="bg-gray-50 rounded-lg p-4">
-                          <div className="text-xs text-gray-500 mb-1">
-                            Overall Assessment
-                          </div>
+                          <div className="text-xs text-gray-500 mb-1">Flow</div>
                           <p className="text-sm text-gray-800 leading-relaxed">
-                            {summary?.evaluation?.responseSkill?.overall ||
-                              "N/A"}
+                            {summary.analysis.skills.flow}
                           </p>
                         </div>
-                        {summary?.evaluation?.responseSkill
-                          ?.conversationFlow && (
-                          <div className="bg-gray-50 rounded-lg p-4">
-                            <div className="text-xs text-gray-500 mb-1">
-                              Conversation Flow
-                            </div>
-                            <p className="text-sm text-gray-800 leading-relaxed">
-                              {
-                                summary.evaluation.responseSkill
-                                  .conversationFlow
-                              }
-                            </p>
+                        <div className="bg-gray-50 rounded-lg p-4">
+                          <div className="text-xs text-gray-500 mb-1">
+                            Comprehension
                           </div>
-                        )}
-                        {summary?.evaluation?.responseSkill?.comprehension && (
-                          <div className="bg-gray-50 rounded-lg p-4">
-                            <div className="text-xs text-gray-500 mb-1">
-                              Comprehension
-                            </div>
-                            <p className="text-sm text-gray-800 leading-relaxed">
-                              {summary.evaluation.responseSkill.comprehension}
-                            </p>
+                          <p className="text-sm text-gray-800 leading-relaxed">
+                            {summary.analysis.skills.comprehension}
+                          </p>
+                        </div>
+                        <div className="bg-gray-50 rounded-lg p-4">
+                          <div className="text-xs text-gray-500 mb-1">
+                            Development
                           </div>
-                        )}
-                        {summary?.evaluation?.responseSkill?.reason && (
-                          <div className="bg-blue-50 border border-blue-100 rounded-lg p-4">
-                            <div className="text-xs text-gray-600 mb-1">
-                              Reasoning
-                            </div>
-                            <p className="text-sm text-gray-800 leading-relaxed">
-                              {summary.evaluation.responseSkill.reason}
-                            </p>
+                          <p className="text-sm text-gray-800 leading-relaxed">
+                            {summary.analysis.skills.development}
+                          </p>
+                        </div>
+                        <div className="bg-gray-50 rounded-lg p-4 border-l-4 border-gray-300">
+                          <div className="text-xs text-gray-600 mb-2">
+                            Example
                           </div>
-                        )}
-                        {summary?.evaluation?.responseSkill?.example && (
-                          <div className="bg-gray-50 rounded-lg p-4 border-l-4 border-gray-300">
-                            <div className="text-xs text-gray-600 mb-2">
-                              Example
-                            </div>
-                            <p className="text-sm text-gray-800 leading-relaxed italic">
-                              {summary.evaluation.responseSkill.example}
-                            </p>
-                          </div>
-                        )}
+                          <p className="text-sm text-gray-800 leading-relaxed italic">
+                            {summary.analysis.skills.example}
+                          </p>
+                        </div>
                       </div>
                     </div>
+                  </div>
+                </div>
 
-                    {/* Conversation Flow */}
-                    {summary?.evaluation?.conversationFlow && (
+                <div className="bg-white rounded-lg border border-gray-200 p-6">
+                  <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
+                    <BookOpen className="w-5 h-5 mr-2 text-gray-600" />
+                    Vocabulary Analysis
+                  </h2>
+
+                  <div className="space-y-4">
+                    {summary.analysis.vocabulary.verbs.length > 0 && (
                       <div>
-                        <h3 className="text-sm font-medium text-gray-700 mb-3">
-                          Conversation Flow
-                        </h3>
-                        <div className="space-y-3">
-                          <div className="flex items-center justify-between bg-gray-50 rounded-lg p-4">
-                            <span className="text-sm text-gray-600">
-                              Rating
-                            </span>
-                            <span className="text-base font-semibold text-gray-900">
-                              {summary.evaluation.conversationFlow.rating ||
-                                "N/A"}
-                            </span>
-                          </div>
-                          {summary.evaluation.conversationFlow.reason && (
-                            <div className="bg-blue-50 border border-blue-100 rounded-lg p-4">
-                              <p className="text-sm text-gray-800 leading-relaxed">
-                                {summary.evaluation.conversationFlow.reason}
-                              </p>
-                            </div>
-                          )}
-                          {summary.evaluation.conversationFlow.example && (
-                            <div className="bg-gray-50 rounded-lg p-4 border-l-4 border-gray-300">
-                              <div className="text-xs text-gray-600 mb-2">
-                                Example
+                        <div className="text-xs font-medium text-gray-600 mb-2">
+                          Verbs (動詞)
+                        </div>
+                        <div className="space-y-2">
+                          {summary?.analysis.vocabulary.verbs.map(
+                            (item, index) => (
+                              <div
+                                key={index}
+                                className="flex items-center justify-between bg-blue-50 border border-blue-200 rounded-lg p-3"
+                              >
+                                <div className="flex items-center space-x-3">
+                                  <span className="text-base font-medium text-gray-900">
+                                    {item.word}
+                                  </span>
+                                  <span className="text-sm text-gray-600">
+                                    {item.reading}
+                                  </span>
+                                  <span className="text-xs text-gray-500 font-mono">
+                                    {item.romaji}
+                                  </span>
+                                </div>
+                                <span className="text-sm font-semibold text-gray-700">
+                                  ×{item.count}
+                                </span>
                               </div>
-                              <p className="text-sm text-gray-800 leading-relaxed italic">
-                                {summary.evaluation.conversationFlow.example}
-                              </p>
-                            </div>
+                            )
                           )}
                         </div>
                       </div>
                     )}
 
-                    {/* Accuracy */}
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-700 mb-3">
-                        Accuracy
-                      </h3>
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between bg-gray-50 rounded-lg p-4">
-                          <span className="text-sm text-gray-600">
-                            Grammar Mistakes
-                          </span>
-                          <span className="text-2xl font-bold text-gray-900">
-                            {summary?.evaluation?.accuracy?.grammarMistakes ||
-                              0}
-                          </span>
-                        </div>
-                        {summary?.evaluation?.accuracy?.reason && (
-                          <div className="bg-blue-50 border border-blue-100 rounded-lg p-4">
-                            <p className="text-sm text-gray-800 leading-relaxed">
-                              {summary.evaluation.accuracy.reason}
-                            </p>
-                          </div>
-                        )}
-                        {summary?.evaluation?.accuracy?.examples?.length >
-                          0 && (
-                          <div className="space-y-2">
-                            {summary.evaluation.accuracy.examples.map(
-                              (ex, index) => (
-                                <div
-                                  key={index}
-                                  className="border border-gray-200 rounded-lg p-4"
-                                >
-                                  <div className="grid md:grid-cols-2 gap-3 mb-2">
-                                    <div>
-                                      <div className="text-xs text-gray-500 mb-1">
-                                        Original
-                                      </div>
-                                      <div className="bg-red-50 border border-red-200 rounded p-2 text-sm text-gray-900">
-                                        {ex.original}
-                                      </div>
-                                    </div>
-                                    <div>
-                                      <div className="text-xs text-gray-500 mb-1">
-                                        Correction
-                                      </div>
-                                      <div className="bg-green-50 border border-green-200 rounded p-2 text-sm text-gray-900">
-                                        {ex.correction}
-                                      </div>
-                                    </div>
-                                  </div>
-                                  {ex.note && (
-                                    <div className="text-xs text-gray-600 mt-2 italic">
-                                      💡 {ex.note}
-                                    </div>
-                                  )}
-                                </div>
-                              )
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Vocabulary Range */}
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-700 mb-3">
-                        Vocabulary Range
-                      </h3>
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between bg-gray-50 rounded-lg p-4">
-                          <span className="text-sm text-gray-600">Rating</span>
-                          <span className="text-base font-semibold text-gray-900">
-                            {summary?.evaluation?.vocabularyRange?.rating ||
-                              "N/A"}
-                          </span>
-                        </div>
-                        {summary?.evaluation?.vocabularyRange?.comment && (
-                          <div className="bg-gray-50 rounded-lg p-4">
-                            <p className="text-sm text-gray-800 leading-relaxed">
-                              {summary.evaluation.vocabularyRange.comment}
-                            </p>
-                          </div>
-                        )}
-                        {summary?.evaluation?.vocabularyRange?.reason && (
-                          <div className="bg-blue-50 border border-blue-100 rounded-lg p-4">
-                            <p className="text-sm text-gray-800 leading-relaxed">
-                              {summary.evaluation.vocabularyRange.reason}
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Vocabulary Analysis */}
-                    {summary?.evaluation?.vocabularyAnalysis && (
+                    {summary.analysis.vocabulary.adjectives.length > 0 && (
                       <div>
-                        <h3 className="text-sm font-medium text-gray-700 mb-3">
-                          Vocabulary Analysis
-                        </h3>
-                        <div className="space-y-4">
-                          {/* Word Diversity */}
-                          {summary.evaluation.vocabularyAnalysis
-                            .wordDiversity !== undefined && (
-                            <div className="bg-gray-50 rounded-lg p-4">
-                              <div className="flex items-center justify-between mb-2">
-                                <span className="text-sm text-gray-600">
-                                  Word Diversity
+                        <div className="text-xs font-medium text-gray-600 mb-2">
+                          Adjectives (形容詞)
+                        </div>
+                        <div className="space-y-2">
+                          {summary.analysis.vocabulary.adjectives.map(
+                            (item, index) => (
+                              <div
+                                key={index}
+                                className="flex items-center justify-between bg-green-50 border border-green-200 rounded-lg p-3"
+                              >
+                                <div className="flex items-center space-x-3">
+                                  <span className="text-base font-medium text-gray-900">
+                                    {item.word}
+                                  </span>
+                                  <span className="text-sm text-gray-600">
+                                    {item.reading}
+                                  </span>
+                                  <span className="text-xs text-gray-500 font-mono">
+                                    {item.romaji}
+                                  </span>
+                                </div>
+                                <span className="text-sm font-semibold text-gray-700">
+                                  ×{item.count}
                                 </span>
-                                <span className="text-lg font-semibold text-gray-900">
-                                  {(
-                                    summary.evaluation.vocabularyAnalysis
-                                      .wordDiversity * 100
-                                  ).toFixed(0)}
-                                  %
-                                </span>
                               </div>
-                              <div className="w-full bg-gray-200 rounded-full h-2">
-                                <div
-                                  className="bg-gray-900 h-2 rounded-full transition-all duration-500"
-                                  style={{
-                                    width: `${
-                                      summary.evaluation.vocabularyAnalysis
-                                        .wordDiversity * 100
-                                    }%`,
-                                  }}
-                                ></div>
-                              </div>
-                            </div>
-                          )}
-
-                          {/* Common Words */}
-                          {summary.evaluation.vocabularyAnalysis.commonWords
-                            ?.length > 0 && (
-                            <div>
-                              <div className="text-xs font-medium text-gray-600 mb-2">
-                                Most Used Words
-                              </div>
-                              <div className="space-y-2">
-                                {summary.evaluation.vocabularyAnalysis.commonWords.map(
-                                  (item, index) => (
-                                    <div
-                                      key={index}
-                                      className="flex items-center justify-between bg-gray-50 rounded-lg p-3"
-                                    >
-                                      <span className="text-sm font-medium text-gray-900">
-                                        {item.word}
-                                      </span>
-                                      <div className="flex items-center space-x-2">
-                                        <div className="w-24 bg-gray-200 rounded-full h-1.5">
-                                          <div
-                                            className="bg-gray-600 h-1.5 rounded-full"
-                                            style={{
-                                              width: `${Math.min(
-                                                (item.count /
-                                                  Math.max(
-                                                    ...summary.evaluation.vocabularyAnalysis.commonWords.map(
-                                                      (w) => w.count
-                                                    )
-                                                  )) *
-                                                  100,
-                                                100
-                                              )}%`,
-                                            }}
-                                          ></div>
-                                        </div>
-                                        <span className="text-xs font-semibold text-gray-600 w-6 text-right">
-                                          ×{item.count}
-                                        </span>
-                                      </div>
-                                    </div>
-                                  )
-                                )}
-                              </div>
-                            </div>
-                          )}
-
-                          {/* Rare Words */}
-                          {summary.evaluation.vocabularyAnalysis.rareWords
-                            ?.length > 0 && (
-                            <div>
-                              <div className="text-xs font-medium text-gray-600 mb-2">
-                                Advanced/Rare Words
-                              </div>
-                              <div className="flex flex-wrap gap-2">
-                                {summary.evaluation.vocabularyAnalysis.rareWords.map(
-                                  (item, index) => (
-                                    <div
-                                      key={index}
-                                      className="px-3 py-2 bg-blue-50 border border-blue-200 rounded-lg"
-                                    >
-                                      <span className="text-sm font-medium text-gray-900">
-                                        {item.word}
-                                      </span>
-                                      {item.count && (
-                                        <span className="text-xs text-gray-600 ml-2">
-                                          ×{item.count}
-                                        </span>
-                                      )}
-                                    </div>
-                                  )
-                                )}
-                              </div>
-                            </div>
-                          )}
-
-                          {/* Frequent Words */}
-                          {summary.evaluation.vocabularyAnalysis.frequentWords
-                            ?.length > 0 && (
-                            <div>
-                              <div className="text-xs font-medium text-gray-600 mb-2">
-                                Frequently Used Words
-                              </div>
-                              <div className="flex flex-wrap gap-2">
-                                {summary.evaluation.vocabularyAnalysis.frequentWords.map(
-                                  (item, index) => (
-                                    <div
-                                      key={index}
-                                      className="px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg"
-                                    >
-                                      <span className="text-sm font-medium text-gray-900">
-                                        {item.word}
-                                      </span>
-                                    </div>
-                                  )
-                                )}
-                              </div>
-                            </div>
-                          )}
-
-                          {/* Upgraded Words */}
-                          {summary.evaluation.vocabularyAnalysis.upgradedWords
-                            ?.length > 0 && (
-                            <div>
-                              <div className="text-xs font-medium text-gray-600 mb-2">
-                                Vocabulary Upgrades
-                              </div>
-                              <div className="space-y-3">
-                                {summary.evaluation.vocabularyAnalysis.upgradedWords.map(
-                                  (item, index) => (
-                                    <div
-                                      key={index}
-                                      className="bg-green-50 border border-green-200 rounded-lg p-3"
-                                    >
-                                      <div className="flex items-center space-x-2 mb-2">
-                                        <span className="text-sm font-medium text-gray-900">
-                                          {item.word}
-                                        </span>
-                                        <ArrowRight className="w-4 h-4 text-gray-400" />
-                                        <span className="text-sm text-gray-700">
-                                          {item.alternatives?.join(", ")}
-                                        </span>
-                                      </div>
-                                    </div>
-                                  )
-                                )}
-                              </div>
-                            </div>
-                          )}
-
-                          {/* Comment */}
-                          {summary.evaluation.vocabularyAnalysis.comment && (
-                            <div className="bg-blue-50 border border-blue-100 rounded-lg p-4">
-                              <p className="text-sm text-gray-800 leading-relaxed">
-                                {summary.evaluation.vocabularyAnalysis.comment}
-                              </p>
-                            </div>
+                            )
                           )}
                         </div>
                       </div>
@@ -882,25 +433,24 @@ export const Summary = ({ summary = sampleSummary }) => {
               </div>
             )}
 
-            {/* Feedback & Corrections Tab */}
+            {/* Feedback & Improvements Tab */}
             {activeTab === "feedback" && (
               <div className="space-y-6">
                 <div className="bg-white rounded-lg border border-gray-200 p-6">
                   <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
                     <AlertCircle className="w-5 h-5 mr-2 text-gray-600" />
-                    Feedback & Corrections
+                    Feedback & Improvements
                   </h2>
 
                   <div className="space-y-6">
-                    {/* Good Points */}
-                    {summary?.feedback?.goodPoints?.length > 0 && (
+                    {summary.feedback.strengths.length > 0 && (
                       <div>
                         <h3 className="text-sm font-medium text-gray-700 mb-3 flex items-center">
                           <CheckCircle className="w-4 h-4 mr-2 text-green-600" />
                           Strengths
                         </h3>
                         <div className="space-y-2">
-                          {summary.feedback.goodPoints.map((point, index) => (
+                          {summary.feedback.strengths.map((point, index) => (
                             <div
                               key={index}
                               className="flex items-start space-x-3 p-4 bg-green-50 border border-green-100 rounded-lg"
@@ -915,8 +465,7 @@ export const Summary = ({ summary = sampleSummary }) => {
                       </div>
                     )}
 
-                    {/* Common Mistakes */}
-                    {summary?.feedback?.commonMistakes?.length > 0 && (
+                    {summary.feedback.commonMistakes.length > 0 && (
                       <div>
                         <h3 className="text-sm font-medium text-gray-700 mb-3 flex items-center">
                           <AlertCircle className="w-4 h-4 mr-2 text-red-600" />
@@ -942,8 +491,29 @@ export const Summary = ({ summary = sampleSummary }) => {
                       </div>
                     )}
 
-                    {/* Corrections */}
-                    {summary?.feedback?.corrections?.length > 0 && (
+                    {summary.feedback.improvements.length > 0 && (
+                      <div>
+                        <h3 className="text-sm font-medium text-gray-700 mb-3 flex items-center">
+                          <Target className="w-4 h-4 mr-2 text-gray-600" />
+                          Focus Areas
+                        </h3>
+                        <div className="space-y-2">
+                          {summary.feedback.improvements.map((point, index) => (
+                            <div
+                              key={index}
+                              className="flex items-start space-x-3 p-4 bg-yellow-50 border border-yellow-100 rounded-lg"
+                            >
+                              <div className="w-6 h-6 bg-yellow-200 rounded-full flex items-center justify-center text-yellow-800 text-xs font-semibold flex-shrink-0">
+                                {index + 1}
+                              </div>
+                              <p className="text-sm text-gray-800">{point}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {summary.feedback.corrections.length > 0 && (
                       <div>
                         <h3 className="text-sm font-medium text-gray-700 mb-3 flex items-center">
                           <Target className="w-4 h-4 mr-2 text-gray-600" />
@@ -988,126 +558,58 @@ export const Summary = ({ summary = sampleSummary }) => {
                       </div>
                     )}
 
-                    {/* Sentence Upgrades */}
-                    {summary?.feedback?.sentenceUpgrades?.length > 0 && (
+                    {summary.feedback.enhancements.length > 0 && (
                       <div>
                         <h3 className="text-sm font-medium text-gray-700 mb-3 flex items-center">
                           <RotateCcw className="w-4 h-4 mr-2 text-gray-600" />
                           Expression Enhancements
                         </h3>
                         <div className="space-y-4">
-                          {summary.feedback.sentenceUpgrades.map(
-                            (item, index) => (
-                              <div
-                                key={index}
-                                className="border border-gray-200 rounded-lg p-5"
-                              >
-                                {item.advice && (
-                                  <div className="bg-blue-50 border border-blue-100 rounded-lg p-3 mb-3">
-                                    <p className="text-xs text-gray-700">
-                                      💡 {item.advice}
+                          {summary.feedback.enhancements.map((item, index) => (
+                            <div
+                              key={index}
+                              className="border border-gray-200 rounded-lg p-5"
+                            >
+                              {item.advice && (
+                                <div className="bg-blue-50 border border-blue-100 rounded-lg p-3 mb-3">
+                                  <p className="text-xs text-gray-700">
+                                    💡 {item.advice}
+                                  </p>
+                                </div>
+                              )}
+                              <div className="grid md:grid-cols-3 gap-4 items-center">
+                                <div>
+                                  <div className="text-xs text-gray-500 mb-2">
+                                    Current
+                                  </div>
+                                  <div className="bg-gray-50 rounded-lg p-3">
+                                    <p className="text-sm font-medium text-gray-900 mb-1">
+                                      {item.original.kanji}
+                                    </p>
+                                    <p className="text-xs text-gray-600">
+                                      {item.original.kana}
                                     </p>
                                   </div>
-                                )}
-                                <div className="grid md:grid-cols-3 gap-4 items-center mb-3">
-                                  <div>
-                                    <div className="text-xs text-gray-500 mb-2">
-                                      Current
-                                    </div>
-                                    <div className="bg-gray-50 rounded-lg p-3">
-                                      <p className="text-sm font-medium text-gray-900 mb-1">
-                                        {item.original.kanji}
-                                      </p>
-                                      <p className="text-xs text-gray-600">
-                                        {item.original.kana}
-                                      </p>
-                                    </div>
+                                </div>
+                                <div className="flex justify-center">
+                                  <ArrowRight className="w-5 h-5 text-gray-400" />
+                                </div>
+                                <div>
+                                  <div className="text-xs text-gray-500 mb-2">
+                                    Enhanced
                                   </div>
-                                  <div className="flex justify-center">
-                                    <ArrowRight className="w-5 h-5 text-gray-400" />
-                                  </div>
-                                  <div>
-                                    <div className="text-xs text-gray-500 mb-2">
-                                      Enhanced
-                                    </div>
-                                    <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                                      <p className="text-sm font-medium text-gray-900 mb-1">
-                                        {item.upgraded.kanji}
-                                      </p>
-                                      <p className="text-xs text-gray-600">
-                                        {item.upgraded.kana}
-                                      </p>
-                                    </div>
+                                  <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                                    <p className="text-sm font-medium text-gray-900 mb-1">
+                                      {item.upgraded.kanji}
+                                    </p>
+                                    <p className="text-xs text-gray-600">
+                                      {item.upgraded.kana}
+                                    </p>
                                   </div>
                                 </div>
-                                {item.reason && (
-                                  <div className="text-xs text-gray-600 italic">
-                                    📝 {item.reason}
-                                  </div>
-                                )}
                               </div>
-                            )
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Topic Development */}
-                    {summary?.feedback?.topicDevelopment && (
-                      <div>
-                        <h3 className="text-sm font-medium text-gray-700 mb-3">
-                          Topic Development
-                        </h3>
-                        <div className="bg-gray-50 rounded-lg p-4">
-                          {typeof summary.feedback.topicDevelopment ===
-                          "object" ? (
-                            <>
-                              {summary.feedback.topicDevelopment.rating && (
-                                <div className="flex items-center justify-between mb-3 pb-3 border-b border-gray-200">
-                                  <span className="text-sm text-gray-600">
-                                    Rating
-                                  </span>
-                                  <span className="text-base font-semibold text-gray-900">
-                                    {summary.feedback.topicDevelopment.rating}
-                                  </span>
-                                </div>
-                              )}
-                              {summary.feedback.topicDevelopment.reason && (
-                                <p className="text-sm text-gray-800 leading-relaxed">
-                                  {summary.feedback.topicDevelopment.reason}
-                                </p>
-                              )}
-                            </>
-                          ) : (
-                            <p className="text-sm text-gray-800 leading-relaxed">
-                              {summary.feedback.topicDevelopment}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Improvement Points */}
-                    {summary?.feedback?.improvementPoints?.length > 0 && (
-                      <div>
-                        <h3 className="text-sm font-medium text-gray-700 mb-3 flex items-center">
-                          <Target className="w-4 h-4 mr-2 text-gray-600" />
-                          Focus Areas
-                        </h3>
-                        <div className="space-y-2">
-                          {summary.feedback.improvementPoints.map(
-                            (point, index) => (
-                              <div
-                                key={index}
-                                className="flex items-start space-x-3 p-4 bg-yellow-50 border border-yellow-100 rounded-lg"
-                              >
-                                <div className="w-6 h-6 bg-yellow-200 rounded-full flex items-center justify-center text-yellow-800 text-xs font-semibold flex-shrink-0">
-                                  {index + 1}
-                                </div>
-                                <p className="text-sm text-gray-800">{point}</p>
-                              </div>
-                            )
-                          )}
+                            </div>
+                          ))}
                         </div>
                       </div>
                     )}
@@ -1117,7 +619,7 @@ export const Summary = ({ summary = sampleSummary }) => {
             )}
 
             {/* Growth Path Tab */}
-            {activeTab === "growth" && (
+            {activeTab === "milestone" && (
               <div className="space-y-6">
                 <div className="bg-white rounded-lg border border-gray-200 p-6">
                   <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
@@ -1126,14 +628,13 @@ export const Summary = ({ summary = sampleSummary }) => {
                   </h2>
 
                   <div className="space-y-6">
-                    {/* Current Status */}
                     <div className="grid md:grid-cols-2 gap-6">
                       <div>
                         <h3 className="text-sm font-medium text-gray-700 mb-3">
                           Current Milestone
                         </h3>
                         <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 text-sm text-gray-800 leading-relaxed">
-                          {summary?.growth?.milestone || "N/A"}
+                          {summary.milestone.current.milestone}
                         </div>
                       </div>
                       <div>
@@ -1141,69 +642,40 @@ export const Summary = ({ summary = sampleSummary }) => {
                           Current Ability
                         </h3>
                         <div className="bg-gray-50 rounded-lg p-4 text-sm text-gray-800 leading-relaxed">
-                          {summary?.growth?.currentAbility || "N/A"}
+                          {summary.milestone.current.ability}
                         </div>
                       </div>
                     </div>
 
-                    {/* Next Level Goal */}
                     <div>
                       <h3 className="text-sm font-medium text-gray-700 mb-3">
                         Next Level Goal
                       </h3>
                       <div className="bg-green-50 border border-green-100 rounded-lg p-4 text-sm text-gray-800 leading-relaxed">
-                        {summary?.growth?.nextLevelGoal || "N/A"}
+                        {summary.milestone.next.goal}
                       </div>
                     </div>
 
-                    {/* Strength Enhancement */}
-                    {summary?.growth?.strengthEnhancement?.length > 0 && (
+                    {summary.milestone.next.steps.length > 0 && (
                       <div>
                         <h3 className="text-sm font-medium text-gray-700 mb-3 flex items-center">
                           <Lightbulb className="w-4 h-4 mr-2 text-gray-600" />
-                          Strength Enhancement
+                          Action Steps
                         </h3>
                         <div className="space-y-2">
-                          {summary.growth.strengthEnhancement.map(
-                            (item, index) => (
-                              <div
-                                key={index}
-                                className="flex items-start space-x-3 p-4 bg-gray-50 rounded-lg"
-                              >
-                                <div className="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center text-gray-700 text-xs font-semibold flex-shrink-0">
-                                  {index + 1}
-                                </div>
-                                <span className="text-sm text-gray-800">
-                                  {item}
-                                </span>
+                          {summary.milestone.next.steps.map((item, index) => (
+                            <div
+                              key={index}
+                              className="flex items-start space-x-3 p-4 bg-gray-50 rounded-lg"
+                            >
+                              <div className="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center text-gray-700 text-xs font-semibold flex-shrink-0">
+                                {index + 1}
                               </div>
-                            )
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Reflection Questions */}
-                    {summary?.growth?.reflectionQuestions?.length > 0 && (
-                      <div>
-                        <h3 className="text-sm font-medium text-gray-700 mb-3 flex items-center">
-                          <HelpCircle className="w-4 h-4 mr-2 text-gray-600" />
-                          Reflection Questions
-                        </h3>
-                        <div className="space-y-3">
-                          {summary.growth.reflectionQuestions.map(
-                            (question, index) => (
-                              <div
-                                key={index}
-                                className="flex items-start space-x-3 p-4 bg-purple-50 border border-purple-100 rounded-lg"
-                              >
-                                <HelpCircle className="w-5 h-5 text-purple-600 mt-0.5 flex-shrink-0" />
-                                <span className="text-sm text-gray-800">
-                                  {question}
-                                </span>
-                              </div>
-                            )
-                          )}
+                              <span className="text-sm text-gray-800">
+                                {item}
+                              </span>
+                            </div>
+                          ))}
                         </div>
                       </div>
                     )}
