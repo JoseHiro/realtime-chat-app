@@ -39,17 +39,17 @@ export default async function handler(
 
     // console.log(user);
 
-    // let trialStatus: "active" | "ended" | null = null;
-    // if (user.subscriptionStatus === "trialing") {
-    //   const now = new Date();
-    //   if (user.trialEndsAt && now > user.trialEndsAt) {
-    //     trialStatus = "ended";
-    //   } else if ((user.trialUsedChats ?? 0) >= 2) {
-    //     trialStatus = "ended";
-    //   } else {
-    //     trialStatus = "active";
-    //   }
-    // }
+    let trialStatus: "active" | "ended" | null = null;
+    if (user.subscriptionStatus === "trialing") {
+      const now = new Date();
+      if (user.trialEndsAt && now > user.trialEndsAt) {
+        trialStatus = "ended";
+      } else if ((user.trialUsedChats ?? 0) >= 2) {
+        trialStatus = "ended";
+      } else {
+        trialStatus = "active";
+      }
+    }
 
     return res.status(200).json({
       user: {
