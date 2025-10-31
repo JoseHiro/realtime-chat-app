@@ -37,8 +37,6 @@ export default async function handler(
     });
     if (!user) return res.status(404).json({ error: "User not found" });
 
-    // console.log(user);
-
     let trialStatus: "active" | "ended" | null = null;
     if (user.subscriptionStatus === "trialing") {
       const now = new Date();
