@@ -152,7 +152,9 @@ export default async function handler(
       try {
         parsed = JSON.parse(jsonMatch[0]);
       } catch (error) {
-        res.status(500).json({ error: "Failed to summarize text" });
+        res
+          .status(500)
+          .json({ error: "Failed to summarize text", details: error });
       }
     } else {
       res.status(500).json({ error: "Failed to summarize text" });
@@ -182,7 +184,7 @@ export default async function handler(
       const conjunctionsArray = Array.isArray(wordData.conjunction)
         ? wordData.conjunction
         : [];
-      const nounsArray = Array.isArray(wordData.noun) ? wordData.noun : [];
+      // const nounsArray = Array.isArray(wordData.noun) ? wordData.noun : [];
 
       const vocabularyAnalysis = {
         verbs: verbsArray.slice(0, 4),
