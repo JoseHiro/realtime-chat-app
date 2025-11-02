@@ -70,21 +70,20 @@ export const Chat = () => {
   );
   const [paymentOverlay, setPaymentOverlay] = useState(false);
 
-
   const { data } = useQuery({
     queryKey: ["user"],
     queryFn: async () => {
       const response = await fetch("/api/user");
       if (!response.ok) {
-        const err = await response.json().catch(() => ({}));
-        throw new Error(err.error || "Failed to fetch trial data");
+        // const err = await response.json().catch(() => ({}));
+        throw new Error("Failed to fetch trial data");
       }
       return response.json();
     },
     retry: false,
   });
 
-  console.log(data);
+  // console.log(data);
 
   useEffect(() => {
     if (!data) return;
@@ -149,7 +148,7 @@ export const Chat = () => {
     setChatLoading(true);
 
     try {
-      const data = await apiRequest("/api/chat/generate-response", {
+      const data = await apiRequest("/api/chat/response", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

@@ -10,7 +10,7 @@ export const StopWatch = ({
   history: any;
   setOverlayOpened: (value: boolean) => void;
 }) => {
-  const [timeLeft, setTimeLeft] = useState(2 * 30);
+  const [timeLeft, setTimeLeft] = useState(5 * 1);
   const [isActive, setIsActive] = useState(true);
   const summaryCreatedRef = useRef(false);
 
@@ -58,15 +58,11 @@ export const StopWatch = ({
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
-  const getTimerColor = () => {
-    if (timeLeft <= 60) return "text-red-500";
-    if (timeLeft <= 120) return "text-orange-500";
-    return "text-green-600";
-  };
-
   const getTimerBgColor = () => {
-    if (timeLeft <= 60) return "bg-red-50 border-red-200";
-    if (timeLeft <= 120) return "bg-orange-50 border-orange-200";
+    if (timeLeft === 0) return "text-gray-400 border-gray-200";
+    if (timeLeft <= 60) return "bg-red-50 border-red-200 text-red-500";
+    if (timeLeft <= 120)
+      return "bg-orange-50 border-orange-200 text-orange-500";
     return "bg-green-50 border-green-200";
   };
 
@@ -83,14 +79,11 @@ export const StopWatch = ({
         }),
       });
 
-      console.log(data);
-
       if (data?.status === 204 || !data) {
-
         setSummary(null);
       } else {
         setSummary(data);
-        console.log(data);
+        // console.log(data);
       }
     } catch (error) {
       console.error("Error creating summary:", error);
@@ -105,8 +98,8 @@ export const StopWatch = ({
     <div
       className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${getTimerBgColor()}`}
     >
-      <Clock className={`w-4 h-4 ${getTimerColor()}`} />
-      <span className={`font-mono text-sm font-semibold ${getTimerColor()}`}>
+      <Clock className={`w-4 h-4`} />
+      <span className={`font-mono text-sm font-semibold`}>
         {formatTime(timeLeft)}
       </span>
     </div>

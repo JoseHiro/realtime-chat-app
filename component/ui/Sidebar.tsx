@@ -17,8 +17,15 @@ import { SidebarAppName } from "./AppName";
 import { toast } from "sonner";
 
 export const Sidebar = () => {
-  const { setChatMode, setChatEnded, setChatId, setIsMuted, isMuted } =
-    useSpeech();
+  const {
+    setChatMode,
+    setChatEnded,
+    setChatId,
+    setIsMuted,
+    isMuted,
+    chatEnded,
+    chatId,
+  } = useSpeech();
   const router = useRouter();
   const menuRef = useRef<HTMLDivElement>(null);
   const [activeChat, setActiveChat] = useState<number | null>(null);
@@ -101,10 +108,12 @@ export const Sidebar = () => {
     <div className="hidden lg:flex w-80 border-r h-full border-gray-200 shadow-sm bg-white/15 backdrop-blur-xl">
       <div className="flex flex-col w-full p-6">
         <SidebarAppName onClick={handleGoToSelectMode} />
-
         <button
+          disabled={!!chatId}
           onClick={() => handleGoToSelectMode()}
-          className=" cursor-pointer flex items-center gap-3 p-4 rounded-xl bg-green-500 text-white mb-4 hover:bg-green-600 transition-all duration-200 shadow-sm"
+          className={`flex items-center gap-3 p-4 rounded-xl bg-green-500 text-white mb-4 hover:bg-green-600 transition-all duration-200 shadow-sm ${
+            chatId ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
+          }`}
         >
           <Plus className="w-5 h-5" />
           New Chat

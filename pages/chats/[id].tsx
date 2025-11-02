@@ -49,7 +49,7 @@ const ChatPage = () => {
     <div className="relative w-full h-screen flex">
       <Sidebar />
 
-      <div className="flex-1 min-h-screen flex flex-col bg-gradient-to-br from-gray-50 to-green-50 overflow-hidden">
+      <div className="flex-1 min-h-screen flex flex-col bg-gray-50 overflow-hidden">
         {/* Header */}
         <ChatHeader
           id={typeof id === "string" ? id : undefined}
@@ -63,7 +63,7 @@ const ChatPage = () => {
 
         {/* Chat Content */}
         <div className="h-full overflow-y-auto">
-          <div className="flex-1 p-4 lg:p-6 space-y-6 bg-gradient-to-b from-slate-50 to-gray-50">
+          <div className="flex-1 p-4 lg:p-6 space-y-6">
             {/* Display Mode Toggle */}
 
             {/* Messages */}
