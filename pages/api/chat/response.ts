@@ -46,7 +46,7 @@ export default async function handler(
     };
 
     console.log(messages);
-    
+
     const messagesWithInstruction = [
       systemMessage,
       ...(messages || []), // 今回のやり取り
@@ -126,10 +126,10 @@ export default async function handler(
 
     // }
 
-    const usage = completion.usage; // open ai usage
-    const charCount = reply.length; // azure usage
-    const openaiCost = usage ? (usage.total_tokens / 1000) * 0.015 : 0;
-    const azureCost = (charCount / 1000000) * 16;
+    // const usage = completion.usage; // open ai usage
+    // const charCount = reply.length; // azure usage
+    // const openaiCost = usage ? (usage.total_tokens / 1000) * 0.015 : 0;
+    // const azureCost = (charCount / 1000000) * 16;
 
     // logUsage({
     //   timestamp: new Date().toISOString(),
