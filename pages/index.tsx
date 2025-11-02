@@ -6,24 +6,24 @@ import { Mic } from "lucide-react";
 import { LandingFooter } from "../component/ui/LandingFooter";
 import { FeatureBody } from "../component/ui/LandingPage/FeatureBody";
 
+const chatMessages = [
+  {
+    type: "ai",
+    text: "こんにちは！今日はどうですか？",
+    translation: "Hello! How are you today?",
+  },
+  { type: "user", text: "元気です！ありがとう" },
+  {
+    type: "ai",
+    text: "素晴らしい！何か面白いことはありましたか？",
+    translation: "Wonderful! Did anything interesting happen?",
+  },
+];
+
 const Index = () => {
   const [currentMessage, setCurrentMessage] = useState(0);
   const [isTyping, setIsTyping] = useState(false);
   const router = useRouter();
-
-  const chatMessages = [
-    {
-      type: "ai",
-      text: "こんにちは！今日はどうですか？",
-      translation: "Hello! How are you today?",
-    },
-    { type: "user", text: "元気です！ありがとう" },
-    {
-      type: "ai",
-      text: "素晴らしい！何か面白いことはありましたか？",
-      translation: "Wonderful! Did anything interesting happen?",
-    },
-  ];
 
   useEffect(() => {
     const interval = setInterval(() => {

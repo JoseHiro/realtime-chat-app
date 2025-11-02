@@ -1,6 +1,8 @@
 import { Play, Pause, Languages } from "lucide-react";
 import React, { useRef, useState } from "react";
 import { SoundWave } from "./SoundWave";
+import { useSpeech } from "../../../context/SpeechContext";
+import { toast } from "sonner";
 
 export const AssistantMessageBox = ({
   text,
@@ -17,7 +19,7 @@ export const AssistantMessageBox = ({
   id: number;
   english?: string;
 }) => {
-
+  const { isMuted } = useSpeech();
   const [currentPlayingId, setCurrentPlayingId] = useState<number | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [displayEnglishSentence, setDisplayEnglishSentence] = useState<
@@ -29,15 +31,18 @@ export const AssistantMessageBox = ({
   // const audioList = chatInfo?.map(info => info.audioUrl) ?? [];
 
   const playAudio = (id: number) => {
-    // if(!isMuted) return;
-    if(chatInfo === undefined) return;
+    if (isMuted) {
+      toast.error("Unmute is required to play audio messages.");
+      return;
+    }
+    if (chatInfo === undefined) return;
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
     }
     const audio = new Audio(chatInfo[id - 1].audioUrl);
     audioRef.current = audio;
-    audio.muted = true;
+    audio.muted = false;
     audio.play();
     setCurrentPlayingId(id);
 
@@ -95,35 +100,36 @@ export const AssistantMessageBox = ({
           </div>
         </div>
       ) : (
-        <div className=" border-gray-100">
+        <div className="border-gray-100">
           <p className="text-sm lg:text-base leading-relaxed">{text}</p>
-          <div className="flex justify-between">
-            <div className="mt-2 pt-2 border-t border-gray-100">
-              <p className="text-[10px] text-gray-400 leading-relaxed font-light tracking-wide">
-                {reading}
-              </p>
-            </div>
-          </div>
-          {((chatInfo && chatInfo[id]?.english !== "") || english !== null) && (
-            <>
+
+          <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100">
+            <p className="text-[10px] text-gray-400 leading-relaxed font-light tracking-wide">
+              {reading}
+            </p>
+
+            {((chatInfo && chatInfo[id]?.english !== "") ||
+              english !== null) && (
               <button
                 onClick={() => handleDisplayEnglishSentence(id)}
-                className={`text-gray-500 border p-1 hover:bg-gray-100 transition flex items-center space-x-1 rounded text-xs mt-2 ${
+                className={`p-1.5 rounded-md transition-all hover:bg-gray-100 ${
                   displayEnglishSentence === id
-                    ? "bg-green-50 text-green-700 border border-green-200 shadow-sm"
-                    : ""
+                    ? "bg-green-50 text-green-600"
+                    : "text-gray-400"
                 }`}
+                title="Show translation"
               >
-                <Languages className="w-4 h-4 text-bold" /> Show translation
+                <Languages className="w-4 h-4" />
               </button>
-              {displayEnglishSentence === id && (
-                <div className="mt-1 border-gray-100">
-                  <p className="text-sm text-gray-600 italic leading-relaxed">
-                    {(chatInfo && chatInfo[id]?.english) || english}
-                  </p>
-                </div>
-              )}
-            </>
+            )}
+          </div>
+
+          {displayEnglishSentence === id && (
+            <div className="mt-2 pt-2 border-t border-gray-100">
+              <p className="text-sm text-gray-600 italic leading-relaxed">
+                {(chatInfo && chatInfo[id]?.english) || english}
+              </p>
+            </div>
           )}
         </div>
       )}

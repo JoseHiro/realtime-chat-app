@@ -72,14 +72,8 @@ export const ChatHeader = ({
   };
 
   const getPolitenessInfo = () => {
-    if (politeness) {
-      if (politeness === "casual") {
-        return { label: "Casual", icon: User };
-      }
-    } else {
-      if (selectedPoliteness === "casual") {
-        return { label: "Casual", icon: User };
-      }
+    if ((politeness ?? selectedPoliteness) === "casual") {
+      return { label: "Casual", icon: User };
     }
     return { label: "Formal", icon: UserCheck };
   };
@@ -145,7 +139,7 @@ export const ChatHeader = ({
   };
 
   return (
-    <div className="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
+    <div className="bg-white px-6 rounded-4xl py-4 m-3 shadow-sm">
       <div className="mx-auto flex justify-between items-center">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 bg-gradient-to-r from-green-400 to-green-500 rounded-full flex items-center justify-center">
@@ -182,7 +176,7 @@ export const ChatHeader = ({
                 {id && (
                   <Pen
                     onClick={() => setIsEditingChatTitle(true)}
-                    className="w-2 h-2 text-gray-400 hover:text-gray-500 cursor-pointer"
+                    className="w-3 h-3 text-gray-500 hover:text-gray-500 cursor-pointer"
                   />
                 )}
               </div>
@@ -225,7 +219,7 @@ export const ChatHeader = ({
           </div>
         </div>
 
-        <div className="flex space-x-4">
+        <div className="flex space-x-4 items-center">
           {chatPage && (
             <StopWatch history={history} setOverlayOpened={setOverlayOpened} />
           )}
@@ -235,7 +229,7 @@ export const ChatHeader = ({
               onClick={() => setOverlayOpened(true)}
             />
           ) : (
-            <p className="border py-1 px-2 border-gray-200 rounded text-gray-400 text-xs">
+            <p className="border h-8 px-3 border-gray-200 rounded text-gray-400 text-xs flex items-center justify-center">
               No Summary
             </p>
           )}

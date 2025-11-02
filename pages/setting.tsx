@@ -17,7 +17,7 @@ interface UserData {
 }
 
 const Setting = () => {
-  const router = useRouter()
+  const router = useRouter();
   // Mock data - replace with your actual data fetching logic
   const userData: UserData = {
     user: {
@@ -30,7 +30,6 @@ const Setting = () => {
   };
 
   const handleLogout = async () => {
-
     try {
       await apiRequest("/api/auth/logout", { method: "POST" });
       router.push("/login");
