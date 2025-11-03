@@ -3,6 +3,7 @@ import { Clock } from "lucide-react";
 import { apiRequest } from "../../../lib/apiRequest";
 import { useSpeech } from "../../../context/SpeechContext";
 
+
 export const StopWatch = ({
   history,
   setOverlayOpened,
@@ -10,7 +11,7 @@ export const StopWatch = ({
   history: any;
   setOverlayOpened: (value: boolean) => void;
 }) => {
-  const [timeLeft, setTimeLeft] = useState(5 * 1);
+  const [timeLeft, setTimeLeft] = useState(5 * 10);
   const [isActive, setIsActive] = useState(true);
   const summaryCreatedRef = useRef(false);
 
