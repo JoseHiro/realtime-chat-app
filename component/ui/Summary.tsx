@@ -1,16 +1,44 @@
-import React, { useState } from "react";
-import { BarChart3, BookOpen } from "lucide-react";
-import { SummaryType } from "../../type/types";
+import React, { useState, useMemo, useCallback } from "react";
+import { SummaryType, ConversationReview } from "../../type/types";
 import { SummaryNavigation } from "./Summary/SummaryNavigation";
-import { SectionTitle, SectionSubTitle } from "./Summary/SectionTitle";
-import { SectionContainer, SectionDescription } from "./Summary/Container";
 import { SectionHeader } from "./Summary/SectionHeader";
 import { InfoContainer } from "./Summary/InfoContainer";
 import { AnalysisContainer } from "./Summary/AnalysisContainer";
+import { FeedbackContainer } from "./Summary/FeedbackContainer";
+import { ConversationReviewContainer } from "./Summary/ConversationReviewContainer";
 import { MilestoneContainer } from "./Summary/MilestoneContainer";
+import mockConversationData from "../../data/mockConversationFeedbackData.json";
 
 export const Summary = ({ summary }: { summary: SummaryType }) => {
   const [activeTab, setActiveTab] = useState("info");
+
+  // Memoize computed values to prevent unnecessary recalculations
+  const correctionsLength = useMemo(
+    () => summary?.feedback?.corrections?.length || 0,
+    [summary?.feedback?.corrections]
+  );
+
+  const enhancementsLength = useMemo(
+    () => summary?.feedback?.enhancements?.length || 0,
+    [summary?.feedback?.enhancements]
+  );
+
+  // Memoize the setActiveTab callback to prevent unnecessary re-renders
+  const handleSetActiveTab = useCallback((tabId: string) => {
+    setActiveTab(tabId);
+  }, []);
+
+  // Use mock data as fallback when conversation data is not available from API
+  const conversationData: ConversationReview | null = useMemo(() => {
+    if (summary.conversation && summary.conversation.messages?.length > 0) {
+      return summary.conversation;
+    }
+    // Fallback to mock data for testing
+    return {
+      messages: mockConversationData.messages as ConversationReview["messages"],
+      metadata: mockConversationData.metadata,
+    };
+  }, [summary.conversation]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -21,7 +49,7 @@ export const Summary = ({ summary }: { summary: SummaryType }) => {
         <div className="grid lg:grid-cols-4 gap-6">
           {/* Left Sidebar Navigation */}
           <SummaryNavigation
-            setActiveTab={setActiveTab}
+            setActiveTab={handleSetActiveTab}
             activeTab={activeTab}
           />
           {/* Main Content Area */}
@@ -30,137 +58,35 @@ export const Summary = ({ summary }: { summary: SummaryType }) => {
             {activeTab === "info" && (
               <InfoContainer
                 meta={summary.meta}
-                correctionsLength={summary?.feedback?.corrections?.length || 0}
-                enhancementsLength={
-                  summary?.feedback?.enhancements?.length || 0
-                }
+                correctionsLength={correctionsLength}
+                enhancementsLength={enhancementsLength}
               />
             )}
 
             {/* Analysis Tab - Response Skill, Conversation Flow, Accuracy, Vocabulary */}
             {activeTab === "analysis" && (
-              <div className="space-y-6">
-                <SectionContainer
-                  containerName="Performance Metrics"
-                  icon={BarChart3}
-                >
-                  <div className="space-y-6">
-                    <SectionTitle title="Overall Assessment" />
-                    <div className="bg-gray-50 rounded-lg p-4">
-                      <p className="text-sm text-gray-800 leading-relaxed">
-                        {summary.analysis.overview}
-                      </p>
-                    </div>
-
-                    <div>
-                      <SectionTitle title="Skills Assessment" />
-                      <div className="space-y-3">
-                        <div className="bg-gray-50 rounded-lg p-4">
-                          <SectionSubTitle title="Flow" />
-                          <SectionDescription>
-                            {summary.analysis.skills.flow}
-                          </SectionDescription>
-                        </div>
-                        <div className="bg-gray-50 rounded-lg p-4">
-                          <SectionSubTitle title="Comprehension" />
-                          <SectionDescription>
-                            {summary.analysis.skills.comprehension}
-                          </SectionDescription>
-                        </div>
-                        <div className="bg-gray-50 rounded-lg p-4">
-                          <SectionSubTitle title="Development" />
-                          <SectionDescription>
-                            {summary.analysis.skills.development}
-                          </SectionDescription>
-                        </div>
-                        <div className="bg-gray-50 rounded-lg p-4 border-l-4 border-gray-300">
-                          <SectionSubTitle title="Example" />
-                          <SectionDescription>
-                            {summary.analysis.skills.example}
-                          </SectionDescription>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </SectionContainer>
-
-                <SectionContainer
-                  containerName="Vocabulary Analysis"
-                  icon={BookOpen}
-                >
-                  <div className="space-y-4">
-                    {summary.analysis.vocabulary.verbs.length > 0 && (
-                      <div>
-                        <SectionTitle title="Verbs (動詞)" />
-                        <div className="space-y-2">
-                          {summary?.analysis.vocabulary.verbs.map(
-                            (item, index) => (
-                              <div
-                                key={index}
-                                className="flex items-center justify-between bg-blue-50 border border-blue-200 rounded-lg p-3"
-                              >
-                                <div className="flex items-center space-x-3">
-                                  <span className="text-base font-medium text-gray-900">
-                                    {item.word}
-                                  </span>
-                                  <span className="text-sm text-gray-600">
-                                    {item.reading}
-                                  </span>
-                                  <span className="text-xs text-gray-500 font-mono">
-                                    {item.romaji}
-                                  </span>
-                                </div>
-                                <span className="text-sm font-semibold text-gray-700">
-                                  ×{item.count}
-                                </span>
-                              </div>
-                            )
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                    {summary.analysis.vocabulary.adjectives.length > 0 && (
-                      <div>
-                        <div className="text-xs font-medium text-gray-600 mb-2">
-                          Adjectives (形容詞)
-                        </div>
-                        <div className="space-y-2">
-                          {summary.analysis.vocabulary.adjectives.map(
-                            (item, index) => (
-                              <div
-                                key={index}
-                                className="flex items-center justify-between bg-green-50 border border-green-200 rounded-lg p-3"
-                              >
-                                <div className="flex items-center space-x-3">
-                                  <span className="text-base font-medium text-gray-900">
-                                    {item.word}
-                                  </span>
-                                  <span className="text-sm text-gray-600">
-                                    {item.reading}
-                                  </span>
-                                  <span className="text-xs text-gray-500 font-mono">
-                                    {item.romaji}
-                                  </span>
-                                </div>
-                                <span className="text-sm font-semibold text-gray-700">
-                                  ×{item.count}
-                                </span>
-                              </div>
-                            )
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </SectionContainer>
-              </div>
+              <AnalysisContainer analysis={summary.analysis} />
             )}
 
             {/* Feedback & Improvements Tab */}
             {activeTab === "feedback" && (
-              <AnalysisContainer analysis={summary.analysis} />
+              <FeedbackContainer feedback={summary.feedback} />
             )}
+
+            {/* Refined Responses Tab */}
+            {activeTab === "conversation" &&
+              (conversationData && conversationData.messages?.length > 0 ? (
+                <ConversationReviewContainer conversation={conversationData} />
+              ) : (
+                <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
+                  <p className="text-gray-600 mb-2">
+                    No conversation review data available.
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    Conversation review data will appear here once available.
+                  </p>
+                </div>
+              ))}
 
             {/* Growth Path Tab */}
             {activeTab === "milestone" && (

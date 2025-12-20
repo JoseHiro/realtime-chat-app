@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import { Pen, User } from "lucide-react";
+import { Pen, User, FileText, FileX } from "lucide-react";
 import { StopWatch } from "./StopWatch";
-import { SummaryButton } from "../../button";
 import { SummaryContent } from "../SummaryContent";
 import { useSpeech } from "../../../context/SpeechContext";
 import {
@@ -139,11 +138,11 @@ export const ChatHeader = ({
   };
 
   return (
-    <div className="bg-white px-6 rounded-4xl py-4 m-3 shadow-sm">
+    <div className="bg-white border-b border-gray-200 px-6 py-4 shadow-sm sticky top-0 z-10">
       <div className="mx-auto flex justify-between items-center">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-gradient-to-r from-green-400 to-green-500 rounded-full flex items-center justify-center">
-            <span className="text-white font-bold">AI</span>
+        <div className="flex items-center space-x-4">
+          <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center shadow-sm">
+            <span className="text-white font-semibold text-sm">AI</span>
           </div>
           <div className="space-y-1">
             {isEditingChatTitle ? (
@@ -174,39 +173,42 @@ export const ChatHeader = ({
               <div className="flex space-x-2">
                 <h2 className="text-lg font-bold text-gray-900">{title}</h2>
                 {id && (
-                  <Pen
+                  <button
                     onClick={() => setIsEditingChatTitle(true)}
-                    className="w-3 h-3 text-gray-500 hover:text-gray-500 cursor-pointer"
-                  />
+                    className="p-1 rounded-md hover:bg-gray-100 transition-colors"
+                    aria-label="Edit title"
+                  >
+                    <Pen className="w-3.5 h-3.5 text-gray-500 hover:text-gray-700 cursor-pointer" />
+                  </button>
                 )}
               </div>
             )}
 
-            <div className="flex gap-4 text-sm text-gray-600">
+            <div className="flex gap-2 text-sm text-gray-600 flex-wrap">
               {(theme || customTheme || selectedTheme) && (
-                <div className="flex items-center gap-1 px-1.5 sm:px-2 py-0.5 rounded-full bg-purple-100 text-purple-700">
-                  <ThemeIcon className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
-                  <span className="font-medium text-xs max-w-12 sm:max-w-20 truncate">
+                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-purple-50 text-purple-700 border border-purple-100">
+                  <ThemeIcon className="w-3 h-3 flex-shrink-0" />
+                  <span className="font-medium text-xs max-w-20 truncate">
                     {themeInfo.label}
                   </span>
                 </div>
               )}
               {(level || selectedLevel) && (
                 <span
-                  className={`px-1.5 sm:px-2 py-0.5 rounded-full font-medium text-xs ${
+                  className={`px-2.5 py-1 rounded-md font-medium text-xs border ${
                     (level || selectedLevel) === "easy"
-                      ? "bg-green-100 text-green-700"
+                      ? "bg-green-50 text-green-700 border-green-100"
                       : (level || selectedLevel) === "medium"
-                      ? "bg-yellow-100 text-yellow-700"
-                      : "bg-red-100 text-red-700"
+                      ? "bg-yellow-50 text-yellow-700 border-yellow-100"
+                      : "bg-red-50 text-red-700 border-red-100"
                   }`}
                 >
                   {getLevelLabel()}
                 </span>
               )}
               {(politeness || selectedPoliteness) && (
-                <div className="flex items-center gap-1 px-1.5 sm:px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
-                  <PolitenessIcon className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-blue-50 text-blue-700 border border-blue-100">
+                  <PolitenessIcon className="w-3 h-3 flex-shrink-0" />
                   <span className="font-medium text-xs hidden sm:inline">
                     {politenessInfo.label}
                   </span>
@@ -219,19 +221,25 @@ export const ChatHeader = ({
           </div>
         </div>
 
-        <div className="flex space-x-4 items-center">
+        <div className="flex space-x-3 items-center">
           {chatPage && (
             <StopWatch history={history} setOverlayOpened={setOverlayOpened} />
           )}
           {analysis || summary ? (
-            <SummaryButton
-              summary={analysis || summary}
+            <button
               onClick={() => setOverlayOpened(true)}
-            />
+              className="p-2.5 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors cursor-pointer"
+              title="View Summary"
+            >
+              <FileText className="w-5 h-5" />
+            </button>
           ) : (
-            <p className="border h-8 px-3 border-gray-200 rounded text-gray-400 text-xs flex items-center justify-center">
-              No Summary
-            </p>
+            <div
+              className="p-2.5 rounded-lg bg-gray-100 text-gray-400 cursor-not-allowed"
+              title="No Summary Available"
+            >
+              <FileX className="w-5 h-5" />
+            </div>
           )}
         </div>
       </div>

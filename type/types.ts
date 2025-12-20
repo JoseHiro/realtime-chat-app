@@ -53,8 +53,10 @@ export type ChatDataType = {
   title: string;
   createdAt: string;
   message: MessageType[];
+  theme?: string;
+  level?: string;
+  politeness?: string;
 };
-
 
 export type PricingType = {
   name: string;
@@ -93,6 +95,49 @@ export type SummaryType = {
   analysis: Analysis;
   feedback: Feedback;
   milestone: Milestone;
+  conversation?: ConversationReview;
+};
+
+export type ConversationReview = {
+  messages: ConversationMessage[];
+  metadata?: {
+    totalMessages: number;
+    userMessages: number;
+    improvementsGenerated: number;
+    generatedAt?: string;
+  };
+};
+
+export type ConversationMessage = {
+  id: number;
+  sender: "user" | "assistant";
+  message: string;
+  reading?: string;
+  english?: string;
+  createdAt: string;
+  improvements?: MessageImprovement[];
+};
+
+export type MessageImprovement = {
+  text: string;
+  reading: string;
+  english: string;
+  focus: string;
+  level: string;
+};
+
+export type GrammarPoint = {
+  point: string;
+  explanation: string;
+  jlptLevel: string;
+};
+
+export type VocabularyItem = {
+  word: string;
+  reading: string;
+  meaning: string;
+  partOfSpeech: string;
+  jlptLevel: string;
 };
 
 export type Meta = {

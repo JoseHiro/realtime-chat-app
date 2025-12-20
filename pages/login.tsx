@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import { AuthHeader } from "../component/ui/LandingHeader";
 import { toast } from "sonner";
 import { RoundedButton } from "../component/button";
+import { Eye, EyeOff } from "lucide-react";
 
 type LoginFormInputs = {
   email: string;
@@ -14,6 +15,7 @@ type LoginFormInputs = {
 
 const Login = () => {
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
   const {
     register,
@@ -90,13 +92,29 @@ const Login = () => {
               <label className="block mb-1 font-medium text-gray-700">
                 Password
               </label>
-              <input
-                type="password"
-                {...register("password", { required: "Password is required" })}
-                className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-400 text-black ${
-                  errors.password ? "border-red-500" : "border-gray-300"
-                }`}
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  {...register("password", {
+                    required: "Password is required",
+                  })}
+                  className={`w-full px-4 py-2 pr-10 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-400 text-black ${
+                    errors.password ? "border-red-500" : "border-gray-300"
+                  }`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
+                </button>
+              </div>
               {errors.password && (
                 <p className="text-red-500 text-sm mt-1">
                   {errors.password.message}

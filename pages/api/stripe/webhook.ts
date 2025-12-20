@@ -4,7 +4,7 @@ import { buffer } from "micro";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
-const stripe = new Stripe(process.env.TEST_STRIPE_SECRET_KEY!);
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY_LIVE!);
 
 export const config = {
   api: {
@@ -20,6 +20,8 @@ export default async function handler(
     return res.status(405).end("Method not allowed");
   }
 
+  console.log("Called");
+
   const sig = req.headers["stripe-signature"] as string;
   let event: Stripe.Event;
 
@@ -31,9 +33,18 @@ export default async function handler(
       process.env.STRIPE_WEBHOOK_SECRET! // the webhook signing secret
     );
   } catch (err: any) {
-    console.error(`Webhook signature verification failed.`, err.message);
+    console.error("Webhook signature verification failed:");
+    console.error("Error object:", err); // full error object
+    console.error("Error message:", err.message); // error message only
+    console.error("Raw Stripe Signature header:", sig);
+
+    // optional: write the raw body to inspect it
+    const rawBody = (await buffer(req)).toString("utf8");
+    console.error("Raw body:", rawBody);
+
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
+
   try {
     switch (event.type) {
       case "checkout.session.completed": {

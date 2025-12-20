@@ -25,10 +25,10 @@ export default async function handler(
 
   const { chatId, politeness, history } = req.body;
 
-  console.log(history);
+  // console.log(history);
 
   const wordData = await wordAnalyzer(history);
-  console.log(wordData);
+  // console.log(wordData);
 
   if (!history || !chatId || !politeness) {
     return res.status(400).json({ error: "No data provided" });

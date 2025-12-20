@@ -5,7 +5,7 @@
     "description": "For friends and close relationships",
     "icon": "User",
     "example": "そうだね、面白い",
-    "color": "from-blue-400 to-blue-500"
+    "color": "bg-gray-400"
   },
   {
     "id": "polite",
@@ -13,6 +13,6 @@
     "description": "Polite speech for formal situations",
     "icon": "UserCheck",
     "example": "そうですね、面白いです",
-    "color": "from-purple-400 to-purple-500"
+    "color": "bg-gray-400"
   }
 ]

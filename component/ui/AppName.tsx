@@ -20,12 +20,10 @@ export const AppName = () => {
 };
 
 export const SidebarAppName = ({ onClick }: { onClick: () => void }) => {
-  const { chatId } = useSpeech();
   return (
     <button
-      disabled={!!chatId}
       onClick={onClick}
-      className="flex items-center gap-3 mb-8"
+      className="flex items-center gap-3 mb-8 hover:opacity-80 transition-opacity"
     >
       <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
         <Sparkles className="w-5 h-5 text-white" />

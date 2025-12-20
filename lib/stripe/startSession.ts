@@ -3,11 +3,11 @@ import { apiRequest } from "../apiRequest";
 
 // Initialize Stripe (you'll need your publishable key)
 const stripePromise = loadStripe(
-  process.env.NEXT_PUBLIC_TEST_NEXT_PUBLIC_STRIPE_KEY!
+  // process.env.NEXT_PUBLIC_TEST_NEXT_PUBLIC_STRIPE_KEY!
+  process.env.NEXT_PUBLIC_STRIPE_KEY_LIVE!
 );
 
 export const startStripeSession = async () => {
-
   try {
     // Call your API to create checkout session
     const response = await fetch("/api/stripe/session", {
@@ -17,7 +17,8 @@ export const startStripeSession = async () => {
       },
       credentials: "include",
       body: JSON.stringify({
-        priceId: process.env.NEXT_PUBLIC_TEST_STRIPE_PRICE_ID_KEY,
+        // priceId: process.env.NEXT_PUBLIC_TEST_STRIPE_PRICE_ID_KEY,
+        priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_LIVE,
         quantity: 1,
       }),
     });

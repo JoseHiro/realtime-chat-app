@@ -39,10 +39,12 @@ import { ChatHeader } from "../component/ui/Chat/ChatHeader";
 // block reloading (Prevent stopping conversation)[]
 // homepage design[x]
 // analysis design[]
-// play audio[]
+// play audio[x]
 // audio sound design[]
-// generating chat design[]
+// generating chat design[x]
 // audio speed []
+// delete chat checklist in the settings []
+// summary collection page []
 
 export const Chat = () => {
   const {
@@ -82,8 +84,6 @@ export const Chat = () => {
     },
     retry: false,
   });
-
-  // console.log(data);
 
   useEffect(() => {
     if (!data) return;

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import {
   ChevronRight,
   MessageCircle,
@@ -28,15 +28,12 @@ import { BlockUseOverlay } from "../overlay";
 import { apiRequest } from "../../lib/apiRequest";
 import { toast } from "sonner";
 
-export const ModeSelectScreen = ({
-  setHistory,
-  setChatInfo,
-  setHiraganaReadingList,
-  setPaymentOverlay,
-  needPayment,
-  handleRefreshPreviousData,
-  plan,
-}: {
+// Constants
+const MAX_DIFFICULTY = 3;
+const DIFFICULTY_STARS = [1, 2, 3] as const;
+
+// Types
+type ModeSelectScreenProps = {
   setHistory: React.Dispatch<React.SetStateAction<ChatType>>;
   setChatInfo: React.Dispatch<
     React.SetStateAction<{ audioUrl: string; english: string }[]>
@@ -46,7 +43,71 @@ export const ModeSelectScreen = ({
   needPayment: boolean;
   handleRefreshPreviousData: () => void;
   plan: string;
-}) => {
+};
+
+type ButtonContentsProps = {
+  label: string;
+  description: string;
+  example?: string;
+  selected?: boolean;
+};
+
+type DifficultyStarsProps = {
+  level: number;
+};
+
+// Memoized sub-components
+const DifficultyStars = React.memo(({ level }: DifficultyStarsProps) => {
+  return (
+    <div className="flex gap-1">
+      {DIFFICULTY_STARS.map((star) => (
+        <Star
+          key={star}
+          className={`w-4 h-4 ${
+            star <= level
+              ? "text-yellow-400 fill-yellow-400"
+              : "text-gray-300"
+          }`}
+        />
+      ))}
+    </div>
+  );
+});
+
+DifficultyStars.displayName = "DifficultyStars";
+
+const ButtonContents = React.memo(
+  ({ label, description, example, selected }: ButtonContentsProps) => {
+    return (
+      <>
+        <div className="relative z-10">
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">{label}</h3>
+          <p className="text-gray-600 text-sm">{description}</p>
+          {example && (
+            <p className="text-xs text-gray-500 italic mt-1">{example}</p>
+          )}
+        </div>
+        {selected && (
+          <div className="absolute top-3 right-3 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+            <div className="w-2 h-2 bg-white rounded-full"></div>
+          </div>
+        )}
+      </>
+    );
+  }
+);
+
+ButtonContents.displayName = "ButtonContents";
+
+export const ModeSelectScreen = ({
+  setHistory,
+  setChatInfo,
+  setHiraganaReadingList,
+  setPaymentOverlay,
+  needPayment,
+  handleRefreshPreviousData,
+  plan,
+}: ModeSelectScreenProps) => {
   const {
     selectedPoliteness,
     setSelectedPoliteness,
@@ -64,118 +125,178 @@ export const ModeSelectScreen = ({
     subscriptionPlan,
   } = useSpeech();
 
-  const iconMap: Record<string, React.ElementType> = {
-    ChevronRight,
-    MessageCircle,
-    Coffee,
-    Briefcase,
-    Plane,
-    BookOpen,
-    Users,
-    Plus,
-    User,
-    UserCheck,
-    Leaf,
-    TreePine,
-    Mountain,
-  };
-
   const [loading, setLoading] = useState(false);
-  const canProceed =
-    selectedLevel &&
-    (selectedTheme || customTheme.trim()) &&
-    selectedPoliteness;
 
-  // Start the chat
-  const handleBeginConversation = async () => {
-    // if trial is ended overlay
-    if (needPayment) {
-      setPaymentOverlay(true);
-      if (plan !== "pro") {
-        toast.error("Your trial has ended. Please select a plan to continue.", {
-          position: "top-center",
-        });
-      } else {
-        toast.error(
-          "Your pro subscription is not active. Please subscribe to continue.",
-          {
-            position: "top-center",
-          }
-        );
-      }
-      return;
-    } else {
-      if (loading) return;
-      setLoading(true);
-      handleRefreshPreviousData();
+  // Memoize icon map
+  const iconMap: Record<string, React.ElementType> = useMemo(
+    () => ({
+      ChevronRight,
+      MessageCircle,
+      Coffee,
+      Briefcase,
+      Plane,
+      BookOpen,
+      Users,
+      Plus,
+      User,
+      UserCheck,
+      Leaf,
+      TreePine,
+      Mountain,
+    }),
+    []
+  );
 
+  // Memoize validation check
+  const canProceed = useMemo(
+    () =>
+      Boolean(
+        selectedLevel &&
+          (selectedTheme || customTheme.trim()) &&
+          selectedPoliteness
+      ),
+    [selectedLevel, selectedTheme, customTheme, selectedPoliteness]
+  );
+
+  // Memoize difficulty percentage calculation
+  const getDifficultyPercentage = useCallback(
+    (difficulty: number) => (difficulty / MAX_DIFFICULTY) * 100,
+    []
+  );
+
+  // Handle payment requirement check
+  const handlePaymentCheck = useCallback(() => {
+    setPaymentOverlay(true);
+    const message =
+      plan !== "pro"
+        ? "Your trial has ended. Please select a plan to continue."
+        : "Your pro subscription is not active. Please subscribe to continue.";
+    toast.error(message, { position: "top-center" });
+  }, [plan, setPaymentOverlay]);
+
+  // Handle audio playback
+  const handleAudioPlayback = useCallback(
+    (audioData: string, english: string) => {
       try {
-        const data = await apiRequest("/api/chat/start-chat", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            level: selectedLevel,
-            theme: selectedTheme || customTheme.trim(),
-            politeness: selectedPoliteness || "polite",
-          }),
-        });
-
-        setHistory((prev) => [
-          ...prev,
-          { role: "assistant", content: data.reply },
-        ]);
-        setChatId(Number(data.chatId));
-        setHiraganaReadingList((prev) => [...prev, data.reading]);
-
-        if (data.audio) {
-          const audioBuffer = Uint8Array.from(atob(data.audio), (c) =>
-            c.charCodeAt(0)
-          );
-          const blob = new Blob([audioBuffer], { type: "audio/mpeg" });
-          const audioUrl = URL.createObjectURL(blob);
-          const audio = new Audio(audioUrl);
-          audio.play();
-          setChatInfo((prev) => [
-            ...prev,
-            { audioUrl: audioUrl, english: data.english },
-          ]);
-          setChatMode(true);
-        }
+        const audioBuffer = Uint8Array.from(atob(audioData), (c) =>
+          c.charCodeAt(0)
+        );
+        const blob = new Blob([audioBuffer], { type: "audio/mpeg" });
+        const audioUrl = URL.createObjectURL(blob);
+        const audio = new Audio(audioUrl);
+        audio.play();
+        setChatInfo((prev) => [...prev, { audioUrl, english }]);
+        setChatMode(true);
       } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
+        console.error("Error playing audio:", error);
+        toast.error("Failed to play audio", { position: "top-center" });
       }
-    }
-  };
+    },
+    [setChatInfo, setChatMode]
+  );
 
-  const DifficultyStars = ({ level }: { level: number }) => {
-    return (
-      <div className="flex gap-1">
-        {[1, 2, 3].map((star) => (
-          <Star
-            key={star}
-            className={`w-4 h-4 ${
-              star <= level
-                ? "text-yellow-400 fill-yellow-400"
-                : "text-gray-300"
-            }`}
-          />
-        ))}
-      </div>
-    );
-  };
+  // Start the chat - memoized with useCallback
+  const handleBeginConversation = useCallback(async () => {
+    if (needPayment) {
+      handlePaymentCheck();
+      return;
+    }
+
+    if (loading) return;
+
+    setLoading(true);
+    handleRefreshPreviousData();
+
+    try {
+      const data = await apiRequest("/api/chat/start-chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          level: selectedLevel,
+          theme: selectedTheme || customTheme.trim(),
+          politeness: selectedPoliteness || "polite",
+        }),
+      });
+
+      setHistory((prev) => [
+        ...prev,
+        { role: "assistant", content: data.reply },
+      ]);
+      setChatId(Number(data.chatId));
+      setHiraganaReadingList((prev) => [...prev, data.reading]);
+
+      if (data.audio) {
+        handleAudioPlayback(data.audio, data.english);
+      }
+    } catch (error) {
+      console.error("Error starting conversation:", error);
+      toast.error("Failed to start conversation. Please try again.", {
+        position: "top-center",
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [
+    needPayment,
+    loading,
+    handleRefreshPreviousData,
+    selectedLevel,
+    selectedTheme,
+    customTheme,
+    selectedPoliteness,
+    setHistory,
+    setChatId,
+    setHiraganaReadingList,
+    handlePaymentCheck,
+    handleAudioPlayback,
+  ]);
+
+  // Memoized handlers for selection
+  const handleLevelSelect = useCallback(
+    (levelId: string) => setSelectedLevel(levelId),
+    [setSelectedLevel]
+  );
+
+  const handlePolitenessSelect = useCallback(
+    (politenessId: string) => setSelectedPoliteness(politenessId),
+    [setSelectedPoliteness]
+  );
+
+  const handleThemeSelect = useCallback(
+    (themeId: string) => setSelectedTheme(themeId),
+    [setSelectedTheme]
+  );
+
+  const handleGrammarModeSelect = useCallback(
+    (value: boolean) => setCheckGrammarMode(value),
+    [setCheckGrammarMode]
+  );
+
+  const handleCustomThemeChange = useCallback(
+    (value: string) => {
+      setCustomTheme(value);
+      setSelectedTheme("");
+    },
+    [setCustomTheme, setSelectedTheme]
+  );
+
+  const handleCustomThemeClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      setSelectedTheme("");
+    },
+    [setSelectedTheme]
+  );
 
   return (
     <div className="z-10 min-h-screen shadow-sm backdrop-blur-xl overflow-auto w-full">
-      <div className="min-h-screen p-4 overflow-auto w-full ">
+      <div className="min-h-screen p-4 overflow-auto w-full">
         <div className="max-w-4xl mx-auto py-8">
           {/* Header */}
           <div className="text-center mb-12 relative">
-            <div className="absolute top-0 right-0 flex items-center gap-3 bg-white/95 backdrop-blur-sm rounded-full  px-4 py-2 shadow-sm">
-              {/* Avatar */}
+            <div className="absolute top-0 right-0 flex items-center gap-3 bg-white/95 backdrop-blur-sm rounded-full px-4 py-2 shadow-sm">
               <div
                 className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold ${
                   subscriptionPlan === "pro"
@@ -230,14 +351,13 @@ export const ModeSelectScreen = ({
                 return (
                   <div
                     key={level.id}
-                    onClick={() => setSelectedLevel(level.id)}
+                    onClick={() => handleLevelSelect(level.id)}
                     className={`cursor-pointer relative group p-6 rounded-2xl bg-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border-2 ${
                       isSelected
                         ? "border-green-500 shadow-green-200 ring-4 ring-green-500 ring-opacity-20"
                         : "border-transparent hover:border-green-200"
                     }`}
                   >
-                    {/* Header with Icon and Stars */}
                     <div className="flex items-center justify-between mb-4">
                       <div
                         className={`w-14 h-14 rounded-full flex items-center justify-center bg-gradient-to-br ${level.color} text-white shadow-lg`}
@@ -247,7 +367,6 @@ export const ModeSelectScreen = ({
                       <DifficultyStars level={level.difficulty} />
                     </div>
 
-                    {/* Level Info */}
                     <div className="mb-4">
                       <div className="flex items-center gap-2 mb-1">
                         <h3 className="text-xl font-bold text-gray-900">
@@ -262,7 +381,6 @@ export const ModeSelectScreen = ({
                       </p>
                     </div>
 
-                    {/* Difficulty Indicator Bar */}
                     <div className="mb-4">
                       <div className="flex items-center gap-2 text-xs text-gray-500 mb-1">
                         <span>Difficulty</span>
@@ -270,19 +388,19 @@ export const ModeSelectScreen = ({
                       <div className="w-full bg-gray-200 rounded-full h-2">
                         <div
                           className={`h-2 rounded-full bg-gradient-to-r ${level.color} transition-all duration-300`}
-                          style={{ width: `${(level.difficulty / 3) * 100}%` }}
+                          style={{
+                            width: `${getDifficultyPercentage(level.difficulty)}%`,
+                          }}
                         />
                       </div>
                     </div>
 
-                    {/* Selected Indicator */}
                     {isSelected && (
                       <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold">
                         SELECTED
                       </div>
                     )}
 
-                    {/* Hover Glow Effect */}
                     <div
                       className={`absolute inset-0 rounded-2xl transition-all duration-300 pointer-events-none ${
                         isSelected
@@ -304,23 +422,24 @@ export const ModeSelectScreen = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
               {politenesses.map((option) => {
                 const IconComponent = iconMap[option.icon] ?? User;
+                const isSelected = selectedPoliteness === option.id;
                 return (
                   <SelectModeButton
                     key={option.id}
-                    onClick={() => setSelectedPoliteness(option.id)}
+                    onClick={() => handlePolitenessSelect(option.id)}
                     className={`cursor-pointer relative group p-6 rounded-2xl bg-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border-2 ${
-                      selectedPoliteness === option.id
+                      isSelected
                         ? "border-green-500 shadow-green-200"
                         : "border-transparent hover:border-green-200"
                     }`}
                   >
                     <div
                       className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${option.color} opacity-10 group-hover:opacity-20 transition-opacity duration-300`}
-                    ></div>
+                    />
                     <div className="relative z-10 text-center">
                       <div
                         className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 mx-auto transition-colors duration-300 ${
-                          selectedPoliteness === option.id
+                          isSelected
                             ? "bg-green-500 text-white"
                             : "bg-gray-100 text-gray-600 group-hover:bg-green-100 group-hover:text-green-600"
                         }`}
@@ -331,7 +450,7 @@ export const ModeSelectScreen = ({
                         label={option.label}
                         description={option.description}
                         example={option.example}
-                        selected={selectedPoliteness === option.id}
+                        selected={isSelected}
                       />
                     </div>
                   </SelectModeButton>
@@ -353,25 +472,20 @@ export const ModeSelectScreen = ({
                 return (
                   <div
                     key={theme.id}
-                    onClick={() => setSelectedTheme(theme.id)}
+                    onClick={() => handleThemeSelect(theme.id)}
                     className={`relative group cursor-pointer rounded-2xl overflow-hidden bg-white shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 ${
                       isSelected
                         ? "ring-4 ring-green-500 ring-opacity-50 shadow-green-200"
                         : "hover:shadow-xl"
                     }`}
                   >
-                    {/* Background Image */}
                     <div className="relative h-48 overflow-hidden">
                       <img
                         src={theme.imgURL}
                         alt={theme.label}
                         className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                       />
-
-                      {/* Gradient Overlay */}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-
-                      {/* Selected Badge */}
                       {isSelected && (
                         <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">
                           Selected
@@ -379,7 +493,6 @@ export const ModeSelectScreen = ({
                       )}
                     </div>
 
-                    {/* Content */}
                     <div className="p-6">
                       <div className="flex items-center gap-3 mb-3">
                         <div
@@ -395,13 +508,11 @@ export const ModeSelectScreen = ({
                           {theme.label}
                         </h3>
                       </div>
-
                       <p className="text-gray-600 text-sm leading-relaxed">
                         {theme.description}
                       </p>
                     </div>
 
-                    {/* Hover Effect Border */}
                     <div
                       className={`absolute inset-0 rounded-2xl transition-all duration-300 pointer-events-none ${
                         isSelected
@@ -420,19 +531,13 @@ export const ModeSelectScreen = ({
                     : "hover:shadow-xl"
                 }`}
               >
-                {" "}
                 <div className="relative h-48 bg-gradient-to-br from-purple-400 via-pink-400 to-orange-400 overflow-hidden">
-                  {/* Gradient Overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-
-                  {/* Custom Icon */}
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
                       <Edit3 className="w-8 h-8 text-white" />
                     </div>
                   </div>
-
-                  {/* Selected Badge */}
                   {customTheme.trim() && (
                     <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">
                       Selected
@@ -454,28 +559,19 @@ export const ModeSelectScreen = ({
                       Custom Theme
                     </h3>
                   </div>
-
                   <p className="text-gray-600 text-sm leading-relaxed mb-4">
                     Create your own conversation topic
                   </p>
-
                   <input
                     id="custom-theme"
                     type="text"
                     placeholder="Enter your topic (e.g., cooking, anime, sports...)"
                     value={customTheme}
-                    onChange={(e) => {
-                      setCustomTheme(e.target.value);
-                      setSelectedTheme("");
-                    }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedTheme("");
-                    }}
+                    onChange={(e) => handleCustomThemeChange(e.target.value)}
+                    onClick={handleCustomThemeClick}
                     className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-500 focus:outline-none transition-colors duration-300 bg-white text-gray-900 placeholder-gray-400"
                   />
                 </div>
-                {/* Hover Effect Border */}
                 <div
                   className={`absolute inset-0 rounded-2xl transition-all duration-300 pointer-events-none ${
                     customTheme.trim()
@@ -487,7 +583,7 @@ export const ModeSelectScreen = ({
             </div>
           </div>
 
-          {/* fix grammar during conversation */}
+          {/* Fix grammar during conversation */}
           <div className="mb-12">
             <h2 className="text-xl font-semibold text-gray-900 mb-6 text-center">
               Fix Grammar During Conversation
@@ -495,23 +591,24 @@ export const ModeSelectScreen = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
               {corrections.map((option) => {
                 const IconComponent = iconMap[option.icon] ?? User;
+                const isSelected = checkGrammarMode === option.value;
                 return (
                   <SelectModeButton
                     key={option.id}
-                    onClick={() => setCheckGrammarMode(option.value)}
+                    onClick={() => handleGrammarModeSelect(option.value)}
                     className={`cursor-pointer relative group p-6 rounded-2xl bg-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border-2 ${
-                      checkGrammarMode === option.value
+                      isSelected
                         ? "border-green-500 shadow-green-200"
                         : "border-transparent hover:border-green-200"
                     }`}
                   >
                     <div
                       className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${option.color} opacity-10 group-hover:opacity-20 transition-opacity duration-300`}
-                    ></div>
+                    />
                     <div className="relative z-10 text-center">
                       <div
                         className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 mx-auto transition-colors duration-300 ${
-                          checkGrammarMode === option.value
+                          isSelected
                             ? "bg-green-500 text-white"
                             : "bg-gray-100 text-gray-600 group-hover:bg-green-100 group-hover:text-green-600"
                         }`}
@@ -522,7 +619,7 @@ export const ModeSelectScreen = ({
                         label={option.label}
                         description={option.description}
                         example={option.example}
-                        selected={checkGrammarMode === option.value}
+                        selected={isSelected}
                       />
                     </div>
                   </SelectModeButton>
@@ -536,7 +633,7 @@ export const ModeSelectScreen = ({
             <RoundedButton
               disabled={!canProceed}
               loading={loading}
-              onClick={() => handleBeginConversation()}
+              onClick={handleBeginConversation}
               className={`cursor-pointer inline-flex items-center gap-2 px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform ${
                 canProceed
                   ? "bg-green-500 hover:bg-green-600 text-white shadow-lg shadow-green-200 hover:shadow-xl hover:-translate-y-1"
@@ -553,39 +650,5 @@ export const ModeSelectScreen = ({
         <BlockUseOverlay plan={plan === "pro" ? "pro" : "trial"} />
       )}
     </div>
-  );
-};
-
-type ButtonContentsProps = {
-  color?: string;
-  label: string;
-  description: string;
-  example?: string;
-  selected?: boolean;
-};
-
-const ButtonContents = ({
-  color,
-  label,
-  description,
-  example,
-  selected,
-}: ButtonContentsProps) => {
-  return (
-    <>
-      <div
-        className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${color} opacity-10 group-hover:opacity-20 transition-opacity duration-300`}
-      ></div>
-      <div className="relative z-10">
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">{label}</h3>
-        <p className="text-gray-600 text-sm">{description}</p>
-        <p className="text-xs text-gray-500 italic">{example}</p>
-      </div>
-      {selected && (
-        <div className="absolute top-3 right-3 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-          <div className="w-2 h-2 bg-white rounded-full"></div>
-        </div>
-      )}
-    </>
   );
 };

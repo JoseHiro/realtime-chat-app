@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 
 // Initialize Stripe (you'll need your publishable key)
-const stripePromise = loadStripe(process.env.NEXT_TEST_NEXT_PUBLIC_STRIPE_KEY!);
+// const stripePromise = loadStripe(process.env.NEXT_TEST_NEXT_PUBLIC_STRIPE_KEY!);
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_KEY_LIVE!);
 
 const Checkout = () => {
   const [loading, setLoading] = useState(false);
@@ -18,7 +19,8 @@ const Checkout = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          priceId: process.env.NEXT_TEST_STRIPE_PRICE_ID_KEY,
+          // priceId: process.env.NEXT_TEST_STRIPE_PRICE_ID_KEY,
+          priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_LIVE,
           quantity: 1,
         }),
       });

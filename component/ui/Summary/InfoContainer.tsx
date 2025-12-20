@@ -2,7 +2,7 @@ import React from "react";
 import { MessageCircle, Award } from "lucide-react";
 import { SectionContainer, SectionDescription } from "./Container";
 
-export const InfoContainer = ({
+export const InfoContainer = React.memo(({
   meta,
   correctionsLength,
   enhancementsLength,
@@ -78,6 +78,8 @@ export const InfoContainer = ({
       </SectionContainer>
     </div>
   );
-};
+});
+
+InfoContainer.displayName = "InfoContainer";
 
 export default InfoContainer;
