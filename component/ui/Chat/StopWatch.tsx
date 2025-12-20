@@ -3,7 +3,6 @@ import { Clock } from "lucide-react";
 import { apiRequest } from "../../../lib/apiRequest";
 import { useSpeech } from "../../../context/SpeechContext";
 
-
 export const StopWatch = ({
   history,
   setOverlayOpened,

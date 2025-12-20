@@ -3,7 +3,7 @@ import { BarChart3, BookOpen } from "lucide-react";
 import { SectionContainer, SectionDescription } from "./Container";
 import { SectionTitle, SectionSubTitle } from "./SectionTitle";
 
-export const AnalysisContainer = ({ analysis }: { analysis: any }) => {
+export const AnalysisContainer = React.memo(({ analysis }: { analysis: any }) => {
   return (
     <div className="space-y-6">
       <SectionContainer containerName="Performance Metrics" icon={BarChart3}>
@@ -112,6 +112,8 @@ export const AnalysisContainer = ({ analysis }: { analysis: any }) => {
       </SectionContainer>
     </div>
   );
-};
+});
+
+AnalysisContainer.displayName = "AnalysisContainer";
 
 export default AnalysisContainer;

@@ -1,0 +1,136 @@
+{
+  "conversationId": 132,
+  "messages": [
+    {
+      "id": 424,
+      "sender": "assistant",
+      "message": "最近、何してる？",
+      "reading": "さいきん、なにしてる？",
+      "english": "What have you been doing lately?",
+      "createdAt": "2025-12-19T13:30:57.994Z"
+    },
+    {
+      "id": 425,
+      "sender": "user",
+      "message": "結構いいよ！",
+      "reading": "けっこういいよ！",
+      "english": "Pretty good!",
+      "createdAt": "2025-12-19T13:31:11.973Z",
+      "improvements": [
+        {
+          "text": "最近は仕事が忙しくて、でも充実してるよ！",
+          "reading": "さいきんはしごとがいそがしくて、でもじゅうじつしてるよ！",
+          "english": "I've been busy with work lately, but it's fulfilling!",
+          "focus": "て-form for connecting sentences (忙しくて)",
+          "level": "intermediate"
+        },
+        {
+          "text": "色々なことをやってて、結構いいよ！",
+          "reading": "いろいろなことをやってて、けっこういいよ！",
+          "english": "I'm doing various things, and it's pretty good!",
+          "focus": "Progressive form ている → casual てて",
+          "level": "beginner-intermediate"
+        },
+        {
+          "text": "特に変わったことはないけど、元気だよ！",
+          "reading": "とくにかわったことはないけど、げんきだよ！",
+          "english": "Nothing particularly new, but I'm doing well!",
+          "focus": "けど for contrast and softening",
+          "level": "beginner"
+        }
+      ]
+    },
+    {
+      "id": 426,
+      "sender": "assistant",
+      "message": "それはよかったね！何か楽しいことあった？",
+      "reading": "それはよかったね！なにかたのしいことあった？",
+      "english": "That's great! Did anything fun happen?",
+      "createdAt": "2025-12-19T13:31:14.698Z"
+    },
+    {
+      "id": 427,
+      "sender": "user",
+      "message": "たくさんの学生と会えたよ！",
+      "reading": "たくさんのがくせいとあえたよ！",
+      "english": "I was able to meet many students!",
+      "createdAt": "2025-12-19T13:31:32.745Z",
+      "improvements": [
+        {
+          "text": "実はたくさんの学生と会う機会があって、楽しかったよ！",
+          "reading": "じつはたくさんのがくせいとあうきかいがあって、たのしかったよ！",
+          "english": "Actually, I had the opportunity to meet many students, and it was fun!",
+          "focus": "実は + 機会があって for adding context",
+          "level": "intermediate"
+        },
+        {
+          "text": "学生たちと久しぶりに会えたんだ！",
+          "reading": "がくせいたちとひさしぶりにあえたんだ！",
+          "english": "I was able to meet the students after a long time!",
+          "focus": "Explanatory んだ for providing context",
+          "level": "beginner-intermediate"
+        },
+        {
+          "text": "先週、学生たちと交流するイベントに参加したよ！",
+          "reading": "せんしゅう、がくせいたちとこうりゅうするイベントにさんかしたよ！",
+          "english": "Last week, I participated in an event to interact with students!",
+          "focus": "Time expressions (先週) + specific verbs (交流する、参加する)",
+          "level": "intermediate"
+        }
+      ]
+    },
+    {
+      "id": 428,
+      "sender": "assistant",
+      "message": "いいね！学生たちとどんなことをしたの？",
+      "reading": "いいね！がくせいたちとどんなことをしたの？",
+      "english": "That's great! What did you do with the students?",
+      "createdAt": "2025-12-19T13:31:35.653Z"
+    },
+    {
+      "id": 429,
+      "sender": "user",
+      "message": "実は飲みに行ったよ！",
+      "reading": "じつはのみにいったよ！",
+      "english": "Actually, we went drinking!",
+      "createdAt": "2025-12-19T13:31:48.119Z",
+      "improvements": [
+        {
+          "text": "実はみんなで飲みに行って、盛り上がったよ！",
+          "reading": "じつはみんなでのみにいって、もりあがったよ！",
+          "english": "Actually, we all went drinking together and had a great time!",
+          "focus": "みんなで (doing together) + descriptive verb (盛り上がる)",
+          "level": "intermediate-advanced"
+        },
+        {
+          "text": "居酒屋で飲みながら色々な話をしたよ！",
+          "reading": "いざかやでのみながらいろいろなはなしをしたよ！",
+          "english": "We talked about various things while drinking at an izakaya!",
+          "focus": "ながら for simultaneous actions + location details",
+          "level": "intermediate"
+        },
+        {
+          "text": "飲みに行って、お互いのことをもっと知ることができたんだ！",
+          "reading": "のみにいって、おたがいのことをもっとしることができたんだ！",
+          "english": "We went drinking, and I was able to get to know each other better!",
+          "focus": "ことができる (potential) + んだ (explanatory)",
+          "level": "intermediate"
+        }
+      ]
+    },
+    {
+      "id": 430,
+      "sender": "assistant",
+      "message": "楽しそう！どんなお酒を飲んだの？",
+      "reading": "たのしそう！どんなおさけをのんだの？",
+      "english": "Sounds fun! What kind of alcohol did you drink?",
+      "createdAt": "2025-12-19T13:31:50.238Z"
+    }
+  ],
+  "metadata": {
+    "totalMessages": 7,
+    "userMessages": 3,
+    "improvementsGenerated": 9,
+    "generatedAt": "2025-12-19T13:32:00.000Z"
+  }
+}

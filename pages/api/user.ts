@@ -38,22 +38,22 @@ export default async function handler(
     if (!user) return res.status(404).json({ error: "User not found" });
 
     let trialStatus: "active" | "ended" | null = null;
-    if (user.subscriptionStatus === "trialing") {
-      const now = new Date();
-      if (user.trialEndsAt && now > user.trialEndsAt) {
-        trialStatus = "ended";
-      } else if ((user.trialUsedChats ?? 0) >= 2) {
-        trialStatus = "ended";
-      } else {
-        trialStatus = "active";
-      }
-    }
+    // if (user.subscriptionStatus === "trialing") {
+    //   const now = new Date();
+    //   if (user.trialEndsAt && now > user.trialEndsAt) {
+    //     trialStatus = "ended";
+    //   } else if ((user.trialUsedChats ?? 0) >= 2) {
+    //     trialStatus = "ended";
+    //   } else {
+    //     trialStatus = "active";
+    //   }
+    // }
 
     return res.status(200).json({
       user: {
         username: user.username,
-        subscriptionStatus: user.subscriptionStatus,
-        subscriptionPlan: user.subscriptionPlan,
+        // subscriptionStatus: user.subscriptionStatus,
+        // subscriptionPlan: user.subscriptionPlan,
         createdAt: user.createdAt,
       },
       trialStatus,

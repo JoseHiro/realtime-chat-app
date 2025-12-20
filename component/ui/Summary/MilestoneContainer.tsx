@@ -3,7 +3,7 @@ import { TrendingUp, Lightbulb } from "lucide-react";
 import { SectionContainer, SectionDescription } from "./Container";
 import { SectionTitle } from "./SectionTitle";
 
-export const MilestoneContainer = ({ milestone }: { milestone: any }) => {
+export const MilestoneContainer = React.memo(({ milestone }: { milestone: any }) => {
   return (
     <div className="space-y-6">
       <SectionContainer containerName="Growth Path" icon={TrendingUp}>
@@ -52,6 +52,8 @@ export const MilestoneContainer = ({ milestone }: { milestone: any }) => {
       </SectionContainer>
     </div>
   );
-};
+});
+
+MilestoneContainer.displayName = "MilestoneContainer";
 
 export default MilestoneContainer;
