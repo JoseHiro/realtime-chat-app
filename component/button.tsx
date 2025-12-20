@@ -1,3 +1,5 @@
+import { cn } from "../src/lib/utils";
+
 type SelectModeButtonType = {
   children: any;
   className?: string;
@@ -28,9 +30,12 @@ export const RoundedButton = ({
   return (
     <button
       disabled={disabled || loading}
-      className={`cursor-pointer rounded-full flex items-center transition-all duration-300 justify-center relative ${className} ${
-        disabled || loading ? "cursor-not-allowed" : "cursor-pointer"
-      }`}
+      className={cn(
+        "cursor-pointer flex items-center transition-all duration-300 justify-center relative",
+        className,
+        disabled || loading ? "cursor-not-allowed" : "cursor-pointer",
+        "rounded-full" // Always apply rounded-full last to ensure it takes precedence
+      )}
       onClick={onClick}
     >
       {loading && (
