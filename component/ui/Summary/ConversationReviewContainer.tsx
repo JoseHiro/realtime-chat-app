@@ -5,8 +5,8 @@ import {
   ChevronUp,
   BookOpen,
   User,
-  Bot,
 } from "lucide-react";
+import Image from "next/image";
 import { SectionContainer, SectionDescription } from "./Container";
 import { SectionSubTitle } from "./SectionTitle";
 import {
@@ -16,7 +16,13 @@ import {
 } from "../../../type/types";
 
 export const ConversationReviewContainer = React.memo(
-  ({ conversation }: { conversation: ConversationReview }) => {
+  ({
+    conversation,
+    characterName,
+  }: {
+    conversation: ConversationReview;
+    characterName?: string;
+  }) => {
     const [expandedMessages, setExpandedMessages] = useState<Set<number>>(
       new Set()
     );
@@ -46,6 +52,19 @@ export const ConversationReviewContainer = React.memo(
     const isMessageExpanded = (messageId: number) =>
       expandedMessages.has(messageId);
 
+    // Get character image path based on character name
+    const getCharacterImage = () => {
+      console.log("characterName", characterName);
+      if (characterName === "Sakura") {
+        return "/img/female.jpg";
+      } else if (characterName === "Ken") {
+        return "/img/man.jpg";
+      }
+      return null;
+    };
+
+    const characterImage = getCharacterImage();
+
     return (
       <div className="space-y-6">
         <SectionContainer
@@ -56,52 +75,95 @@ export const ConversationReviewContainer = React.memo(
             {conversation.messages?.map((message: ConversationMessage) => (
               <div key={message.id} className="space-y-3">
                 {/* Message */}
-                <div className="flex items-start space-x-3">
-                  <div
-                    className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
-                      message.sender === "user" ? "bg-gray-200" : "bg-gray-100"
-                    }`}
-                  >
-                    {message.sender === "user" ? (
-                      <User className="w-4 h-4 text-gray-600" />
-                    ) : (
-                      <Bot className="w-4 h-4 text-gray-600" />
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center space-x-2 mb-1">
-                      <span className="text-xs font-medium text-gray-700">
-                        {message.sender === "user" ? "You" : "Assistant"}
-                      </span>
-                      <span className="text-xs text-gray-500">
-                        {new Date(message.createdAt).toLocaleTimeString()}
-                      </span>
-                    </div>
-                    <SectionDescription>
-                      <div className="space-y-1">
-                        <p className="text-sm text-gray-900 font-medium">
-                          {message.message}
-                        </p>
-                        {message.reading && (
-                          <p className="text-xs text-gray-600">
-                            {message.reading}
-                          </p>
-                        )}
-                        {message.english && (
-                          <p className="text-xs text-gray-500 italic">
-                            {message.english}
-                          </p>
-                        )}
+                {message.sender === "user" ? (
+                  // User message - aligned to right
+                  <div className="flex items-start justify-end space-x-3">
+                    <div className="flex-1 min-w-0 max-w-[80%]">
+                      <div className="flex items-center justify-end space-x-2 mb-1">
+                        <span className="text-xs text-gray-500">
+                          {new Date(message.createdAt).toLocaleTimeString()}
+                        </span>
+                        <span className="text-xs font-medium text-gray-700">
+                          You
+                        </span>
                       </div>
-                    </SectionDescription>
+                      <div className="bg-blue-50 rounded-lg p-3 border border-blue-100">
+                        <SectionDescription>
+                          <div className="space-y-1">
+                            <p className="text-sm text-gray-900 font-medium">
+                              {message.message}
+                            </p>
+                            {message.reading && (
+                              <p className="text-xs text-gray-600">
+                                {message.reading}
+                              </p>
+                            )}
+                            {message.english && (
+                              <p className="text-xs text-gray-500 italic">
+                                {message.english}
+                              </p>
+                            )}
+                          </div>
+                        </SectionDescription>
+                      </div>
+                    </div>
+                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+                      <User className="w-4 h-4 text-gray-600" />
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  // Assistant message - aligned to left
+                  <div className="flex items-start space-x-3">
+                    {characterImage ? (
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full overflow-hidden ring-2 ring-white shadow-sm">
+                        <Image
+                          src={characterImage}
+                          alt={characterName || "Assistant"}
+                          width={32}
+                          height={32}
+                          className="object-cover w-full h-full"
+                        />
+                      </div>
+                    ) : (
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
+                        <MessageSquare className="w-4 h-4 text-gray-600" />
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center space-x-2 mb-1">
+                        <span className="text-xs font-medium text-gray-700">
+                          {characterName || "Assistant"}
+                        </span>
+                        <span className="text-xs text-gray-500">
+                          {new Date(message.createdAt).toLocaleTimeString()}
+                        </span>
+                      </div>
+                      <SectionDescription>
+                        <div className="space-y-1">
+                          <p className="text-sm text-gray-900 font-medium">
+                            {message.message}
+                          </p>
+                          {message.reading && (
+                            <p className="text-xs text-gray-600">
+                              {message.reading}
+                            </p>
+                          )}
+                          {message.english && (
+                            <p className="text-xs text-gray-500 italic">
+                              {message.english}
+                            </p>
+                          )}
+                        </div>
+                      </SectionDescription>
+                    </div>
+                  </div>
+                )}
 
                 {/* User Message Improvements */}
                 {message.sender === "user" &&
                   message.improvements &&
                   message.improvements.length > 0 && (
-                    <div className="ml-11">
+                    <div className="mr-11">
                       <button
                         onClick={() => toggleMessage(message.id)}
                         className="flex items-center space-x-2 text-xs font-medium text-gray-700 hover:text-gray-900 mb-3 transition-colors"

@@ -25,6 +25,7 @@ type Chat = {
   theme?: string;
   level?: string;
   politeness?: string;
+  characterName?: string;
   message: Message[];
   analysis?: {
     result?: string;
@@ -59,6 +60,7 @@ const ChatPage = () => {
           customTheme=""
           level={chat?.level || ""}
           analysis={chat?.analysis?.result}
+          characterName={chat?.characterName}
         />
 
         {/* Chat Content */}

@@ -63,7 +63,7 @@ export const FeedbackContainer = React.memo(
                   <div className="space-y-3">
                     <div>
                       <SectionSubTitle title="Before" />
-                      <SectionDescription className="bg-red-50 border-l-4 border-red-500">
+                      <SectionDescription className="bg-white border-black">
                         {correction.before}
                       </SectionDescription>
                     </div>
@@ -72,7 +72,7 @@ export const FeedbackContainer = React.memo(
                     </div>
                     <div>
                       <SectionSubTitle title="After" />
-                      <SectionDescription className="bg-green-50 border-l-4 border-green-500">
+                      <SectionDescription className="bg-green-50 border-green-500">
                         {correction.after}
                       </SectionDescription>
                     </div>
@@ -119,7 +119,7 @@ export const FeedbackContainer = React.memo(
                     </div>
                     <div>
                       <SectionSubTitle title="Enhanced" />
-                      <SectionDescription className="bg-blue-50 border-l-4 border-blue-500">
+                      <SectionDescription className="bg-white">
                         <div className="space-y-1">
                           <p className="text-sm text-gray-900 font-medium">
                             {enhancement.upgraded.kanji}

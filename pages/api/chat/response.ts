@@ -3,10 +3,17 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { OpenAI } from "openai";
 // import { logUsage } from "../../../lib/loggingData/logger";
 import { saveMessage } from "../../../lib/message/messageService";
+import { PrismaClient } from "@prisma/client";
+import {
+  getAzureVoiceGender,
+  getAzureVoiceName,
+  type CharacterName,
+} from "../../../lib/voice/voiceMapping";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 const speechKey = process.env.AZURE_API_KEY || "";
 const serviceRegion = process.env.AZURE_SERVICE_REGION || "japaneast";
+const prisma = new PrismaClient();
 
 export default async function handler(
   req: NextApiRequest,
@@ -20,6 +27,17 @@ export default async function handler(
   try {
     const { messages, politeness, level, checkGrammarMode, chatId } =
       req.body;
+
+    // Fetch chat to get character name
+    const chat = await prisma.chat.findUnique({
+      where: { id: chatId },
+      select: { characterName: true },
+    });
+
+    // Default to "Sakura" if characterName is not set (for backward compatibility)
+    const characterName = (chat?.characterName as CharacterName) || "Sakura";
+    const azureVoiceName = getAzureVoiceName(characterName);
+    const azureVoiceGender = getAzureVoiceGender(characterName);
 
     saveMessage(chatId, "user", messages[messages.length - 1].content);
     const formality =
@@ -87,7 +105,7 @@ export default async function handler(
     // 3. SSML作成
     const ssml = `
       <speak version='1.0' xml:lang='ja-JP'>
-        <voice xml:lang='ja-JP' xml:gender='Female' name='ja-JP-NanamiNeural'>
+        <voice xml:lang='ja-JP' xml:gender='${azureVoiceGender}' name='${azureVoiceName}'>
           ${reply}
         </voice>
       </speak>

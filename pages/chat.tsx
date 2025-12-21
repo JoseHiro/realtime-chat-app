@@ -11,6 +11,7 @@ import { PaymentPromotionContent } from "../component/ui/PaymentPromotionContent
 import { apiRequest } from "../lib/apiRequest";
 import { SummaryContent } from "../component/ui/SummaryContent";
 import { ChatHeader } from "../component/ui/Chat/ChatHeader";
+import { getCharacterName } from "../lib/voice/voiceMapping";
 // notes : common mistakes, tendencies,
 // vocabulary, natural word selection,
 // UI while the chat is thinking
@@ -58,6 +59,7 @@ export const Chat = () => {
     setSummary,
     summary,
     summaryFetchLoading,
+    voiceGender,
   } = useSpeech();
 
   const [chatInfo, setChatInfo] = useState<
@@ -215,7 +217,12 @@ export const Chat = () => {
         </div>
       ) : (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-green-50 w-full flex flex-col justify-between">
-          <ChatHeader title="Chat" chatPage={true} history={history} />
+          <ChatHeader
+            title="Chat"
+            chatPage={true}
+            history={history}
+            characterName={getCharacterName(voiceGender)}
+          />
           <Messages
             history={history}
             chatInfo={chatInfo}
