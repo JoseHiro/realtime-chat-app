@@ -23,6 +23,7 @@ import { toast } from "sonner";
 import { Header } from "./Header";
 import { LevelSelection } from "./LevelSelection";
 import { PolitenessSelection } from "./PolitenessSelection";
+import { VoiceSelection } from "./VoiceSelection";
 import { ThemeSelection } from "./ThemeSelection";
 import { GrammarCorrection } from "./GrammarCorrection";
 
@@ -60,6 +61,8 @@ export const ModeSelectScreen = ({
     setChatMode,
     username,
     subscriptionPlan,
+    voiceGender,
+    setVoiceGender,
   } = useSpeech();
 
   const iconMap: Record<string, React.ElementType> = useMemo(
@@ -82,8 +85,7 @@ export const ModeSelectScreen = ({
   );
 
   const [loading, setLoading] = useState(false);
-  // const isProUser = plan === "pro" || subscriptionPlan === "pro";
-  const isProUser = "pro";
+  const isProUser = plan === "pro" || subscriptionPlan === "pro";
 
   // Memoize validation check to prevent unnecessary recalculations
   const canProceed = useMemo(
@@ -129,6 +131,7 @@ export const ModeSelectScreen = ({
             level: selectedLevel,
             theme: selectedTheme || customTheme.trim(),
             politeness: selectedPoliteness || "polite",
+            voiceGender: voiceGender,
           }),
         });
 
@@ -169,6 +172,7 @@ export const ModeSelectScreen = ({
     selectedTheme,
     customTheme,
     selectedPoliteness,
+    voiceGender,
     loading,
     handleRefreshPreviousData,
     setHistory,
@@ -198,6 +202,11 @@ export const ModeSelectScreen = ({
             selectedPoliteness={selectedPoliteness}
             setSelectedPoliteness={setSelectedPoliteness}
             iconMap={iconMap}
+          />
+
+          <VoiceSelection
+            voiceGender={voiceGender}
+            setVoiceGender={setVoiceGender}
           />
 
           <ThemeSelection

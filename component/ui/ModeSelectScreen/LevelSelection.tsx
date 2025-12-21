@@ -15,7 +15,7 @@ export const LevelSelection = ({
   iconMap,
 }: LevelSelectionProps) => {
   return (
-    <div className="mb-12">
+    <div className="mb-4">
       <div className="flex justify-between items-center">
         <h2 className="text-xl text-gray-700 mb-2 mt-10">Japanese Level</h2>
         <div className="bg-gray-100 rounded-full p-2">

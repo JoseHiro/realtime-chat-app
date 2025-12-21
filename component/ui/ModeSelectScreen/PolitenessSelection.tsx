@@ -17,21 +17,21 @@ export const PolitenessSelection = ({
   iconMap,
 }: PolitenessSelectionProps) => {
   return (
-    <div className="mb-12">
+    <div className="mb-4">
       <div className="flex justify-between items-center">
         <h2 className="text-xl text-gray-700 mb-2 mt-10">Speaking Style</h2>
         <div className="bg-gray-100 rounded-full p-2">
           <FaPersonWalkingLuggage className="w-6 h-6 text-gray-700" />
         </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl">
+      <div className="flex gap-6">
         {politenesses.map((option) => {
           const IconComponent = iconMap[option.icon] ?? User;
           return (
             <SelectModeButton
               key={option.id}
               onClick={() => setSelectedPoliteness(option.id)}
-              className={`cursor-pointer relative group p-6 rounded-2xl bg-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border-2 ${
+              className={`cursor-pointer relative group p-3 rounded-2xl bg-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border-2 ${
                 selectedPoliteness === option.id
                   ? "border-green-500 shadow-green-200"
                   : "border-transparent hover:border-green-200"
@@ -42,7 +42,7 @@ export const PolitenessSelection = ({
               ></div>
               <div className="relative z-10 text-center">
                 <div
-                  className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 mx-auto transition-colors duration-300 ${
+                  className={` h-8 w-8 rounded-full flex items-center justify-center mb-3 mx-auto transition-colors duration-300 ${
                     selectedPoliteness === option.id
                       ? "bg-green-500 text-white"
                       : "bg-gray-100 text-gray-600 group-hover:bg-green-100 group-hover:text-green-600"

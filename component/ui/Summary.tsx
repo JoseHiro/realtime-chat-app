@@ -76,7 +76,10 @@ export const Summary = ({ summary }: { summary: SummaryType }) => {
             {/* Refined Responses Tab */}
             {activeTab === "conversation" &&
               (conversationData && conversationData.messages?.length > 0 ? (
-                <ConversationReviewContainer conversation={conversationData} />
+                <ConversationReviewContainer
+                  conversation={conversationData}
+                  characterName={summary?.meta?.characterName}
+                />
               ) : (
                 <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
                   <p className="text-gray-600 mb-2">

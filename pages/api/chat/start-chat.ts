@@ -4,6 +4,11 @@ import { OpenAI } from "openai";
 import { verifyAuth } from "../../../middleware/middleware";
 import { PrismaClient } from "@prisma/client";
 import { MyJwtPayload } from "../../../type/types";
+import {
+  getCharacterName,
+  getVoiceConfig,
+  type VoiceGender,
+} from "../../../lib/voice/voiceMapping";
 
 const prisma = new PrismaClient();
 const speechKey = process.env.AZURE_API_KEY || "";
@@ -24,10 +29,15 @@ export default async function handler(
     return res.status(401).json({ error: "Not authenticated" });
   }
 
-  const { level, theme, politeness } = req.body;
+  const { level, theme, politeness, voiceGender } = req.body;
   if (!level || !theme) {
     return res.status(400).json({ error: "Text is required" });
   }
+
+  // Map voiceGender to character name (default to "female" if not provided)
+  const gender: VoiceGender = voiceGender || "female";
+  const characterName = getCharacterName(gender);
+  const voiceConfig = getVoiceConfig(gender);
 
   const prompt = `あなたは日本語会話の練習相手です。以下の条件で会話を始めてください。
 - 学習者のレベル: ${level}
@@ -57,6 +67,7 @@ export default async function handler(
         theme: theme,
         politeness: politeness,
         level: level,
+        characterName: characterName,
         time: 1,
       },
     });
@@ -90,7 +101,7 @@ export default async function handler(
     // SSML構築
     const ssml = `
       <speak version='1.0' xml:lang='ja-JP' xmlns:mstts="http://www.w3.org/2001/mstts">
-        <voice xml:lang='ja-JP' xml:gender='Female' name='ja-JP-NanamiNeural'>
+        <voice xml:lang='ja-JP' xml:gender='${voiceConfig.azureVoiceGender}' name='${voiceConfig.azureVoiceName}'>
           <mstts:express-as style="sad" styledegree="1.0">
             <prosody rate="1.0">
               ${reply}

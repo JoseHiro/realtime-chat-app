@@ -28,6 +28,8 @@ interface SpeechContextType {
   setSummaryFetchLoading: React.Dispatch<React.SetStateAction<boolean>>;
   isMuted: boolean;
   setIsMuted: React.Dispatch<React.SetStateAction<boolean>>;
+  voiceGender: "male" | "female";
+  setVoiceGender: React.Dispatch<React.SetStateAction<"male" | "female">>;
 }
 
 const SpeechContext = createContext<SpeechContextType>({
@@ -57,6 +59,8 @@ const SpeechContext = createContext<SpeechContextType>({
   setSummaryFetchLoading: () => {},
   isMuted: false,
   setIsMuted: () => {},
+  voiceGender: "female",
+  setVoiceGender: () => {},
 });
 
 //
@@ -82,6 +86,7 @@ export const SpeechProvider: React.FC<{ children: React.ReactNode }> = ({
   const [summary, setSummary] = useState(null); // chat summary
   const [summaryFetchLoading, setSummaryFetchLoading] = useState(false); // summary generating loading
   const [isMuted, setIsMuted] = useState(false); // speech mute mode
+  const [voiceGender, setVoiceGender] = useState<"male" | "female">("female"); // voice gender preference
 
   return (
     <SpeechContext.Provider
@@ -112,6 +117,8 @@ export const SpeechProvider: React.FC<{ children: React.ReactNode }> = ({
         setSummaryFetchLoading,
         isMuted,
         setIsMuted,
+        voiceGender,
+        setVoiceGender,
       }}
     >
       {children}

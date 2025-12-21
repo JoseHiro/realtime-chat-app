@@ -39,6 +39,7 @@ model Chat {
   theme    String?
   politeness String?
   level    String?
+  characterName String? // e.g. "Sakura" (female) or "Ken" (male)
   time     Int?
   createdAt DateTime @default(now())
   analysis   Analysis?

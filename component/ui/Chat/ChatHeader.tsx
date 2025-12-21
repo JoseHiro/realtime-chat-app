@@ -3,6 +3,7 @@ import { Pen, User, FileText, FileX } from "lucide-react";
 import { StopWatch } from "./StopWatch";
 import { SummaryContent } from "../SummaryContent";
 import { useSpeech } from "../../../context/SpeechContext";
+import Image from "next/image";
 import {
   UserCheck,
   Coffee,
@@ -28,6 +29,7 @@ export const ChatHeader = ({
   history,
   analysis,
   id,
+  characterName,
 }: {
   title: string;
   theme?: string;
@@ -38,6 +40,7 @@ export const ChatHeader = ({
   history?: any;
   analysis?: any;
   id?: string;
+  characterName?: string;
 }) => {
   const [overlayOpened, setOverlayOpened] = useState(false);
   const [summaryOpened, setSummaryOpened] = useState<boolean>(false);
@@ -109,6 +112,19 @@ export const ChatHeader = ({
   const ThemeIcon = themeInfo.icon;
   const PolitenessIcon = politenessInfo.icon;
 
+  // Get character image path based on character name
+  const getCharacterImage = () => {
+    if (characterName === "Sakura") {
+      return "/img/female.jpg";
+    } else if (characterName === "Ken") {
+      return "/img/man.jpg";
+    }
+    // Default fallback - return null to show default icon
+    return null;
+  };
+
+  const characterImage = getCharacterImage();
+
   // edit chat title
   const handleSaveNewChatTitle = async (value: string) => {
     const newTitle = value.trim();
@@ -141,9 +157,21 @@ export const ChatHeader = ({
     <div className="bg-white border-b border-gray-200 px-6 py-4 shadow-sm sticky top-0 z-10">
       <div className="mx-auto flex justify-between items-center">
         <div className="flex items-center space-x-4">
-          <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center shadow-sm">
-            <span className="text-white font-semibold text-sm">AI</span>
-          </div>
+          {characterImage ? (
+            <div className="w-10 h-10 rounded-full overflow-hidden shadow-sm ring-2 ring-white">
+              <Image
+                src={characterImage}
+                alt={characterName || "AI"}
+                width={40}
+                height={40}
+                className="object-cover w-full h-full"
+              />
+            </div>
+          ) : (
+            <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm border">
+              <span className="text-black font-semibold text-sm">AI</span>
+            </div>
+          )}
           <div className="space-y-1">
             {isEditingChatTitle ? (
               <div className="flex items-center space-x-2">
