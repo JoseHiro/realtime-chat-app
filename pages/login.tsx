@@ -46,7 +46,7 @@ const Login = () => {
       toast.success("Successfully logged in!", {
         position: "top-center",
       });
-      router.push("/chat");
+      router.push("/new");
     } catch (error: any) {
       console.error("Login error:", error);
     } finally {

@@ -243,6 +243,12 @@ export const Chat = () => {
       {overlayOpened && (
         <Overlay
           onClose={() => {
+            if (summaryFetchLoading) {
+              toast.info("Summary generation in progress", {
+                description: "We'll notify you when your summary is ready.",
+                position: "top-center",
+              });
+            }
             setOverlayOpened(false);
             setSummaryOpened(false);
           }}

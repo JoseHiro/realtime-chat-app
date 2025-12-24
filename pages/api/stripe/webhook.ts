@@ -69,6 +69,47 @@ export default async function handler(
         });
         break;
       }
+      case "customer.subscription.updated": {
+        const subscription = event.data.object as Stripe.Subscription;
+
+        // Find user by subscription ID
+        const user = await prisma.user.findUnique({
+          where: { stripeSubscriptionId: subscription.id },
+        });
+
+        if (user) {
+          await prisma.user.update({
+            where: { id: user.id },
+            data: {
+              subscriptionStatus: subscription.status === "active" && !subscription.cancel_at_period_end
+                ? "active"
+                : subscription.cancel_at_period_end
+                ? "canceled"
+                : subscription.status,
+            },
+          });
+        }
+        break;
+      }
+      case "customer.subscription.deleted": {
+        const subscription = event.data.object as Stripe.Subscription;
+
+        // Find user by subscription ID
+        const user = await prisma.user.findUnique({
+          where: { stripeSubscriptionId: subscription.id },
+        });
+
+        if (user) {
+          await prisma.user.update({
+            where: { id: user.id },
+            data: {
+              subscriptionStatus: "canceled",
+              subscriptionPlan: null,
+            },
+          });
+        }
+        break;
+      }
       default:
         console.log(`Unhandled event type: ${event.type}`);
     }

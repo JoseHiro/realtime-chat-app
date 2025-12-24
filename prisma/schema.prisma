@@ -20,6 +20,8 @@ model User {
   password  String
   chats     Chat[]
   createdAt DateTime @default(now())
+  isAdmin   Boolean  @default(false)
+  usageEvents UsageEvent[]
 
   // Stripe-related fields
   stripeCustomerId     String?   @unique
@@ -43,6 +45,7 @@ model Chat {
   time     Int?
   createdAt DateTime @default(now())
   analysis   Analysis?
+  usageEvents UsageEvent[]
 }
 
 model Message {
@@ -62,4 +65,54 @@ model Analysis {
   chatId    Int      @unique
   result    Json
   createdAt DateTime @default(now())
+}
+
+enum Provider {
+  OPENAI
+  AZURE
+  ELEVENLABS
+}
+
+enum ApiType {
+  CHAT
+  SUMMARY
+  TTS
+  STT
+  READING_TRANSLATION
+}
+
+enum EventStatus {
+  SUCCESS
+  ERROR
+  TIMEOUT
+  RATE_LIMITED
+}
+
+model UsageEvent {
+  id          Int       @id @default(autoincrement())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chatId      Int?
+  chat        Chat?     @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  provider    Provider
+  apiType     ApiType
+  status      EventStatus @default(SUCCESS)
+  model       String?
+  voice       String?
+  inputTokens Int?
+  outputTokens Int?
+  characters  Int?
+  audioSeconds Int?
+  costUsd     Decimal   @db.Decimal(10, 6)
+  requestId   String?
+  responseTime Int?
+  messageCount Int?
+  errorCode   String?
+  createdAt   DateTime  @default(now())
+
+  @@index([userId, createdAt])
+  @@index([chatId])
+  @@index([provider, apiType])
+  @@index([createdAt])
+  @@index([status])
 }

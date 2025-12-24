@@ -165,7 +165,7 @@ const Pricing = () => {
             onClick={() => {
               if (!plan.disabled) {
                 console.log("hellooooo");
-                
+
                 router.push(`/signup?plan=${plan.type}`);
               }
             }}
@@ -347,7 +347,7 @@ const Pricing = () => {
               Start Free Trial
             </RoundedButton>
             <RoundedButton
-              onClick={() => router.push("/chat")}
+              onClick={() => router.push("/new")}
               className="border-2 border-white text-white hover:bg-white hover:text-green-600 px-8 py-4 text-lg font-semibold hover:scale-105 transition-all duration-200"
             >
               Try Demo

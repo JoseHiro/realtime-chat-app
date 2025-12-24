@@ -48,7 +48,7 @@ export const BlockUseOverlay = ({ plan }: { plan: string }) => {
       {/* Modal Container */}
       <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden border border-gray-100">
         {/* Gradient Header */}
-        <div className="bg-gradient-to-r from-green-500 to-emerald-600 px-8 py-6 text-center relative overflow-hidden">
+        <div className="bg-green-400 px-8 py-6 text-center relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent"></div>
           <div className="relative z-10">
             <div className="w-16 h-16 mx-auto mb-4 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
@@ -79,7 +79,7 @@ export const BlockUseOverlay = ({ plan }: { plan: string }) => {
           <button
             onClick={handleSubscribe}
             disabled={loading}
-            className={`w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none ${
+            className={`w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 text-gray-700 font-semibold border border-black rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none ${
               loading ? "cursor-wait" : "cursor-pointer"
             }`}
           >

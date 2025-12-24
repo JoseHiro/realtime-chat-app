@@ -9,6 +9,8 @@ import {
   getAzureVoiceName,
   type CharacterName,
 } from "../../../lib/voice/voiceMapping";
+import { logOpenAIEvent, logTTSEvent } from "../../../lib/cost/logUsageEvent";
+import { ApiType, Provider } from "../../../lib/cost/constants";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 const speechKey = process.env.AZURE_API_KEY || "";
@@ -28,11 +30,15 @@ export default async function handler(
     const { messages, politeness, level, checkGrammarMode, chatId } =
       req.body;
 
-    // Fetch chat to get character name
+    // Fetch chat to get character name and userId
     const chat = await prisma.chat.findUnique({
       where: { id: chatId },
-      select: { characterName: true },
+      select: { characterName: true, userId: true },
     });
+
+    if (!chat) {
+      return res.status(404).json({ error: "Chat not found" });
+    }
 
     // Default to "Sakura" if characterName is not set (for backward compatibility)
     const characterName = (chat?.characterName as CharacterName) || "Sakura";
@@ -76,8 +82,25 @@ export default async function handler(
       messages: messagesWithInstruction,
     });
 
+    // Log OpenAI usage
+    if (completion.usage) {
+      await logOpenAIEvent({
+        userId: chat.userId,
+        chatId: chatId,
+        apiType: ApiType.CHAT,
+        model: "gpt-4o-mini",
+        inputTokens: completion.usage.prompt_tokens || 0,
+        outputTokens: completion.usage.completion_tokens || 0,
+        messageCount: messages.length,
+      });
+    }
+
     const reply = completion.choices[0].message?.content ?? "";
-    const { reading, english } = await addReading(reply);
+    const { reading, english } = await addReading(
+      reply,
+      chat.userId,
+      chatId
+    );
     const message = await saveMessage(
       chatId,
       "assistant",
@@ -130,6 +153,15 @@ export default async function handler(
 
     const audioBuffer = Buffer.from(await ttsResponse.arrayBuffer());
 
+    // Log Azure TTS usage
+    await logTTSEvent({
+      userId: chat.userId,
+      chatId: chatId,
+      provider: "AZURE",
+      voice: azureVoiceName,
+      characters: reply.length,
+    });
+
     // 5. 音声とテキストを返す
     res.setHeader("Content-Type", "application/json");
     res.status(200).json({
@@ -174,7 +206,11 @@ export default async function handler(
 }
 
 // Add reading japanese since some might have kanji
-const addReading = async (text: string) => {
+const addReading = async (
+  text: string,
+  userId?: string,
+  chatId?: number
+) => {
   const prompt = `以下の文章の漢字をひらがなに変換してください。
 - 元々ひらがな・カタカナの部分はそのまま残す
 - 句読点などはそのまま残す
@@ -197,6 +233,19 @@ const addReading = async (text: string) => {
       { role: "user", content: text },
     ],
   });
+
+  // Log OpenAI usage for reading/translation
+  if (completion.usage && userId && chatId) {
+    await logOpenAIEvent({
+      userId,
+      chatId,
+      apiType: ApiType.READING_TRANSLATION,
+      model: "gpt-4o-mini",
+      inputTokens: completion.usage.prompt_tokens || 0,
+      outputTokens: completion.usage.completion_tokens || 0,
+    });
+  }
+
   const result = completion.choices[0]?.message?.content ?? "";
 
   try {

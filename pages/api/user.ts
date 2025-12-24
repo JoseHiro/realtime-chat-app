@@ -28,16 +28,24 @@ export default async function handler(
       where: { id: decodedToken.userId },
       select: {
         username: true,
+        email: true,
         subscriptionStatus: true,
         subscriptionPlan: true,
         trialUsedChats: true,
         trialEndsAt: true,
         createdAt: true,
+        stripeSubscriptionId: true,
+        stripeCustomerId: true,
+        _count: {
+          select: {
+            chats: true,
+          },
+        },
       },
     });
     if (!user) return res.status(404).json({ error: "User not found" });
 
-    let trialStatus: "active" | "ended" | null = null;
+    // let trialStatus: "active" | "ended" | null = null;
     // if (user.subscriptionStatus === "trialing") {
     //   const now = new Date();
     //   if (user.trialEndsAt && now > user.trialEndsAt) {
@@ -52,11 +60,13 @@ export default async function handler(
     return res.status(200).json({
       user: {
         username: user.username,
+        email: user.email,
         // subscriptionStatus: user.subscriptionStatus,
         // subscriptionPlan: user.subscriptionPlan,
         createdAt: user.createdAt,
+        totalChats: user._count.chats,
       },
-      trialStatus,
+      // trialStatus,
     });
   } catch (error) {
     console.error(error);
