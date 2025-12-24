@@ -9,6 +9,8 @@ import {
   getVoiceConfig,
   type VoiceGender,
 } from "../../../lib/voice/voiceMapping";
+import { logOpenAIEvent, logTTSEvent } from "../../../lib/cost/logUsageEvent";
+import { ApiType, Provider } from "../../../lib/cost/constants";
 
 const prisma = new PrismaClient();
 const speechKey = process.env.AZURE_API_KEY || "";
@@ -81,9 +83,26 @@ export default async function handler(
       messages: [{ role: "system", content: prompt }],
     });
 
+    // Log OpenAI usage
+    if (completion.usage) {
+      await logOpenAIEvent({
+        userId: decodedToken.userId,
+        chatId: chat.id,
+        apiType: ApiType.CHAT,
+        model: "gpt-4o-mini",
+        inputTokens: completion.usage.prompt_tokens || 0,
+        outputTokens: completion.usage.completion_tokens || 0,
+        messageCount: 1,
+      });
+    }
+
     const raw = completion.choices[0]?.message?.content ?? "";
     const reply = raw.replace(/^\d+\.\s*/, "").trim();
-    const { reading, english } = await addReading(reply);
+    const { reading, english } = await addReading(
+      reply,
+      decodedToken.userId,
+      chat.id
+    );
     const tokenUrl = `https://${serviceRegion}.api.cognitive.microsoft.com/sts/v1.0/issuetoken`;
     const tokenResponse = await fetch(tokenUrl, {
       method: "POST",
@@ -129,6 +148,15 @@ export default async function handler(
     }
 
     const audioBuffer = Buffer.from(await ttsResponse.arrayBuffer());
+
+    // Log Azure TTS usage
+    await logTTSEvent({
+      userId: decodedToken.userId,
+      chatId: chat.id,
+      provider: "AZURE",
+      voice: voiceConfig.azureVoiceName,
+      characters: reply.length,
+    });
 
     // if (process.env.NODE_ENV === "development") {
     //   const usage = completion.usage; // open ai usage
@@ -183,7 +211,11 @@ export default async function handler(
 }
 
 // Add reading japanese since some might have kanji
-const addReading = async (text: string) => {
+const addReading = async (
+  text: string,
+  userId?: string,
+  chatId?: number
+) => {
   const prompt = `以下の日本語を処理してください。出力フォーマットは必ずJSONで次の形にしてください:
 {
   "reading": "ひらがなのみで表記",
@@ -198,6 +230,18 @@ const addReading = async (text: string) => {
       { role: "user", content: text },
     ],
   });
+
+  // Log OpenAI usage for reading/translation
+  if (completion.usage && userId && chatId) {
+    await logOpenAIEvent({
+      userId,
+      chatId,
+      apiType: ApiType.READING_TRANSLATION,
+      model: "gpt-4o-mini",
+      inputTokens: completion.usage.prompt_tokens || 0,
+      outputTokens: completion.usage.completion_tokens || 0,
+    });
+  }
 
   const result = completion.choices[0]?.message?.content ?? "";
 

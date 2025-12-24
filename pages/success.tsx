@@ -38,7 +38,7 @@ const PaymentSuccess = () => {
     //     // 2秒後にリダイレクト
     //     setTimeout(() => {
     //       setIsRedirecting(true);
-    //       router.push("/chat");
+      //       router.push("/new");
     //     }, 2000);
     //   }
     // },
@@ -50,7 +50,7 @@ const PaymentSuccess = () => {
   const handleStartNow = () => {
     if (payment?.subscriptionStatus === "active") {
       setIsRedirecting(true);
-      router.push("/chat");
+      router.push("/new");
     }
   };
 

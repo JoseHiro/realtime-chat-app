@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Pen, User, FileText, FileX } from "lucide-react";
+import { Pen, User, FileText, FileX, Loader2 } from "lucide-react";
 import { StopWatch } from "./StopWatch";
 import { SummaryContent } from "../SummaryContent";
 import { useSpeech } from "../../../context/SpeechContext";
@@ -154,7 +154,7 @@ export const ChatHeader = ({
   };
 
   return (
-    <div className="bg-white border-b border-gray-200 px-6 py-4 shadow-sm sticky top-0 z-10">
+    <div className="bg-white border-gray-200 px-6 py-4 shadow-sm sticky top-0 z-10">
       <div className="mx-auto flex justify-between items-center">
         <div className="flex items-center space-x-4">
           {characterImage ? (
@@ -253,7 +253,15 @@ export const ChatHeader = ({
           {chatPage && (
             <StopWatch history={history} setOverlayOpened={setOverlayOpened} />
           )}
-          {analysis || summary ? (
+          {summaryFetchLoading ? (
+            <button
+              disabled
+              className="p-2.5 rounded-lg bg-gray-100 text-gray-400 cursor-wait"
+              title="Generating Summary..."
+            >
+              <Loader2 className="w-5 h-5 animate-spin" />
+            </button>
+          ) : analysis || summary ? (
             <button
               onClick={() => setOverlayOpened(true)}
               className="p-2.5 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors cursor-pointer"
@@ -281,6 +289,12 @@ export const ChatHeader = ({
       {chatPage && overlayOpened && (
         <Overlay
           onClose={() => {
+            if (summaryFetchLoading) {
+              toast.info("Summary generation in progress", {
+                description: "We'll notify you when your summary is ready.",
+                position: "top-center",
+              });
+            }
             setOverlayOpened(false);
             setSummaryOpened(false);
           }}

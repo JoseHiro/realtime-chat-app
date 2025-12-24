@@ -48,6 +48,15 @@ export async function logOpenAIEvent(
   try {
     const cost = calculateOpenAICost(params.inputTokens, params.outputTokens);
 
+    console.log(`[Usage Tracking] Logging OpenAI event:`, {
+      userId: params.userId,
+      chatId: params.chatId,
+      apiType: params.apiType,
+      inputTokens: params.inputTokens,
+      outputTokens: params.outputTokens,
+      cost: cost,
+    });
+
     await prisma.usageEvent.create({
       data: {
         userId: params.userId,
@@ -65,9 +74,16 @@ export async function logOpenAIEvent(
         responseTime: params.responseTime,
       },
     });
-  } catch (error) {
+
+    console.log(`[Usage Tracking] Successfully logged OpenAI event`);
+  } catch (error: any) {
     // Log error but don't throw - we don't want to break the main flow
     console.error("Failed to log OpenAI usage event:", error);
+    console.error("Error details:", {
+      message: error?.message,
+      code: error?.code,
+      meta: error?.meta,
+    });
   }
 }
 
@@ -80,6 +96,14 @@ export async function logTTSEvent(params: LogTTSEventParams): Promise<void> {
       params.provider === "AZURE"
         ? calculateAzureTTSCost(params.characters)
         : calculateElevenLabsCost(params.characters);
+
+    console.log(`[Usage Tracking] Logging TTS event:`, {
+      userId: params.userId,
+      chatId: params.chatId,
+      provider: params.provider,
+      characters: params.characters,
+      cost: cost,
+    });
 
     await prisma.usageEvent.create({
       data: {
@@ -97,9 +121,16 @@ export async function logTTSEvent(params: LogTTSEventParams): Promise<void> {
         responseTime: params.responseTime,
       },
     });
-  } catch (error) {
+
+    console.log(`[Usage Tracking] Successfully logged TTS event`);
+  } catch (error: any) {
     // Log error but don't throw - we don't want to break the main flow
     console.error("Failed to log TTS usage event:", error);
+    console.error("Error details:", {
+      message: error?.message,
+      code: error?.code,
+      meta: error?.meta,
+    });
   }
 }
 
