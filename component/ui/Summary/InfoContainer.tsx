@@ -2,15 +2,7 @@ import React from "react";
 import { MessageCircle, Award } from "lucide-react";
 import { SectionContainer, SectionDescription } from "./Container";
 
-export const InfoContainer = React.memo(({
-  meta,
-  correctionsLength,
-  enhancementsLength,
-}: {
-  meta: any;
-  correctionsLength: number;
-  enhancementsLength: number;
-}) => {
+export const InfoContainer = React.memo(({ meta }: { meta: any }) => {
   return (
     <div className="space-y-6">
       <SectionContainer
@@ -21,7 +13,8 @@ export const InfoContainer = React.memo(({
           <div>
             <div className="text-sm text-gray-500 mb-2">Topic</div>
             <div className="text-lg text-gray-900 font-medium">
-              {meta?.selectedTopic || "General Conversation"}
+              {meta?.selectedTopic?.charAt(0).toUpperCase() +
+                meta?.selectedTopic?.slice(1) || "Conversation"}
             </div>
           </div>
           <div>
@@ -57,24 +50,6 @@ export const InfoContainer = React.memo(({
             </p>
           )}
         </SectionDescription>
-      </SectionContainer>
-
-      {/* Quick Stats */}
-      <SectionContainer containerName="Performance Metrics">
-        <div className="space-y-3">
-          <div className="flex justify-between items-center py-3 border-b border-gray-100">
-            <span className="text-sm text-gray-600">Corrections Made</span>
-            <span className="text-lg font-semibold text-gray-900">
-              {correctionsLength || 0}
-            </span>
-          </div>
-          <div className="flex justify-between items-center py-3 border-b border-gray-100">
-            <span className="text-sm text-gray-600">Sentence Upgrades</span>
-            <span className="text-lg font-semibold text-gray-900">
-              {enhancementsLength || 0}
-            </span>
-          </div>
-        </div>
       </SectionContainer>
     </div>
   );

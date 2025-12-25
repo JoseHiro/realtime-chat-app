@@ -12,21 +12,11 @@ import mockConversationData from "../../data/mockConversationFeedbackData.json";
 export const Summary = ({ summary }: { summary: SummaryType }) => {
   const [activeTab, setActiveTab] = useState("info");
 
-  // Memoize computed values to prevent unnecessary recalculations
-  const correctionsLength = useMemo(
-    () => summary?.feedback?.corrections?.length || 0,
-    [summary?.feedback?.corrections]
-  );
-
-  const enhancementsLength = useMemo(
-    () => summary?.feedback?.enhancements?.length || 0,
-    [summary?.feedback?.enhancements]
-  );
-
   // Memoize the setActiveTab callback to prevent unnecessary re-renders
   const handleSetActiveTab = useCallback((tabId: string) => {
     setActiveTab(tabId);
   }, []);
+  console.log(summary);
 
   // Use mock data as fallback when conversation data is not available from API
   const conversationData: ConversationReview | null = useMemo(() => {
@@ -34,10 +24,15 @@ export const Summary = ({ summary }: { summary: SummaryType }) => {
       return summary.conversation;
     }
     // Fallback to mock data for testing
-    return {
-      messages: mockConversationData.messages as ConversationReview["messages"],
-      metadata: mockConversationData.metadata,
+    const fallback: ConversationReview = {
+      messages: (mockConversationData as any)
+        .messages as ConversationReview["messages"],
     };
+    if ((mockConversationData as any).metadata) {
+      fallback.metadata = (mockConversationData as any)
+        .metadata as ConversationReview["metadata"];
+    }
+    return fallback;
   }, [summary.conversation]);
 
   return (
@@ -54,31 +49,18 @@ export const Summary = ({ summary }: { summary: SummaryType }) => {
           />
           {/* Main Content Area */}
           <div className="lg:col-span-3">
-            {/* Conversation Info Tab */}
-            {activeTab === "info" && (
-              <InfoContainer
-                meta={summary.meta}
-                correctionsLength={correctionsLength}
-                enhancementsLength={enhancementsLength}
-              />
-            )}
-
-            {/* Analysis Tab - Response Skill, Conversation Flow, Accuracy, Vocabulary */}
+            {activeTab === "info" && <InfoContainer meta={summary.meta} />}
             {activeTab === "analysis" && (
               <AnalysisContainer analysis={summary.analysis} />
             )}
-
-            {/* Feedback & Improvements Tab */}
             {activeTab === "feedback" && (
               <FeedbackContainer feedback={summary.feedback} />
             )}
-
-            {/* Refined Responses Tab */}
             {activeTab === "conversation" &&
               (conversationData && conversationData.messages?.length > 0 ? (
                 <ConversationReviewContainer
                   conversation={conversationData}
-                  characterName={summary?.meta?.characterName}
+                  characterName={(summary?.meta as any)?.characterName}
                 />
               ) : (
                 <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">

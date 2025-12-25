@@ -3,6 +3,16 @@
  * This file ensures the enums are properly accessible
  */
 
-import { Provider, ApiType, EventStatus } from "@prisma/client";
+// Using require to bypass TypeScript module resolution issues
+// Prisma enums are exported as const objects
+const prismaClient = require("@prisma/client");
 
-export { Provider, ApiType, EventStatus };
+// Export enum const objects for runtime values
+export const Provider = prismaClient.Provider;
+export const ApiType = prismaClient.ApiType;
+export const EventStatus = prismaClient.EventStatus;
+
+// Export types
+export type Provider = typeof Provider[keyof typeof Provider];
+export type ApiType = typeof ApiType[keyof typeof ApiType];
+export type EventStatus = typeof EventStatus[keyof typeof EventStatus];

@@ -34,12 +34,6 @@ export const AnalysisContainer = React.memo(({ analysis }: { analysis: any }) =>
                   {analysis.skills.development}
                 </SectionDescription>
               </div>
-              <div className="bg-gray-50 rounded-lg p-4 border-l-4 border-gray-300">
-                <SectionSubTitle title="Example" />
-                <SectionDescription>
-                  {analysis.skills.example}
-                </SectionDescription>
-              </div>
             </div>
           </div>
         </div>
