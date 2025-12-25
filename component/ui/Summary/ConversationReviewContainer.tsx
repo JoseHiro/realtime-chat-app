@@ -5,6 +5,8 @@ import {
   ChevronUp,
   BookOpen,
   User,
+  CheckCircle2,
+  XCircle,
 } from "lucide-react";
 import Image from "next/image";
 import { SectionContainer, SectionDescription } from "./Container";
@@ -26,6 +28,8 @@ export const ConversationReviewContainer = React.memo(
     const [expandedMessages, setExpandedMessages] = useState<Set<number>>(
       new Set()
     );
+
+    console.log("conversation", conversation);
 
     // Handle empty or missing messages
     if (!conversation?.messages || conversation.messages.length === 0) {
@@ -83,6 +87,24 @@ export const ConversationReviewContainer = React.memo(
                         <span className="text-xs text-gray-500">
                           {new Date(message.createdAt).toLocaleTimeString()}
                         </span>
+                        {/* Grammar correctness indicator */}
+                        {typeof (message as any).grammarCorrect ===
+                          "boolean" && (
+                          <div
+                            className="flex items-center"
+                            title={
+                              (message as any).grammarCorrect
+                                ? "Grammatically correct"
+                                : "Grammar needs improvement"
+                            }
+                          >
+                            {(message as any).grammarCorrect ? (
+                              <CheckCircle2 className="w-4 h-4 text-green-500" />
+                            ) : (
+                              <XCircle className="w-4 h-4 text-orange-500" />
+                            )}
+                          </div>
+                        )}
                         <span className="text-xs font-medium text-gray-700">
                           You
                         </span>
@@ -197,7 +219,13 @@ export const ConversationReviewContainer = React.memo(
                                   {/* Improved Sentence */}
                                   <div>
                                     <SectionSubTitle
-                                      title={`Option ${impIndex + 1}`}
+                                      title={
+                                        impIndex === 2
+                                          ? `Option ${
+                                              impIndex + 1
+                                            } - Conversation Development`
+                                          : `Option ${impIndex + 1}`
+                                      }
                                     />
                                     <SectionDescription>
                                       <div className="space-y-1">

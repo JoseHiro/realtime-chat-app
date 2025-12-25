@@ -3,24 +3,37 @@
  * Handles all API call tracking with proper error handling
  */
 
-import { PrismaClient, Provider, ApiType, EventStatus } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
+import { Provider, ApiType, EventStatus } from "./constants";
+import type {
+  Provider as ProviderType,
+  ApiType as ApiTypeType,
+  EventStatus as EventStatusType,
+} from "./constants";
 import {
   calculateOpenAICost,
   calculateAzureTTSCost,
   calculateElevenLabsCost,
 } from "./calculateCost";
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient() as PrismaClient & {
+  usageEvent: {
+    create: (args: any) => Promise<any>;
+    findMany: (args?: any) => Promise<any>;
+    findUnique: (args: any) => Promise<any>;
+    count: (args?: any) => Promise<number>;
+  };
+};
 
 export interface LogOpenAIEventParams {
   userId: string;
   chatId?: number;
-  apiType: ApiType;
+  apiType: ApiTypeType;
   model: string;
   inputTokens: number;
   outputTokens: number;
   messageCount?: number;
-  status?: EventStatus;
+  status?: EventStatusType;
   errorCode?: string;
   requestId?: string;
   responseTime?: number;
@@ -33,7 +46,7 @@ export interface LogTTSEventParams {
   voice: string;
   characters: number;
   audioSeconds?: number;
-  status?: EventStatus;
+  status?: EventStatusType;
   errorCode?: string;
   requestId?: string;
   responseTime?: number;
@@ -109,7 +122,8 @@ export async function logTTSEvent(params: LogTTSEventParams): Promise<void> {
       data: {
         userId: params.userId,
         chatId: params.chatId,
-        provider: params.provider === "AZURE" ? Provider.AZURE : Provider.ELEVENLABS,
+        provider:
+          params.provider === "AZURE" ? Provider.AZURE : Provider.ELEVENLABS,
         apiType: ApiType.TTS,
         status: params.status || EventStatus.SUCCESS,
         voice: params.voice,
@@ -140,8 +154,8 @@ export async function logTTSEvent(params: LogTTSEventParams): Promise<void> {
 export async function logFailedEvent(
   userId: string,
   chatId: number | undefined,
-  provider: Provider,
-  apiType: ApiType,
+  provider: ProviderType,
+  apiType: ApiTypeType,
   errorCode: string,
   errorMessage?: string
 ): Promise<void> {

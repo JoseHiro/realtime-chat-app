@@ -115,6 +115,7 @@ export type ConversationMessage = {
   reading?: string;
   english?: string;
   createdAt: string;
+  grammarCorrect?: boolean; // true if grammatically correct, false if has errors (only for user messages)
   improvements?: MessageImprovement[];
 };
 
@@ -158,7 +159,6 @@ export type Analysis = {
     flow: string;
     comprehension: string;
     development: string;
-    example: string;
   };
   vocabulary: {
     verbs: {
@@ -192,12 +192,6 @@ export type Feedback = {
   strengths: string[];
   improvements: string[];
   commonMistakes: string[];
-  corrections: {
-    advice: string;
-    before: string;
-    after: string;
-  }[];
-  enhancements: SentenceUpgrade[];
 };
 
 export type Milestone = {
