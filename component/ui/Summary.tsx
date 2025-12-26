@@ -21,6 +21,7 @@ export const Summary = ({
   const handleSetActiveTab = useCallback((tabId: string) => {
     setActiveTab(tabId);
   }, []);
+  console.log(summary);
 
   // Use mock data as fallback when conversation data is not available from API
   const conversationData: ConversationReview | null = useMemo(() => {
@@ -28,10 +29,15 @@ export const Summary = ({
       return summary.conversation;
     }
     // Fallback to mock data for testing
-    return {
-      messages: mockConversationData.messages as ConversationReview["messages"],
-      metadata: mockConversationData.metadata,
+    const fallback: ConversationReview = {
+      messages: (mockConversationData as any)
+        .messages as ConversationReview["messages"],
     };
+    if ((mockConversationData as any).metadata) {
+      fallback.metadata = (mockConversationData as any)
+        .metadata as ConversationReview["metadata"];
+    }
+    return fallback;
   }, [summary.conversation]);
 
   return (
@@ -57,8 +63,6 @@ export const Summary = ({
                 feedback={summary.feedback}
               />
             )}
-
-            {/* Refined Responses Tab */}
             {activeTab === "conversation" &&
               (conversationData && conversationData.messages?.length > 0 ? (
                 <ConversationReviewContainer
