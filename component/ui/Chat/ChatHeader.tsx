@@ -282,7 +282,7 @@ export const ChatHeader = ({
 
       {!chatPage && overlayOpened && (
         <Overlay onClose={() => setOverlayOpened(false)}>
-          <Summary summary={analysis} />
+          <Summary summary={analysis} characterName={characterName} />
         </Overlay>
       )}
 

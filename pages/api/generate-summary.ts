@@ -142,9 +142,7 @@ export default async function handler(
     - Only include Japanese sentences with grammatical errors or unnatural expressions. Do not include correct sentences or stylistic variations.
     - Provide detailed, specific feedback, not vague comments.
     - All evaluations and explanations are in English except the Japanese learner sentences.
-    - Japanese sentence corrections must preserve the indicated politeness (casual/formal).
-    - vocabularySuggestions: include words the learner should learn or use more frequently.
-    `;
+    - Japanese sentence corrections must preserve the indicated politeness (casual/formal).    `;
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
@@ -225,7 +223,6 @@ export default async function handler(
         conjunctions: conjunctionsArray.slice(0, 4),
       };
       parsed.analysis.vocabulary = vocabularyAnalysis;
-      console.log(parsed, "--------------------------------------");
     }
 
     await increaseChatCount(decodedToken.userId);

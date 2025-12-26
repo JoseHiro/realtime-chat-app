@@ -1,16 +1,14 @@
 import React, { useCallback } from "react";
 import {
   MessageCircle,
-  Target,
-  AlertCircle,
+  BarChart3,
   TrendingUp,
   MessageSquare,
 } from "lucide-react";
 
 const tabs = [
   { id: "info", label: "Conversation Info", icon: MessageCircle },
-  { id: "analysis", label: "Analysis", icon: Target },
-  { id: "feedback", label: "Feedback & Corrections", icon: AlertCircle },
+  { id: "performance", label: "Performance", icon: BarChart3 },
   { id: "conversation", label: "Refined Responses", icon: MessageSquare },
   { id: "milestone", label: "Growth Path", icon: TrendingUp },
 ];
