@@ -15,7 +15,9 @@ export const SectionHeader = ({ meta }: { meta: any }) => {
                 {meta?.title || "Learning Summary"}
               </h1>
               <p className="text-sm text-gray-500 mt-0.5">
-                {meta?.selectedTopic || "Conversation"} •{" "}
+                {meta?.selectedTopic?.charAt(0).toUpperCase() +
+                  meta?.selectedTopic?.slice(1) || "Conversation"}{" "}
+                •{" "}
                 {typeof meta?.level === "object"
                   ? meta.level.label
                   : meta?.level || "N5"}{" "}

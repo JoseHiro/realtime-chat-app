@@ -3,25 +3,19 @@ import { SummaryType, ConversationReview } from "../../type/types";
 import { SummaryNavigation } from "./Summary/SummaryNavigation";
 import { SectionHeader } from "./Summary/SectionHeader";
 import { InfoContainer } from "./Summary/InfoContainer";
-import { AnalysisContainer } from "./Summary/AnalysisContainer";
-import { FeedbackContainer } from "./Summary/FeedbackContainer";
+import { PerformanceContainer } from "./Summary/PerformanceContainer";
 import { ConversationReviewContainer } from "./Summary/ConversationReviewContainer";
 import { MilestoneContainer } from "./Summary/MilestoneContainer";
 import mockConversationData from "../../data/mockConversationFeedbackData.json";
 
-export const Summary = ({ summary }: { summary: SummaryType }) => {
+export const Summary = ({
+  summary,
+  characterName,
+}: {
+  summary: SummaryType;
+  characterName?: string;
+}) => {
   const [activeTab, setActiveTab] = useState("info");
-
-  // Memoize computed values to prevent unnecessary recalculations
-  const correctionsLength = useMemo(
-    () => summary?.feedback?.corrections?.length || 0,
-    [summary?.feedback?.corrections]
-  );
-
-  const enhancementsLength = useMemo(
-    () => summary?.feedback?.enhancements?.length || 0,
-    [summary?.feedback?.enhancements]
-  );
 
   // Memoize the setActiveTab callback to prevent unnecessary re-renders
   const handleSetActiveTab = useCallback((tabId: string) => {
@@ -44,7 +38,6 @@ export const Summary = ({ summary }: { summary: SummaryType }) => {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <SectionHeader meta={summary?.meta} />
-
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="grid lg:grid-cols-4 gap-6">
           {/* Left Sidebar Navigation */}
@@ -55,22 +48,14 @@ export const Summary = ({ summary }: { summary: SummaryType }) => {
           {/* Main Content Area */}
           <div className="lg:col-span-3">
             {/* Conversation Info Tab */}
-            {activeTab === "info" && (
-              <InfoContainer
-                meta={summary.meta}
-                correctionsLength={correctionsLength}
-                enhancementsLength={enhancementsLength}
+            {activeTab === "info" && <InfoContainer meta={summary.meta} />}
+
+            {/* Performance Tab - Overview, Strengths, Improvements, Vocabulary */}
+            {activeTab === "performance" && (
+              <PerformanceContainer
+                analysis={summary.analysis}
+                feedback={summary.feedback}
               />
-            )}
-
-            {/* Analysis Tab - Response Skill, Conversation Flow, Accuracy, Vocabulary */}
-            {activeTab === "analysis" && (
-              <AnalysisContainer analysis={summary.analysis} />
-            )}
-
-            {/* Feedback & Improvements Tab */}
-            {activeTab === "feedback" && (
-              <FeedbackContainer feedback={summary.feedback} />
             )}
 
             {/* Refined Responses Tab */}
@@ -78,7 +63,7 @@ export const Summary = ({ summary }: { summary: SummaryType }) => {
               (conversationData && conversationData.messages?.length > 0 ? (
                 <ConversationReviewContainer
                   conversation={conversationData}
-                  characterName={summary?.meta?.characterName}
+                  characterName={characterName || undefined}
                 />
               ) : (
                 <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
