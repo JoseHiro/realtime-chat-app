@@ -83,33 +83,45 @@ export const ConversationReviewContainer = React.memo(
                   // User message - aligned to right
                   <div className="flex items-start justify-end space-x-3">
                     <div className="flex-1 min-w-0 max-w-[80%]">
-                      <div className="flex items-center justify-end space-x-2 mb-1">
-                        <span className="text-xs text-gray-500">
-                          {new Date(message.createdAt).toLocaleTimeString()}
-                        </span>
-                        {/* Grammar correctness indicator */}
-                        {typeof (message as any).grammarCorrect ===
-                          "boolean" && (
-                          <div
-                            className="flex items-center"
-                            title={
-                              (message as any).grammarCorrect
-                                ? "Grammatically correct"
-                                : "Grammar needs improvement"
-                            }
-                          >
-                            {(message as any).grammarCorrect ? (
-                              <CheckCircle2 className="w-4 h-4 text-green-500" />
-                            ) : (
-                              <XCircle className="w-4 h-4 text-orange-500" />
-                            )}
-                          </div>
-                        )}
-                        <span className="text-xs font-medium text-gray-700">
-                          You
-                        </span>
+                      <div className="flex flex-col items-end space-y-1 mb-1">
+                        <div className="flex items-center justify-end space-x-2">
+                          <span className="text-xs text-gray-500">
+                            {new Date(message.createdAt).toLocaleTimeString([], {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </span>
+                          {/* Grammar correctness indicator */}
+                          {typeof (message as any).grammarCorrect ===
+                            "boolean" && (
+                            <div
+                              className="flex items-center"
+                              title={
+                                (message as any).grammarCorrect
+                                  ? "Grammatically correct"
+                                  : "Grammar needs improvement"
+                              }
+                            >
+                              {(message as any).grammarCorrect ? (
+                                <CheckCircle2 className="w-4 h-4 text-green-500" />
+                              ) : (
+                                <XCircle className="w-4 h-4 text-orange-500" />
+                              )}
+                            </div>
+                          )}
+                          <span className="text-xs font-medium text-gray-700">
+                            You
+                          </span>
+                        </div>
+                        {/* Grammar reason - show when grammar is incorrect */}
+                        {(message as any).grammarCorrect === false &&
+                          (message as any).grammarReason && (
+                            <div className="text-xs text-orange-600 italic max-w-full">
+                              {(message as any).grammarReason}
+                            </div>
+                          )}
                       </div>
-                      <div className="bg-blue-50 rounded-lg p-3 border border-blue-100">
+                      <div className="rounded-lg p-3 border border-black">
                         <SectionDescription>
                           <div className="space-y-1">
                             <p className="text-sm text-gray-900 font-medium">
@@ -157,7 +169,10 @@ export const ConversationReviewContainer = React.memo(
                           {characterName || "Assistant"}
                         </span>
                         <span className="text-xs text-gray-500">
-                          {new Date(message.createdAt).toLocaleTimeString()}
+                          {new Date(message.createdAt).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
                         </span>
                       </div>
                       <SectionDescription>
@@ -186,23 +201,25 @@ export const ConversationReviewContainer = React.memo(
                   message.improvements &&
                   message.improvements.length > 0 && (
                     <div className="mr-11">
-                      <button
-                        onClick={() => toggleMessage(message.id)}
-                        className="flex items-center space-x-2 text-xs font-medium text-gray-700 hover:text-gray-900 mb-3 transition-colors"
-                      >
-                        <BookOpen className="w-3 h-3" />
-                        <span>
-                          {message.improvements.length} Improved
-                          {message.improvements.length > 1
-                            ? " Options"
-                            : " Option"}
-                        </span>
-                        {isMessageExpanded(message.id) ? (
-                          <ChevronUp className="w-3 h-3" />
-                        ) : (
-                          <ChevronDown className="w-3 h-3" />
-                        )}
-                      </button>
+                      <div className="flex justify-end space-x-2">
+                        <button
+                          onClick={() => toggleMessage(message.id)}
+                          className="flex items-center space-x-2 text-xs font-medium text-gray-700 hover:text-gray-900 mb-3 transition-colors"
+                        >
+                          <BookOpen className="w-3 h-3" />
+                          <span>
+                            {message.improvements.length} Improved
+                            {message.improvements.length > 1
+                              ? " Options"
+                              : " Option"}
+                          </span>
+                          {isMessageExpanded(message.id) ? (
+                            <ChevronUp className="w-3 h-3" />
+                          ) : (
+                            <ChevronDown className="w-3 h-3" />
+                          )}
+                        </button>
+                      </div>
 
                       {isMessageExpanded(message.id) && (
                         <div className="space-y-3">
@@ -213,7 +230,7 @@ export const ConversationReviewContainer = React.memo(
                             ) => (
                               <div
                                 key={impIndex}
-                                className="bg-gray-50 rounded-lg p-4 border-l-4 border-gray-300"
+                                className="bg-gray-50 rounded-lg p-4 border-green-300 border-1"
                               >
                                 <div className="space-y-3">
                                   {/* Improved Sentence */}
@@ -245,15 +262,15 @@ export const ConversationReviewContainer = React.memo(
                                   {/* Grammar Focus */}
                                   {improvement.focus && (
                                     <div>
-                                      <div className="flex items-center space-x-2 mb-2">
+                                      <div className="flex items-center space-x-2 mb-1">
                                         <BookOpen className="w-3 h-3 text-gray-500" />
-                                        <SectionSubTitle title="Grammar Focus" />
-                                      </div>
-                                      <SectionDescription>
-                                        <p className="text-xs text-gray-700 leading-relaxed">
-                                          {improvement.focus}
+                                        <p className="text-xs text-gray-500">
+                                          Grammar Focus
                                         </p>
-                                      </SectionDescription>
+                                      </div>
+                                      <p className="text-xs text-gray-700 leading-relaxed">
+                                        {improvement.focus}
+                                      </p>
                                     </div>
                                   )}
 
@@ -305,16 +322,6 @@ export const ConversationReviewContainer = React.memo(
                   {conversation.metadata.improvementsGenerated}
                 </span>
               </div>
-              {conversation.metadata.generatedAt && (
-                <div className="flex justify-between items-center py-2">
-                  <span className="text-sm text-gray-600">Generated At</span>
-                  <span className="text-sm font-semibold text-gray-900">
-                    {new Date(
-                      conversation.metadata.generatedAt
-                    ).toLocaleString()}
-                  </span>
-                </div>
-              )}
             </div>
           </SectionContainer>
         )}

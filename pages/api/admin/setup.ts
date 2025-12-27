@@ -20,7 +20,7 @@ export default async function handler(
 
   try {
     const email = "admin@yahoo.co.jp";
-    const password = "Admin1234!";
+    const password = "Admin2025!";
 
     // Check if user exists
     const existingUser = await prisma.user.findUnique({

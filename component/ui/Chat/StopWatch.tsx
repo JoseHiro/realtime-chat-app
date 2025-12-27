@@ -11,7 +11,7 @@ export const StopWatch = ({
   history: any;
   setOverlayOpened: (value: boolean) => void;
 }) => {
-  const [timeLeft, setTimeLeft] = useState(5 * 10);
+  const [timeLeft, setTimeLeft] = useState(3 * 60);
   const [isActive, setIsActive] = useState(true);
   const summaryCreatedRef = useRef(false);
 

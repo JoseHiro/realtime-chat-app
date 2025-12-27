@@ -59,17 +59,39 @@ const AccountSettings = () => {
     try {
       const response = (await apiRequest("/api/user/update-username", {
         method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({ username }),
-      })) as { message: string; user: { username: string } };
-      setUserData((prev) =>
-        prev
-          ? {
-              ...prev,
-              user: { ...prev.user, username: response.user.username },
-            }
-          : null
-      );
-      toast.success("Username updated successfully!");
+      })) as { message?: string; user?: { username: string } } | null;
+
+      if (!response) {
+        toast.error("Failed to update username");
+        return;
+      }
+
+      if (response.user?.username) {
+        setUserData((prev) =>
+          prev
+            ? {
+                ...prev,
+                user: { ...prev.user, username: response.user!.username },
+              }
+            : null
+        );
+        toast.success("Username updated successfully!");
+      } else {
+        // Fallback: use the username from the form if response doesn't have it
+        setUserData((prev) =>
+          prev
+            ? {
+                ...prev,
+                user: { ...prev.user, username: username.trim() },
+              }
+            : null
+        );
+        toast.success("Username updated successfully!");
+      }
     } catch (error: any) {
       toast.error(error.message || "Failed to update username");
     } finally {
@@ -97,6 +119,9 @@ const AccountSettings = () => {
     try {
       await apiRequest("/api/user/update-password", {
         method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({ currentPassword, newPassword }),
       });
       toast.success("Password updated successfully!");
