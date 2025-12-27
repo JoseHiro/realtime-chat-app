@@ -90,7 +90,11 @@ const ChatPage = () => {
                     />
                   )}
                   {message.sender === "user" && (
-                    <UserMessageBox id={index} text={message.message} />
+                    <UserMessageBox
+                      id={index}
+                      text={message.message}
+                      reading={message.reading || undefined}
+                    />
                   )}
                   <TimeStamp time={message.createdAt} />
                 </div>

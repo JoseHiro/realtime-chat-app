@@ -77,7 +77,7 @@ export const Messages = ({
             />
           )}
           {message.role === "user" && (
-            <UserMessageBox id={id} text={message.content} />
+            <UserMessageBox id={id} text={message.content} reading={undefined} />
           )}
           {/* <div
             className={`max-w-md lg:max-w-2xl transform transition-all duration-300 ${

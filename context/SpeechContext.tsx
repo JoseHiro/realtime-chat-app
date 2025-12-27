@@ -30,6 +30,8 @@ interface SpeechContextType {
   setIsMuted: React.Dispatch<React.SetStateAction<boolean>>;
   voiceGender: "male" | "female";
   setVoiceGender: React.Dispatch<React.SetStateAction<"male" | "female">>;
+  showHiragana: boolean;
+  setShowHiragana: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const SpeechContext = createContext<SpeechContextType>({
@@ -61,6 +63,8 @@ const SpeechContext = createContext<SpeechContextType>({
   setIsMuted: () => {},
   voiceGender: "female",
   setVoiceGender: () => {},
+  showHiragana: false,
+  setShowHiragana: () => {},
 });
 
 //
@@ -87,6 +91,7 @@ export const SpeechProvider: React.FC<{ children: React.ReactNode }> = ({
   const [summaryFetchLoading, setSummaryFetchLoading] = useState(false); // summary generating loading
   const [isMuted, setIsMuted] = useState(false); // speech mute mode
   const [voiceGender, setVoiceGender] = useState<"male" | "female">("female"); // voice gender preference
+  const [showHiragana, setShowHiragana] = useState(false); // show/hide hiragana reading for user messages
 
   return (
     <SpeechContext.Provider
@@ -119,6 +124,8 @@ export const SpeechProvider: React.FC<{ children: React.ReactNode }> = ({
         setIsMuted,
         voiceGender,
         setVoiceGender,
+        showHiragana,
+        setShowHiragana,
       }}
     >
       {children}

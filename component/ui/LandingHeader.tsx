@@ -33,12 +33,12 @@ export const LandingHeader = () => {
             >
               Features
             </a>
-            <a
-              href="#how-it-works"
+            <Link
+              href="/how-it-works"
               className="text-gray-600 hover:text-green-600 transition-colors duration-200"
             >
               How it Works
-            </a>
+            </Link>
             <Link
               href="/pricing"
               className="text-gray-600 hover:text-green-600 transition-colors duration-200"

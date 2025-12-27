@@ -9,12 +9,24 @@ export const InfoContainer = React.memo(({ meta }: { meta: any }) => {
         containerName="Conversation Information"
         icon={MessageCircle}
       >
-        <div className="grid md:grid-cols-2 gap-6 mb-6">
+        <div className="grid md:grid-cols-3 gap-6 mb-6">
           <div>
             <div className="text-sm text-gray-500 mb-2">Topic</div>
             <div className="text-lg text-gray-900 font-medium">
               {meta?.selectedTopic?.charAt(0).toUpperCase() +
                 meta?.selectedTopic?.slice(1) || "Conversation"}
+            </div>
+          </div>
+          <div>
+            <div className="text-sm text-gray-500 mb-2">Date</div>
+            <div className="text-lg text-gray-900 font-medium">
+              {meta?.createdAt
+                ? new Date(meta.createdAt).toLocaleDateString([], {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })
+                : "N/A"}
             </div>
           </div>
           <div>

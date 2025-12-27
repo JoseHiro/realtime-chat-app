@@ -194,12 +194,13 @@ export default async function handler(
 
     const title = parsed.meta?.title || "Untitled Conversation";
     const chat = await storeChatTitle(chatId, title);
-    const { level, theme, time } = chat;
+    const { level, theme, time, createdAt } = chat;
 
     if (parsed.meta) {
       parsed.meta.selectedLevel = level;
       parsed.meta.selectedTopic = theme;
       parsed.meta.chatDuration = time;
+      parsed.meta.createdAt = createdAt;
     }
 
     if (parsed.analysis) {
@@ -277,7 +278,7 @@ const storeChatTitle = async (chatId: number, title: string) => {
   console.log("Updating chat title to:", title);
   const chat = await prisma.chat.update({
     where: { id: chatId },
-    data: { title },
+    data: { title, time: 3 },
   });
 
   return chat;
@@ -338,7 +339,8 @@ CRITICAL RULES:
 - Output ONLY valid JSON object, no explanations, markdown, code blocks, or backticks
 - For EACH user message below, provide:
   1. grammarCorrect: boolean - true if the message is grammatically correct, false if there are grammar errors
-  2. EXACTLY 3 improvement suggestions:
+  2. grammarReason: string (only when grammarCorrect is false) - brief explanation in English of why the grammar is incorrect (e.g., "Wrong particle usage: should use を instead of が", "Missing subject marker は", "Verb conjugation error")
+  3. EXACTLY 3 improvement suggestions:
      - Improvements 1-2: Grammar/vocabulary improvements (more natural or advanced ways to express the same idea)
      - Improvement 3: Conversation development (show how to ask back or develop the conversation further)
 
@@ -397,6 +399,7 @@ Output format (JSON only - return ONLY user messages with improvements):
     {
       "id": <user message id>,
       "grammarCorrect": <true if grammatically correct, false if has errors>,
+      "grammarReason": <if grammarCorrect is false, provide a brief explanation in English of why it's incorrect (e.g., "Wrong particle usage: should use を instead of が"), if true, omit this field>,
       "improvements": [
         {
           "text": "<grammar/vocabulary improvement with kanji>",
@@ -464,6 +467,7 @@ IMPORTANT:
       // Extract improvements and grammarCorrect from AI response
       const improvementsByMessageId: Record<number, any[]> = {};
       const grammarCorrectByMessageId: Record<number, boolean> = {};
+      const grammarReasonByMessageId: Record<number, string> = {};
 
       if (parsed.messages && Array.isArray(parsed.messages)) {
         parsed.messages.forEach((msg: any) => {
@@ -471,6 +475,10 @@ IMPORTANT:
             // Store grammar correctness flag
             if (typeof msg.grammarCorrect === "boolean") {
               grammarCorrectByMessageId[msg.id] = msg.grammarCorrect;
+              // Store grammar reason if provided and grammarCorrect is false
+              if (msg.grammarCorrect === false && msg.grammarReason) {
+                grammarReasonByMessageId[msg.id] = msg.grammarReason;
+              }
             } else {
               // Default to true if not specified
               grammarCorrectByMessageId[msg.id] = true;
@@ -499,6 +507,14 @@ IMPORTANT:
 
           // Add grammar correctness (default to true if not analyzed)
           result.grammarCorrect = grammarCorrectByMessageId[msg.id] ?? true;
+
+          // Add grammar reason if grammar is incorrect
+          if (
+            result.grammarCorrect === false &&
+            grammarReasonByMessageId[msg.id]
+          ) {
+            result.grammarReason = grammarReasonByMessageId[msg.id];
+          }
 
           // Add improvements if available
           if (improvementsByMessageId[msg.id]) {

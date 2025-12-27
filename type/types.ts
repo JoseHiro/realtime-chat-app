@@ -116,6 +116,7 @@ export type ConversationMessage = {
   english?: string;
   createdAt: string;
   grammarCorrect?: boolean; // true if grammatically correct, false if has errors (only for user messages)
+  grammarReason?: string; // explanation in English of why grammar is incorrect (only when grammarCorrect is false)
   improvements?: MessageImprovement[];
 };
 
@@ -151,6 +152,7 @@ export type Meta = {
   selectedLevel: string;
   selectedTopic: string;
   chatDuration: number;
+  createdAt?: string | Date;
 };
 
 export type Analysis = {

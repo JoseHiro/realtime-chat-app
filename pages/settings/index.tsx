@@ -174,7 +174,7 @@ const SettingsIndex = () => {
                   <button
                     key={card.title}
                     onClick={() => router.push(card.href)}
-                    className={`w-full p-4 rounded-lg border-2 ${card.color} transition-all duration-200 text-left group`}
+                    className={`w-full p-4 rounded-lg border-1 ${card.color} transition-all duration-200 text-left group`}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4">

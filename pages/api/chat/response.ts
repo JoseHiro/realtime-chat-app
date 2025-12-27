@@ -1,7 +1,6 @@
 // Generate response for a chat application using OpenAI and Azure TTS
 import type { NextApiRequest, NextApiResponse } from "next";
 import { OpenAI } from "openai";
-// import { logUsage } from "../../../lib/loggingData/logger";
 import { saveMessage } from "../../../lib/message/messageService";
 import { PrismaClient } from "@prisma/client";
 import {
@@ -10,7 +9,7 @@ import {
   type CharacterName,
 } from "../../../lib/voice/voiceMapping";
 import { logOpenAIEvent, logTTSEvent } from "../../../lib/cost/logUsageEvent";
-import { ApiType, Provider } from "../../../lib/cost/constants";
+import { ApiType } from "../../../lib/cost/constants";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 const speechKey = process.env.AZURE_API_KEY || "";
@@ -27,8 +26,7 @@ export default async function handler(
   }
 
   try {
-    const { messages, politeness, level, checkGrammarMode, chatId } =
-      req.body;
+    const { messages, politeness, level, checkGrammarMode, chatId } = req.body;
 
     // Fetch chat to get character name and userId
     const chat = await prisma.chat.findUnique({
@@ -69,7 +67,7 @@ export default async function handler(
       `,
     };
 
-    console.log(messages);
+    // console.log(messages);
 
     const messagesWithInstruction = [
       systemMessage,
@@ -96,11 +94,7 @@ export default async function handler(
     }
 
     const reply = completion.choices[0].message?.content ?? "";
-    const { reading, english } = await addReading(
-      reply,
-      chat.userId,
-      chatId
-    );
+    const { reading, english } = await addReading(reply, chat.userId, chatId);
     const message = await saveMessage(
       chatId,
       "assistant",
@@ -206,11 +200,7 @@ export default async function handler(
 }
 
 // Add reading japanese since some might have kanji
-const addReading = async (
-  text: string,
-  userId?: string,
-  chatId?: number
-) => {
+const addReading = async (text: string, userId?: string, chatId?: number) => {
   const prompt = `以下の文章の漢字をひらがなに変換してください。
 - 元々ひらがな・カタカナの部分はそのまま残す
 - 句読点などはそのまま残す

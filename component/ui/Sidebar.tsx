@@ -238,7 +238,7 @@ export const Sidebar = () => {
             <button
               onClick={() => handleGoToSelectMode()}
               className={`
-                flex items-center gap-3 p-4 rounded-xl bg-white text-gray-700 mb-4 hover:bg-gray-100 transition-all duration-200 shadow-sm border border-gray-200 cursor-pointer
+                flex items-center gap-3 p-4 rounded-xl bg-white text-gray-600 mb-4 hover:bg-gray-100 transition-all duration-200 shadow-sm border border-gray-200 cursor-pointer
                 ${
                   isCollapsed
                     ? "justify-center border-none shadow-none px-2 py-2"

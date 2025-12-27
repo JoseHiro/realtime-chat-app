@@ -14,38 +14,48 @@ datasource db {
 }
 
 model User {
-  id       String   @id @default(uuid())
-  email    String   @unique
-  username String?
-  password  String
-  chats     Chat[]
-  createdAt DateTime @default(now())
-  isAdmin   Boolean  @default(false)
-  usageEvents UsageEvent[]
+  id                 String              @id @default(uuid())
+  email              String              @unique
+  username           String?
+  password           String
+  chats              Chat[]
+  createdAt          DateTime            @default(now())
+  isAdmin            Boolean             @default(false)
+  usageEvents        UsageEvent[]
+  creditTransactions CreditTransaction[]
 
   // Stripe-related fields
   stripeCustomerId     String?   @unique
   stripeSubscriptionId String?   @unique
-  subscriptionStatus   String?   // e.g. "trialing", "active", "canceled", "past_due"
-  subscriptionPlan     String?   // e.g. "free", "trial", "pro"
-  trialUsedChats   Int　@default(0)
-  trialEndsAt DateTime?  // null if no trial
+  subscriptionStatus   String? // e.g. "trialing", "active", "canceled", "past_due"
+  subscriptionPlan     String? // e.g. "free", "trial", "pro", "premium"
+  trialUsedChats       Int       @default(0)
+  trialEndsAt          DateTime? // null if no trial
+
+  // Credit system fields
+  creditsRemaining  Int       @default(0)
+  lastCreditResetAt DateTime?
 }
 
 model Chat {
-  id       Int      @id @default(autoincrement())
-  user     User      @relation(fields: [userId], references: [id])
-  userId   String
-  title    String?
-  message  Message[]
-  theme    String?
-  politeness String?
-  level    String?
-  characterName String? // e.g. "Sakura" (female) or "Ken" (male)
-  time     Int?
-  createdAt DateTime @default(now())
-  analysis   Analysis?
-  usageEvents UsageEvent[]
+  id                 Int                 @id @default(autoincrement())
+  user               User                @relation(fields: [userId], references: [id])
+  userId             String
+  title              String?
+  message            Message[]
+  theme              String?
+  politeness         String?
+  level              String?
+  characterName      String? // e.g. "Sakura" (female) or "Ken" (male)
+  time               Int? // Duration in minutes (3, 5, 10)
+  createdAt          DateTime            @default(now())
+  analysis           Analysis?
+  usageEvents        UsageEvent[]
+  creditTransactions CreditTransaction[]
+
+  // Credit system fields
+  voiceProvider String? // "azure" or "elevenlabs"
+  creditsUsed   Int?
 }
 
 model Message {
@@ -54,8 +64,8 @@ model Message {
   chatId    Int
   sender    String
   message   String
-  reading  String?
-  english  String?
+  reading   String?
+  english   String?
   createdAt DateTime @default(now())
 }
 
@@ -88,31 +98,57 @@ enum EventStatus {
   RATE_LIMITED
 }
 
+enum CreditTransactionType {
+  ALLOCATION
+  USAGE
+  TOPUP
+  REFUND
+  ADJUSTMENT
+}
+
 model UsageEvent {
-  id          Int       @id @default(autoincrement())
-  userId      String
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  chatId      Int?
-  chat        Chat?     @relation(fields: [chatId], references: [id], onDelete: Cascade)
-  provider    Provider
-  apiType     ApiType
-  status      EventStatus @default(SUCCESS)
-  model       String?
-  voice       String?
-  inputTokens Int?
+  id           Int         @id @default(autoincrement())
+  userId       String
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chatId       Int?
+  chat         Chat?       @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  provider     Provider
+  apiType      ApiType
+  status       EventStatus @default(SUCCESS)
+  model        String?
+  voice        String?
+  inputTokens  Int?
   outputTokens Int?
-  characters  Int?
+  characters   Int?
   audioSeconds Int?
-  costUsd     Decimal   @db.Decimal(10, 6)
-  requestId   String?
+  costUsd      Decimal     @db.Decimal(10, 6)
+  requestId    String?
   responseTime Int?
   messageCount Int?
-  errorCode   String?
-  createdAt   DateTime  @default(now())
+  errorCode    String?
+  createdAt    DateTime    @default(now())
 
   @@index([userId, createdAt])
   @@index([chatId])
   @@index([provider, apiType])
   @@index([createdAt])
   @@index([status])
+}
+
+model CreditTransaction {
+  id           Int                   @id @default(autoincrement())
+  userId       String
+  user         User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chatId       Int?
+  chat         Chat?                 @relation(fields: [chatId], references: [id], onDelete: SetNull)
+  type         CreditTransactionType
+  amount       Int // Positive for additions, negative for deductions
+  balanceAfter Int // Credit balance after this transaction
+  description  String?
+  createdAt    DateTime              @default(now())
+
+  @@index([userId, createdAt])
+  @@index([chatId])
+  @@index([type])
+  @@index([createdAt])
 }

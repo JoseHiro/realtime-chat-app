@@ -70,7 +70,7 @@ export default async function handler(
         politeness: politeness,
         level: level,
         characterName: characterName,
-        time: 1,
+        time: 3,
       },
     });
 
@@ -211,11 +211,7 @@ export default async function handler(
 }
 
 // Add reading japanese since some might have kanji
-const addReading = async (
-  text: string,
-  userId?: string,
-  chatId?: number
-) => {
+const addReading = async (text: string, userId?: string, chatId?: number) => {
   const prompt = `以下の日本語を処理してください。出力フォーマットは必ずJSONで次の形にしてください:
 {
   "reading": "ひらがなのみで表記",
