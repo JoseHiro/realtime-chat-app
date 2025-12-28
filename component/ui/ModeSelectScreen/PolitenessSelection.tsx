@@ -17,44 +17,56 @@ export const PolitenessSelection = ({
   iconMap,
 }: PolitenessSelectionProps) => {
   return (
-    <div className="mb-4">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl text-gray-700 mb-2 mt-10">Speaking Style</h2>
+    <div className="max-w-5xl mx-auto py-4">
+      {/* Header */}
+      <div className="flex justify-between items-center gap-2">
+        <div className="mb-4">
+          <h2 className="text-lg font-medium text-gray-900 mb-1">
+            Speaking Style
+          </h2>
+          <p className="text-xs text-gray-500">
+            Choose how the character should speak
+          </p>
+        </div>
         <div className="bg-gray-100 rounded-full p-2">
           <FaPersonWalkingLuggage className="w-6 h-6 text-gray-700" />
         </div>
       </div>
-      <div className="flex gap-6">
+
+      {/* Options Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         {politenesses.map((option) => {
           const IconComponent = iconMap[option.icon] ?? User;
+          const isSelected = selectedPoliteness === option.id;
+
           return (
             <SelectModeButton
               key={option.id}
               onClick={() => setSelectedPoliteness(option.id)}
-              className={`cursor-pointer relative group p-3 rounded-2xl bg-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border-2 ${
-                selectedPoliteness === option.id
-                  ? "border-green-500 shadow-green-200"
-                  : "border-transparent hover:border-green-200"
+              className={`cursor-pointer p-5 rounded-lg border transition-all ${
+                isSelected
+                  ? "border-gray-900 bg-gray-50"
+                  : "border-gray-200 bg-white hover:border-gray-300"
               }`}
             >
-              <div
-                className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${option.color} opacity-10 group-hover:opacity-20 transition-opacity duration-300`}
-              ></div>
-              <div className="relative z-10 text-center">
+              <div className="space-y-3">
+                {/* Icon */}
                 <div
-                  className={` h-8 w-8 rounded-full flex items-center justify-center mb-3 mx-auto transition-colors duration-300 ${
-                    selectedPoliteness === option.id
-                      ? "bg-green-500 text-white"
-                      : "bg-gray-100 text-gray-600 group-hover:bg-green-100 group-hover:text-green-600"
+                  className={`w-10 h-10 rounded-md flex items-center justify-center transition-colors ${
+                    isSelected
+                      ? "bg-gray-900 text-white"
+                      : "bg-gray-100 text-gray-600"
                   }`}
                 >
-                  <IconComponent className="w-6 h-6" />
+                  <IconComponent className="w-5 h-5" />
                 </div>
+
+                {/* Content */}
                 <ButtonContents
                   label={option.label}
                   description={option.description}
                   example={option.example}
-                  selected={selectedPoliteness === option.id}
+                  selected={isSelected}
                 />
               </div>
             </SelectModeButton>
@@ -64,4 +76,3 @@ export const PolitenessSelection = ({
     </div>
   );
 };
-

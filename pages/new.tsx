@@ -60,6 +60,7 @@ export const Chat = () => {
     summary,
     summaryFetchLoading,
     voiceGender,
+    selectedCharacter,
   } = useSpeech();
 
   const [chatInfo, setChatInfo] = useState<
@@ -87,6 +88,8 @@ export const Chat = () => {
     retry: false,
   });
 
+  const { setCreditsRemaining } = useSpeech();
+
   useEffect(() => {
     if (!data) return;
     if (data?.trialStatus === "ended") {
@@ -100,7 +103,8 @@ export const Chat = () => {
     }
     setUsername(data?.user.username);
     setSubscriptionPlan(data?.user.subscriptionPlan);
-  }, [data]);
+    setCreditsRemaining(data?.user.creditsRemaining || 0);
+  }, [data, setCreditsRemaining]);
 
   // Send messages to the API and get the response and audio
   // const sendToAPI = async (messages: ChatType) => {
@@ -200,7 +204,7 @@ export const Chat = () => {
       {/* サイドバー */}
       <Sidebar />
       {!chatMode ? (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-green-50 overflow-auto w-full">
+        <div className="relative min-h-screen bg-gradient-to-br from-gray-50 to-green-50 overflow-auto w-full">
           <ModeSelectScreen
             setHistory={setHistory}
             setChatInfo={setChatInfo}
@@ -221,7 +225,7 @@ export const Chat = () => {
             title="Chat"
             chatPage={true}
             history={history}
-            characterName={getCharacterName(voiceGender)}
+            characterName={selectedCharacter}
           />
           <Messages
             history={history}

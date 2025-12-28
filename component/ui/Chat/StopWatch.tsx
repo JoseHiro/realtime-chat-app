@@ -4,14 +4,18 @@ import { apiRequest } from "../../../lib/apiRequest";
 import { useSpeech } from "../../../context/SpeechContext";
 import { toast } from "sonner";
 
-export const StopWatch = ({
+export interface StopWatchProps {
+  history: any;
+  setOverlayOpened: React.Dispatch<React.SetStateAction<boolean>> | ((value: boolean) => void);
+  chatDurationMinutes: number; // Duration in minutes
+}
+
+export function StopWatch({
   history,
   setOverlayOpened,
-}: {
-  history: any;
-  setOverlayOpened: (value: boolean) => void;
-}) => {
-  const [timeLeft, setTimeLeft] = useState(3 * 60);
+  chatDurationMinutes,
+}: StopWatchProps): JSX.Element {
+  const [timeLeft, setTimeLeft] = useState(chatDurationMinutes * 60);
   const [isActive, setIsActive] = useState(true);
   const summaryCreatedRef = useRef(false);
 
@@ -72,6 +76,11 @@ export const StopWatch = ({
     setChatId,
   ]);
 
+  // Initialize timeLeft when chatDurationMinutes changes
+  useEffect(() => {
+    setTimeLeft(chatDurationMinutes * 60);
+  }, [chatDurationMinutes]);
+
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
 
@@ -125,4 +134,4 @@ export const StopWatch = ({
       </span>
     </div>
   );
-};
+}

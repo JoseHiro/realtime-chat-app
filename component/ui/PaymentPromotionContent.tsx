@@ -1,5 +1,6 @@
 import React from "react";
 import { startStripeSession } from "../../lib/stripe/startSession";
+import { Lock, Shield, X } from "lucide-react";
 
 export const PaymentPromotionContent = ({
   onClose,
@@ -10,66 +11,61 @@ export const PaymentPromotionContent = ({
 }) => {
   const display = [
     {
-      title: "🎯 Trial Limit Reached!",
+      title: "Trial Limit Reached",
       messageFirst: "You've used all ",
       messageSecond: "2 free conversations",
     },
     {
-      title: "🚀 Subscription Inactive",
+      title: "Subscription Inactive",
       messageFirst: "Finish payment to unlock ",
-      messageSecond: "all Pro features.",
+      messageSecond: "all Pro features",
     },
   ];
+
   return (
-    <div className="text-center py-4">
-      {/* Header Icon */}
-      <div className="mb-6">
-        <div className="w-20 h-20 mx-auto bg-green-400 rounded-full flex items-center justify-center shadow-lg">
-          <svg
-            className="w-10 h-10 text-white"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-            />
-          </svg>
+    <div className="max-w-md mx-auto p-6">
+      {/* Header */}
+      <div className="mb-8 text-center">
+        <div className="w-14 h-14 mx-auto mb-4 bg-gray-900 rounded-lg flex items-center justify-center">
+          <Lock className="w-7 h-7 text-white" />
+        </div>
+        <h2 className="text-2xl font-medium text-gray-900 mb-2">
+          {isPro ? display[1].title : display[0].title}
+        </h2>
+        <p className="text-sm text-gray-600">
+          {isPro ? display[1].messageFirst : display[0].messageFirst}
+          <span className="font-medium text-gray-900">
+            {isPro ? display[1].messageSecond : display[0].messageSecond}
+          </span>
+        </p>
+      </div>
+
+      {/* Benefits */}
+      <div className="bg-gray-50 rounded-lg p-5 mb-6 border border-gray-200">
+        <h3 className="font-medium text-gray-900 mb-3 text-sm">
+          Upgrade to Premium
+        </h3>
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 text-sm text-gray-600">
+            <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
+            <span>Unlimited conversations</span>
+          </div>
+          <div className="flex items-center gap-2 text-sm text-gray-600">
+            <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
+            <span>All themes & characters</span>
+          </div>
+          <div className="flex items-center gap-2 text-sm text-gray-600">
+            <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
+            <span>Grammar correction mode</span>
+          </div>
         </div>
       </div>
 
-      {/* Title */}
-      <h2 className="text-2xl font-bold text-gray-900 mb-3">
-        {isPro ? display[1].title : display[0].title}
-        {/* 🎯 Trial Limit Reached! */}
-      </h2>
-
-      {/* Message */}
-      <p className="text-gray-600 mb-2 text-lg">
-        {isPro ? display[1].messageFirst : display[0].messageFirst}
-        <span className="font-semibold text-green-600">
-          {isPro ? display[1].messageSecond : display[0].messageSecond}
-        </span>
-      </p>
-      <p className="text-gray-500 mb-6">
-        Ready to unlock unlimited Japanese learning?
-      </p>
-
-      {/* Benefits */}
-      <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-5 mb-6">
-        <h3 className="font-semibold text-gray-800 mb-3">
-          ✨ Upgrade to Premium
-        </h3>
-      </div>
-
       {/* Pricing */}
-      <div className="bg-white border-2 border-orange-200 rounded-lg p-4 mb-6">
-        <div className="flex items-center justify-center mb-2">
-          <span className="text-3xl font-bold text-gray-900">14.99usd</span>
-          <span className="text-gray-500 ml-2">/month</span>
+      <div className="bg-white border-2 border-gray-900 rounded-lg p-5 mb-6">
+        <div className="flex items-baseline justify-center">
+          <span className="text-4xl font-semibold text-gray-900">$14.99</span>
+          <span className="text-gray-500 ml-2 text-sm">/month</span>
         </div>
       </div>
 
@@ -77,40 +73,28 @@ export const PaymentPromotionContent = ({
       <div className="space-y-3">
         <button
           onClick={() => startStripeSession()}
-          className="cursor-pointer w-full bg-green-400 hover:from-orange-600 hover:to-red-600 text-white font-bold py-4 px-6 rounded-lg transition-all duration-200 hover:scale-105 shadow-lg"
+          className="w-full bg-gray-900 hover:bg-gray-800 text-white font-medium py-3.5 px-6 rounded-lg transition-colors"
         >
-          🇯🇵 Start Learning Now!
+          Start Learning Now
         </button>
 
         <button
           onClick={onClose}
-          className="cursor-pointer w-full text-gray-500 hover:text-gray-700 font-medium py-2 transition-colors text-sm"
+          className="w-full text-gray-500 hover:text-gray-700 font-medium py-2 transition-colors text-sm"
         >
           Maybe later
         </button>
       </div>
 
-      {/* Trust indicators */}
-      <div className="mt-6 pt-4 border-t border-gray-100">
-        <div className="flex items-center justify-center space-x-4 text-xs text-gray-400">
-          <div className="flex items-center">
-            <svg
-              className="w-3 h-3 mr-1"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path
-                fillRule="evenodd"
-                d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
-                clipRule="evenodd"
-              />
-            </svg>
-            Secure Payment
+      {/* Trust Indicators */}
+      <div className="mt-6 pt-6 border-t border-gray-200">
+        <div className="flex items-center justify-center gap-4 text-xs text-gray-500">
+          <div className="flex items-center gap-1">
+            <Shield className="w-3 h-3" />
+            <span>Secure Payment</span>
           </div>
-          <span>•</span>
-          <div>No Hidden Fees</div>
-          <span>•</span>
-          <div>Cancel Anytime</div>
+          <span className="text-gray-300">•</span>
+          <span>Cancel Anytime</span>
         </div>
       </div>
     </div>

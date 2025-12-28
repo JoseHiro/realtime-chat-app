@@ -7,7 +7,11 @@ import { MyJwtPayload } from "../../../type/types";
 import {
   getCharacterName,
   getVoiceConfig,
+  getVoiceConfigByCharacter,
+  getVoiceProvider,
+  getElevenLabsVoiceId,
   type VoiceGender,
+  type CharacterName,
 } from "../../../lib/voice/voiceMapping";
 import { logOpenAIEvent, logTTSEvent } from "../../../lib/cost/logUsageEvent";
 import { ApiType, Provider } from "../../../lib/cost/constants";
@@ -31,15 +35,26 @@ export default async function handler(
     return res.status(401).json({ error: "Not authenticated" });
   }
 
-  const { level, theme, politeness, voiceGender } = req.body;
+  const { level, theme, politeness, characterName: requestedCharacterName, chatDuration, voiceGender } = req.body;
   if (!level || !theme) {
     return res.status(400).json({ error: "Text is required" });
   }
 
-  // Map voiceGender to character name (default to "female" if not provided)
-  const gender: VoiceGender = voiceGender || "female";
-  const characterName = getCharacterName(gender);
-  const voiceConfig = getVoiceConfig(gender);
+  // Get character name - either from characterName or fallback to voiceGender (for backward compatibility)
+  let characterName: CharacterName;
+  if (requestedCharacterName && ["Sakura", "Ken", "Chica", "Haruki", "Aiko", "Ryo"].includes(requestedCharacterName)) {
+    characterName = requestedCharacterName as CharacterName;
+  } else {
+    // Fallback to legacy voiceGender mapping
+    const gender: VoiceGender = voiceGender || "female";
+    characterName = getCharacterName(gender);
+  }
+
+  const voiceConfig = getVoiceConfigByCharacter(characterName);
+  const chatVoiceProvider = getVoiceProvider(characterName);
+
+  // Get time from request (default: 3 minutes)
+  const time = chatDuration || 3;
 
   const prompt = `あなたは日本語会話の練習相手です。以下の条件で会話を始めてください。
 - 学習者のレベル: ${level}
@@ -70,7 +85,8 @@ export default async function handler(
         politeness: politeness,
         level: level,
         characterName: characterName,
-        time: 3,
+        time: time,
+        voiceProvider: chatVoiceProvider,
       },
     });
 
@@ -103,22 +119,66 @@ export default async function handler(
       decodedToken.userId,
       chat.id
     );
-    const tokenUrl = `https://${serviceRegion}.api.cognitive.microsoft.com/sts/v1.0/issuetoken`;
-    const tokenResponse = await fetch(tokenUrl, {
-      method: "POST",
-      headers: {
-        "Ocp-Apim-Subscription-Key": speechKey,
-        "Content-Length": "0",
-      },
-    });
 
-    if (!tokenResponse.ok) {
-      throw new Error(`Azure Token Error: ${tokenResponse.statusText}`);
-    }
+    // Generate audio based on voice provider
+    let audioBuffer: Buffer;
+    if (chatVoiceProvider === "elevenlabs") {
+      // Use ElevenLabs TTS
+      const elevenLabsVoiceId = getElevenLabsVoiceId(characterName) || "hBWDuZMNs32sP5dKzMuc";
+      const elevenLabsApiKey = process.env.ELEVEN_API_KEY;
+      if (!elevenLabsApiKey) {
+        throw new Error("ELEVEN_API_KEY is not set");
+      }
 
-    const accessToken = await tokenResponse.text();
-    // SSML構築
-    const ssml = `
+            const elevenLabsResponse = await fetch(
+              `https://api.elevenlabs.io/v1/text-to-speech/${elevenLabsVoiceId}`,
+              {
+                method: "POST",
+                headers: {
+                  "xi-api-key": elevenLabsApiKey,
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  text: reply,
+                  model_id: "eleven_multilingual_v2", // Use multilingual model for Japanese
+                  voice_settings: { stability: 0.75, similarity_boost: 0.75 },
+                }),
+              }
+            );
+
+      if (!elevenLabsResponse.ok) {
+        const errorText = await elevenLabsResponse.text();
+        throw new Error(`ElevenLabs TTS request failed: ${elevenLabsResponse.status} ${errorText}`);
+      }
+
+      audioBuffer = Buffer.from(await elevenLabsResponse.arrayBuffer());
+
+      // Log ElevenLabs TTS usage
+      await logTTSEvent({
+        userId: decodedToken.userId,
+        chatId: chat.id,
+        provider: Provider.ELEVENLABS,
+        voice: elevenLabsVoiceId,
+        characters: reply.length,
+      });
+    } else {
+      // Use Azure TTS
+      const tokenUrl = `https://${serviceRegion}.api.cognitive.microsoft.com/sts/v1.0/issuetoken`;
+      const tokenResponse = await fetch(tokenUrl, {
+        method: "POST",
+        headers: {
+          "Ocp-Apim-Subscription-Key": speechKey,
+          "Content-Length": "0",
+        },
+      });
+
+      if (!tokenResponse.ok) {
+        throw new Error(`Azure Token Error: ${tokenResponse.statusText}`);
+      }
+
+      const accessToken = await tokenResponse.text();
+      // SSML構築
+      const ssml = `
       <speak version='1.0' xml:lang='ja-JP' xmlns:mstts="http://www.w3.org/2001/mstts">
         <voice xml:lang='ja-JP' xml:gender='${voiceConfig.azureVoiceGender}' name='${voiceConfig.azureVoiceName}'>
           <mstts:express-as style="sad" styledegree="1.0">
@@ -130,33 +190,34 @@ export default async function handler(
       </speak>
       `;
 
-    const ttsUrl = `https://${serviceRegion}.tts.speech.microsoft.com/cognitiveservices/v1`;
-    const ttsResponse = await fetch(ttsUrl, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/ssml+xml",
-        "X-Microsoft-OutputFormat": "audio-24khz-48kbitrate-mono-mp3",
-        "User-Agent": "NodeJS-TTS",
-      },
-      body: ssml,
-    });
+      const ttsUrl = `https://${serviceRegion}.tts.speech.microsoft.com/cognitiveservices/v1`;
+      const ttsResponse = await fetch(ttsUrl, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/ssml+xml",
+          "X-Microsoft-OutputFormat": "audio-24khz-48kbitrate-mono-mp3",
+          "User-Agent": "NodeJS-TTS",
+        },
+        body: ssml,
+      });
 
-    if (!ttsResponse.ok) {
-      const errorText = await ttsResponse.text();
-      throw new Error(`TTS request failed: ${ttsResponse.status} ${errorText}`);
+      if (!ttsResponse.ok) {
+        const errorText = await ttsResponse.text();
+        throw new Error(`TTS request failed: ${ttsResponse.status} ${errorText}`);
+      }
+
+      audioBuffer = Buffer.from(await ttsResponse.arrayBuffer());
+
+      // Log Azure TTS usage
+      await logTTSEvent({
+        userId: decodedToken.userId,
+        chatId: chat.id,
+        provider: Provider.AZURE,
+        voice: voiceConfig.azureVoiceName,
+        characters: reply.length,
+      });
     }
-
-    const audioBuffer = Buffer.from(await ttsResponse.arrayBuffer());
-
-    // Log Azure TTS usage
-    await logTTSEvent({
-      userId: decodedToken.userId,
-      chatId: chat.id,
-      provider: "AZURE",
-      voice: voiceConfig.azureVoiceName,
-      characters: reply.length,
-    });
 
     // if (process.env.NODE_ENV === "development") {
     //   const usage = completion.usage; // open ai usage

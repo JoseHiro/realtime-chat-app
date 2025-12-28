@@ -6,6 +6,8 @@ import { PrismaClient } from "@prisma/client";
 import {
   getAzureVoiceGender,
   getAzureVoiceName,
+  getVoiceProvider,
+  getElevenLabsVoiceId,
   type CharacterName,
 } from "../../../lib/voice/voiceMapping";
 import { logOpenAIEvent, logTTSEvent } from "../../../lib/cost/logUsageEvent";
@@ -42,6 +44,7 @@ export default async function handler(
     const characterName = (chat?.characterName as CharacterName) || "Sakura";
     const azureVoiceName = getAzureVoiceName(characterName);
     const azureVoiceGender = getAzureVoiceGender(characterName);
+    const voiceProvider = getVoiceProvider(characterName);
 
     saveMessage(chatId, "user", messages[messages.length - 1].content);
     const formality =
@@ -103,24 +106,69 @@ export default async function handler(
       english
     );
 
-    // 2. Azure TTS用アクセストークン取得
-    const tokenUrl = `https://${serviceRegion}.api.cognitive.microsoft.com/sts/v1.0/issuetoken`;
-    const tokenResponse = await fetch(tokenUrl, {
-      method: "POST",
-      headers: {
-        "Ocp-Apim-Subscription-Key": speechKey,
-        "Content-Length": "0",
-      },
-    });
+    // 2. Generate audio based on voice provider
+    let audioBuffer: Buffer;
+    if (voiceProvider === "elevenlabs") {
+      // Use ElevenLabs TTS
+      const elevenLabsVoiceId =
+        getElevenLabsVoiceId(characterName) || "hBWDuZMNs32sP5dKzMuc";
+      const elevenLabsApiKey = process.env.ELEVEN_API_KEY;
+      if (!elevenLabsApiKey) {
+        throw new Error("ELEVEN_API_KEY is not set");
+      }
 
-    if (!tokenResponse.ok) {
-      throw new Error(`Azure Token Error: ${tokenResponse.statusText}`);
-    }
+      const elevenLabsResponse = await fetch(
+        `https://api.elevenlabs.io/v1/text-to-speech/${elevenLabsVoiceId}`,
+        {
+          method: "POST",
+          headers: {
+            "xi-api-key": elevenLabsApiKey,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            text: reply,
+            model_id: "eleven_multilingual_v2", // Use multilingual model for Japanese
+            voice_settings: { stability: 0.75, similarity_boost: 0.75 },
+          }),
+        }
+      );
 
-    const accessToken = await tokenResponse.text();
+      if (!elevenLabsResponse.ok) {
+        const errorText = await elevenLabsResponse.text();
+        throw new Error(
+          `ElevenLabs TTS request failed: ${elevenLabsResponse.status} ${errorText}`
+        );
+      }
 
-    // 3. SSML作成
-    const ssml = `
+      audioBuffer = Buffer.from(await elevenLabsResponse.arrayBuffer());
+
+      // Log ElevenLabs TTS usage
+      await logTTSEvent({
+        userId: chat.userId,
+        chatId: chatId,
+        provider: "ELEVENLABS",
+        voice: elevenLabsVoiceId,
+        characters: reply.length,
+      });
+    } else {
+      // Use Azure TTS
+      const tokenUrl = `https://${serviceRegion}.api.cognitive.microsoft.com/sts/v1.0/issuetoken`;
+      const tokenResponse = await fetch(tokenUrl, {
+        method: "POST",
+        headers: {
+          "Ocp-Apim-Subscription-Key": speechKey,
+          "Content-Length": "0",
+        },
+      });
+
+      if (!tokenResponse.ok) {
+        throw new Error(`Azure Token Error: ${tokenResponse.statusText}`);
+      }
+
+      const accessToken = await tokenResponse.text();
+
+      // 3. SSML作成
+      const ssml = `
       <speak version='1.0' xml:lang='ja-JP'>
         <voice xml:lang='ja-JP' xml:gender='${azureVoiceGender}' name='${azureVoiceName}'>
           ${reply}
@@ -128,33 +176,34 @@ export default async function handler(
       </speak>
     `;
 
-    // 4. Azure TTSで音声生成
-    const ttsUrl = `https://${serviceRegion}.tts.speech.microsoft.com/cognitiveservices/v1`;
-    const ttsResponse = await fetch(ttsUrl, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/ssml+xml",
-        "X-Microsoft-OutputFormat": "audio-24khz-48kbitrate-mono-mp3",
-        "User-Agent": "NextJS-TTS",
-      },
-      body: ssml,
-    });
+      // 4. Azure TTSで音声生成
+      const ttsUrl = `https://${serviceRegion}.tts.speech.microsoft.com/cognitiveservices/v1`;
+      const ttsResponse = await fetch(ttsUrl, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/ssml+xml",
+          "X-Microsoft-OutputFormat": "audio-24khz-48kbitrate-mono-mp3",
+          "User-Agent": "NextJS-TTS",
+        },
+        body: ssml,
+      });
 
-    if (!ttsResponse.ok) {
-      throw new Error(`Azure TTS Error: ${await ttsResponse.text()}`);
+      if (!ttsResponse.ok) {
+        throw new Error(`Azure TTS Error: ${await ttsResponse.text()}`);
+      }
+
+      audioBuffer = Buffer.from(await ttsResponse.arrayBuffer());
+
+      // Log Azure TTS usage
+      await logTTSEvent({
+        userId: chat.userId,
+        chatId: chatId,
+        provider: "AZURE",
+        voice: azureVoiceName,
+        characters: reply.length,
+      });
     }
-
-    const audioBuffer = Buffer.from(await ttsResponse.arrayBuffer());
-
-    // Log Azure TTS usage
-    await logTTSEvent({
-      userId: chat.userId,
-      chatId: chatId,
-      provider: "AZURE",
-      voice: azureVoiceName,
-      characters: reply.length,
-    });
 
     // 5. 音声とテキストを返す
     res.setHeader("Content-Type", "application/json");

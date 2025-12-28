@@ -1,10 +1,18 @@
 import React from "react";
-import { IoIosColorPalette } from "react-icons/io";
-import { Lock, Crown, Plus, Edit3 } from "lucide-react";
-import themes from "../../../data/themes.json";
+import { Lock, Edit3, Plus } from "lucide-react";
 import { toast } from "sonner";
+import { IoIosColorPalette } from "react-icons/io";
+
+type Theme = {
+  id: string;
+  label: string;
+  description: string;
+  imgURL: string;
+  icon: string;
+};
 
 type ThemeSelectionProps = {
+  themes: Theme[];
   selectedTheme: string;
   setSelectedTheme: (theme: string) => void;
   customTheme: string;
@@ -15,6 +23,7 @@ type ThemeSelectionProps = {
 };
 
 export const ThemeSelection = ({
+  themes,
   selectedTheme,
   setSelectedTheme,
   customTheme,
@@ -24,17 +33,24 @@ export const ThemeSelection = ({
   iconMap,
 }: ThemeSelectionProps) => {
   return (
-    <div className="mb-12">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl text-gray-700 mb-2 mt-10">
-          Conversation Theme
-        </h2>
+    <div className="max-w-5xl mx-auto py-8">
+      {/* Header */}
+      <div className="flex justify-between items-center gap-2">
+        <div className="mb-4">
+          <h2 className="text-lg font-medium text-gray-900 mb-1">
+            Conversation Theme
+          </h2>
+          <p className="text-xs text-gray-500">
+            Choose a topic for your conversation
+          </p>
+        </div>
         <div className="bg-gray-100 rounded-full p-2">
           <IoIosColorPalette className="w-6 h-6 text-gray-700" />
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* Theme Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {themes.map((theme) => {
           const IconComponent = iconMap[theme.icon];
           const isSelected = selectedTheme === theme.id;
@@ -53,174 +69,140 @@ export const ThemeSelection = ({
                 }
                 setSelectedTheme(theme.id);
               }}
-              className={`relative group rounded-2xl overflow-hidden bg-white shadow-lg transition-all duration-300 h-full flex flex-col ${
+              className={`relative rounded-lg overflow-hidden border transition-all ${
                 isLocked
-                  ? "opacity-60 cursor-not-allowed"
-                  : "cursor-pointer hover:shadow-2xl transform hover:-translate-y-2"
+                  ? "opacity-50 cursor-not-allowed"
+                  : "cursor-pointer hover:border-gray-300"
               } ${
                 isSelected
-                  ? "ring-4 ring-green-500 ring-opacity-50 shadow-green-200"
-                  : isLocked
-                  ? ""
-                  : "hover:shadow-xl"
+                  ? "border-gray-900 bg-gray-50"
+                  : "border-gray-200 bg-white"
               }`}
             >
-              {/* Background Image */}
-              <div className="relative h-48 overflow-hidden">
+              {/* Image */}
+              <div className="relative h-40 overflow-hidden bg-gray-100">
                 <img
                   src={theme.imgURL}
                   alt={theme.label}
-                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                  className="w-full h-full object-cover"
                 />
 
-                {/* Gradient Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-
-                {/* Selected Badge */}
-                {isSelected && (
-                  <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">
-                    Selected
-                  </div>
-                )}
-
-                {/* Pro Locked Badge */}
+                {/* Locked Overlay */}
                 {isLocked && (
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20 flex items-center justify-center">
-                    <div className="bg-white/95 backdrop-blur-sm rounded-xl px-4 py-3 shadow-xl border-2 border-yellow-300">
-                      <div className="flex flex-col items-center gap-2">
-                        <Lock className="w-6 h-6 text-yellow-600" />
-                        <span className="text-sm font-bold text-gray-900">
-                          Pro Only
-                        </span>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setPaymentOverlay(true);
-                          }}
-                          className="mt-1 px-3 py-1.5 bg-yellow-500 hover:bg-yellow-600 text-white text-xs font-semibold rounded-lg transition-colors flex items-center gap-1"
-                        >
-                          <Crown className="w-3 h-3" />
-                          Upgrade
-                        </button>
+                  <div className="absolute inset-0 bg-white/90 backdrop-blur-sm flex items-center justify-center">
+                    <div className="text-center">
+                      <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-gray-900 text-white mb-2">
+                        <Lock className="w-5 h-5" />
                       </div>
+                      <p className="text-xs font-medium text-gray-900 mb-2">
+                        Pro Only
+                      </p>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setPaymentOverlay(true);
+                        }}
+                        className="px-3 py-1.5 bg-gray-900 hover:bg-gray-800 text-white text-xs font-medium rounded transition-colors"
+                      >
+                        Upgrade
+                      </button>
                     </div>
                   </div>
                 )}
               </div>
 
               {/* Content */}
-              <div className="p-6">
-                <div className="flex items-center gap-3 mb-3">
+              <div className="p-4">
+                <div className="flex items-center gap-2 mb-2">
                   <div
-                    className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
+                    className={`w-8 h-8 rounded-md flex items-center justify-center transition-colors ${
                       isSelected
-                        ? "bg-green-500 text-white"
-                        : "bg-green-100 text-green-600 group-hover:bg-green-200"
+                        ? "bg-gray-900 text-white"
+                        : "bg-gray-100 text-gray-600"
                     }`}
                   >
-                    <IconComponent className="w-5 h-5" />
+                    <IconComponent className="w-4 h-4" />
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900">
+                  <h3 className="text-sm font-medium text-gray-900">
                     {theme.label}
                   </h3>
                 </div>
-
-                <p className="text-gray-600 text-sm leading-relaxed">
+                <p className="text-xs text-gray-600 leading-relaxed">
                   {theme.description}
                 </p>
               </div>
-
-              {/* Hover Effect Border */}
-              <div
-                className={`absolute inset-0 rounded-2xl transition-all duration-300 pointer-events-none ${
-                  isSelected
-                    ? "border-2 border-green-500"
-                    : "border-2 border-transparent group-hover:border-green-300"
-                }`}
-              />
             </div>
           );
         })}
+
         {/* Custom Theme */}
         <div
-          className={`relative group rounded-2xl overflow-hidden bg-white shadow-lg transition-all duration-300 ${
+          className={`relative rounded-lg overflow-hidden border transition-all ${
             !isProUser
-              ? "opacity-60 cursor-not-allowed"
-              : "cursor-pointer hover:shadow-2xl transform hover:-translate-y-2"
+              ? "opacity-50 cursor-not-allowed"
+              : "cursor-pointer hover:border-gray-300"
           } ${
             customTheme.trim()
-              ? "ring-4 ring-green-500 ring-opacity-50 shadow-green-200"
-              : !isProUser
-              ? ""
-              : "hover:shadow-xl"
+              ? "border-gray-900 bg-gray-50"
+              : "border-gray-200 bg-white"
           }`}
         >
-          <div className="relative h-48 bg-gradient-to-br from-purple-400 via-pink-400 to-orange-400 overflow-hidden">
-            {/* Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-
-            {/* Custom Icon */}
+          {/* Custom Background */}
+          <div className="relative h-40 bg-gradient-to-br from-gray-800 via-gray-700 to-gray-900">
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
-                <Edit3 className="w-8 h-8 text-white" />
+              <div className="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center">
+                <Edit3 className="w-6 h-6 text-white" />
               </div>
             </div>
 
-            {/* Selected Badge */}
-            {customTheme.trim() && (
-              <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">
-                Selected
-              </div>
-            )}
-
-            {/* Pro Locked Badge */}
+            {/* Locked Overlay */}
             {!isProUser && (
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20 flex items-center justify-center">
-                <div className="bg-white/95 backdrop-blur-sm rounded-xl px-4 py-3 shadow-xl border-2 border-yellow-300">
-                  <div className="flex flex-col items-center gap-2">
-                    <Lock className="w-6 h-6 text-yellow-600" />
-                    <span className="text-sm font-bold text-gray-900">
-                      Pro Only
-                    </span>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setPaymentOverlay(true);
-                      }}
-                      className="mt-1 px-3 py-1.5 bg-yellow-500 hover:bg-yellow-600 text-white text-xs font-semibold rounded-lg transition-colors flex items-center gap-1"
-                    >
-                      <Crown className="w-3 h-3" />
-                      Upgrade
-                    </button>
+              <div className="absolute inset-0 bg-white/90 backdrop-blur-sm flex items-center justify-center">
+                <div className="text-center">
+                  <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-gray-900 text-white mb-2">
+                    <Lock className="w-5 h-5" />
                   </div>
+                  <p className="text-xs font-medium text-gray-900 mb-2">
+                    Pro Only
+                  </p>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setPaymentOverlay(true);
+                    }}
+                    className="px-3 py-1.5 bg-gray-900 hover:bg-gray-800 text-white text-xs font-medium rounded transition-colors"
+                  >
+                    Upgrade
+                  </button>
                 </div>
               </div>
             )}
           </div>
-          <div className="p-6">
-            <div className="flex items-center gap-3 mb-4">
+
+          {/* Content */}
+          <div className="p-4">
+            <div className="flex items-center gap-2 mb-2">
               <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
+                className={`w-8 h-8 rounded-md flex items-center justify-center transition-colors ${
                   customTheme.trim()
-                    ? "bg-green-500 text-white"
-                    : "bg-purple-100 text-purple-600 group-hover:bg-purple-200"
+                    ? "bg-gray-900 text-white"
+                    : "bg-gray-100 text-gray-600"
                 }`}
               >
-                <Plus className="w-5 h-5" />
+                <Plus className="w-4 h-4" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900">
+              <h3 className="text-sm font-medium text-gray-900">
                 Custom Theme
               </h3>
             </div>
 
-            <p className="text-gray-600 text-sm leading-relaxed mb-4">
+            <p className="text-xs text-gray-600 leading-relaxed mb-3">
               Create your own conversation topic
             </p>
 
             <input
-              id="custom-theme"
               type="text"
-              placeholder="Enter your topic (e.g., cooking, anime, sports...)"
+              placeholder="Enter your topic..."
               value={customTheme}
               onChange={(e) => {
                 if (!isProUser) {
@@ -252,21 +234,13 @@ export const ThemeSelection = ({
                 setSelectedTheme("");
               }}
               disabled={!isProUser}
-              className={`w-full px-4 py-3 rounded-xl border-2 transition-colors duration-300 text-gray-900 placeholder-gray-400 ${
+              className={`w-full px-3 py-2 rounded-md border text-sm transition-colors ${
                 !isProUser
-                  ? "border-gray-200 bg-gray-100 cursor-not-allowed"
-                  : "border-gray-200 focus:border-green-500 focus:outline-none bg-white"
-              }`}
+                  ? "border-gray-200 bg-gray-50 cursor-not-allowed text-gray-400"
+                  : "border-gray-200 focus:border-gray-900 focus:outline-none bg-white text-gray-900"
+              } placeholder-gray-400`}
             />
           </div>
-          {/* Hover Effect Border */}
-          <div
-            className={`absolute inset-0 rounded-2xl transition-all duration-300 pointer-events-none ${
-              customTheme.trim()
-                ? "border-2 border-green-500"
-                : "border-2 border-transparent group-hover:border-purple-300"
-            }`}
-          />
         </div>
       </div>
     </div>

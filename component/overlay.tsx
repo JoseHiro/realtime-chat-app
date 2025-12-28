@@ -44,7 +44,7 @@ export const BlockUseOverlay = ({ plan }: { plan: string }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 backdrop-blur-md pt-20">
+    <div className="fixed inset-0 z-[100] flex items-start justify-center bg-black/60 backdrop-blur-md pt-20 pointer-events-auto">
       {/* Modal Container */}
       <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden border border-gray-100">
         {/* Gradient Header */}

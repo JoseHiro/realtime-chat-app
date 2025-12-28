@@ -36,6 +36,7 @@ export default async function handler(
         createdAt: true,
         stripeSubscriptionId: true,
         stripeCustomerId: true,
+        creditsRemaining: true,
         _count: {
           select: {
             chats: true,
@@ -61,8 +62,9 @@ export default async function handler(
       user: {
         username: user.username,
         email: user.email,
-        // subscriptionStatus: user.subscriptionStatus,
-        // subscriptionPlan: user.subscriptionPlan,
+        subscriptionStatus: user.subscriptionStatus,
+        subscriptionPlan: user.subscriptionPlan,
+        creditsRemaining: user.creditsRemaining,
         createdAt: user.createdAt,
         totalChats: user._count.chats,
       },

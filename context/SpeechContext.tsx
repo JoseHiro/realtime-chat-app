@@ -32,6 +32,12 @@ interface SpeechContextType {
   setVoiceGender: React.Dispatch<React.SetStateAction<"male" | "female">>;
   showHiragana: boolean;
   setShowHiragana: React.Dispatch<React.SetStateAction<boolean>>;
+  creditsRemaining: number;
+  setCreditsRemaining: React.Dispatch<React.SetStateAction<number>>;
+  selectedTime: number;
+  setSelectedTime: React.Dispatch<React.SetStateAction<number>>;
+  selectedCharacter: "Sakura" | "Ken" | "Chica" | "Haruki" | "Aiko" | "Ryo";
+  setSelectedCharacter: React.Dispatch<React.SetStateAction<"Sakura" | "Ken" | "Chica" | "Haruki" | "Aiko" | "Ryo">>;
 }
 
 const SpeechContext = createContext<SpeechContextType>({
@@ -65,6 +71,12 @@ const SpeechContext = createContext<SpeechContextType>({
   setVoiceGender: () => {},
   showHiragana: false,
   setShowHiragana: () => {},
+  creditsRemaining: 0,
+  setCreditsRemaining: () => {},
+  selectedTime: 3,
+  setSelectedTime: () => {},
+  selectedCharacter: "Sakura",
+  setSelectedCharacter: () => {},
 });
 
 //
@@ -92,6 +104,9 @@ export const SpeechProvider: React.FC<{ children: React.ReactNode }> = ({
   const [isMuted, setIsMuted] = useState(false); // speech mute mode
   const [voiceGender, setVoiceGender] = useState<"male" | "female">("female"); // voice gender preference
   const [showHiragana, setShowHiragana] = useState(false); // show/hide hiragana reading for user messages
+  const [creditsRemaining, setCreditsRemaining] = useState(0); // current credit balance
+  const [selectedTime, setSelectedTime] = useState<number>(3); // selected chat duration in minutes (3, 5, or 10)
+  const [selectedCharacter, setSelectedCharacter] = useState<"Sakura" | "Ken" | "Chica" | "Haruki" | "Aiko" | "Ryo">("Sakura"); // selected character
 
   return (
     <SpeechContext.Provider
@@ -126,6 +141,12 @@ export const SpeechProvider: React.FC<{ children: React.ReactNode }> = ({
         setVoiceGender,
         showHiragana,
         setShowHiragana,
+        creditsRemaining,
+        setCreditsRemaining,
+        selectedTime,
+        setSelectedTime,
+        selectedCharacter,
+        setSelectedCharacter,
       }}
     >
       {children}
