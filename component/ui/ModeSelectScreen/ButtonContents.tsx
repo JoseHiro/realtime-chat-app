@@ -13,7 +13,7 @@ export const ButtonContents = React.memo(
     return (
       <>
         <div
-          className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${color} opacity-10 group-hover:opacity-20 transition-opacity duration-300`}
+          className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${color} opacity-10 group-hover:opacity-20 transition-opacity duration-300 pointer-events-none`}
         ></div>
         <div className="relative z-10">
           <h3 className="text-sm font-semibold text-gray-900 mb-0.5">

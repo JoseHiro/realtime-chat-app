@@ -52,8 +52,7 @@ export const ChatHeader = ({
     selectedLevel,
     selectedPoliteness,
     selectedTheme,
-    showHiragana,
-    setShowHiragana,
+    selectedTime,
   } = useSpeech();
 
   const getLevelLabel = () => {
@@ -172,7 +171,7 @@ export const ChatHeader = ({
           ) : (
             <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm border">
               <span className="text-black font-semibold text-sm">AI</span>
-          </div>
+            </div>
           )}
           <div className="space-y-1">
             {isEditingChatTitle ? (
@@ -253,19 +252,12 @@ export const ChatHeader = ({
 
         <div className="flex space-x-3 items-center">
           {/* Hiragana Toggle Button */}
-          <button
-            onClick={() => setShowHiragana(!showHiragana)}
-            className={`p-2.5 rounded-lg transition-colors ${
-              showHiragana
-                ? "bg-green-100 text-green-600 hover:bg-green-200"
-                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-            }`}
-            title={showHiragana ? "Hide Hiragana Reading" : "Show Hiragana Reading"}
-          >
-            <Type className="w-5 h-5" />
-          </button>
           {chatPage && (
-            <StopWatch history={history} setOverlayOpened={setOverlayOpened} />
+            <StopWatch
+              history={history}
+              setOverlayOpened={setOverlayOpened}
+              chatDurationMinutes={(selectedTime ?? 3) as number}
+            />
           )}
           {summaryFetchLoading ? (
             <button

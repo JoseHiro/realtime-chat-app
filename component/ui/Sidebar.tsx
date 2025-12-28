@@ -39,6 +39,7 @@ export const Sidebar = () => {
     chatId,
     username,
     subscriptionPlan,
+    creditsRemaining,
   } = useSpeech();
   const router = useRouter();
   const menuRef = useRef<HTMLDivElement>(null);
@@ -412,6 +413,11 @@ export const Sidebar = () => {
                           } plan`
                         : "No plan"}
                     </p>
+                    {subscriptionPlan && (subscriptionPlan === "pro" || subscriptionPlan === "premium") && (
+                      <p className="text-xs text-gray-500 mt-0.5 truncate">
+                        {creditsRemaining} credits
+                      </p>
+                    )}
                   </div>
                 )}
               </div>

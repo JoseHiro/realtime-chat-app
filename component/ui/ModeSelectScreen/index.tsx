@@ -26,6 +26,10 @@ import { PolitenessSelection } from "./PolitenessSelection";
 import { VoiceSelection } from "./VoiceSelection";
 import { ThemeSelection } from "./ThemeSelection";
 import { GrammarCorrection } from "./GrammarCorrection";
+import { TimeSelection } from "./TimeSelection";
+import { CreditCostDisplay } from "./CreditCostDisplay";
+import { CharacterTimeSelection } from "./CharacterTimeSelection";
+import themes from "../../../data/themes.json";
 
 export const ModeSelectScreen = ({
   setHistory,
@@ -61,8 +65,11 @@ export const ModeSelectScreen = ({
     setChatMode,
     username,
     subscriptionPlan,
-    voiceGender,
-    setVoiceGender,
+    creditsRemaining,
+    selectedTime,
+    setSelectedTime,
+    selectedCharacter,
+    setSelectedCharacter,
   } = useSpeech();
 
   const iconMap: Record<string, React.ElementType> = useMemo(
@@ -131,7 +138,8 @@ export const ModeSelectScreen = ({
             level: selectedLevel,
             theme: selectedTheme || customTheme.trim(),
             politeness: selectedPoliteness || "polite",
-            voiceGender: voiceGender,
+            characterName: selectedCharacter,
+            time: selectedTime,
           }),
         });
 
@@ -172,7 +180,8 @@ export const ModeSelectScreen = ({
     selectedTheme,
     customTheme,
     selectedPoliteness,
-    voiceGender,
+    selectedTime,
+    selectedCharacter,
     loading,
     handleRefreshPreviousData,
     setHistory,
@@ -184,12 +193,13 @@ export const ModeSelectScreen = ({
   ]);
 
   return (
-    <div className="z-10 min-h-screen shadow-sm backdrop-blur-xl overflow-auto w-full">
+    <div className="relative min-h-screen overflow-auto w-full">
       <div className="min-h-screen p-4 overflow-auto w-full">
         <div className="max-w-4xl mx-auto py-8 mt-12">
           <Header
             username={username || "User"}
             subscriptionPlan={subscriptionPlan}
+            creditsRemaining={creditsRemaining}
           />
 
           <LevelSelection
@@ -204,12 +214,15 @@ export const ModeSelectScreen = ({
             iconMap={iconMap}
           />
 
-          <VoiceSelection
-            voiceGender={voiceGender}
-            setVoiceGender={setVoiceGender}
+          <CharacterTimeSelection
+            selectedCharacter={selectedCharacter}
+            setSelectedCharacter={setSelectedCharacter}
+            selectedTime={selectedTime}
+            setSelectedTime={setSelectedTime}
           />
 
           <ThemeSelection
+            themes={themes}
             selectedTheme={selectedTheme}
             setSelectedTheme={setSelectedTheme}
             customTheme={customTheme}
@@ -225,6 +238,14 @@ export const ModeSelectScreen = ({
             setCheckGrammarMode={setCheckGrammarMode}
             setPaymentOverlay={setPaymentOverlay}
             iconMap={iconMap}
+          />
+
+          {/* Credit Cost Display - Right before Start Button as final checkpoint */}
+          <CreditCostDisplay
+            selectedTime={selectedTime}
+            selectedCharacter={selectedCharacter}
+            creditsRemaining={creditsRemaining}
+            subscriptionPlan={subscriptionPlan}
           />
 
           {/* Start Button */}
@@ -246,7 +267,9 @@ export const ModeSelectScreen = ({
         </div>
       </div>
       {needPayment && (
-        <BlockUseOverlay plan={plan === "pro" ? "pro" : "trial"} />
+        <div className="fixed inset-0 z-[100]">
+          <BlockUseOverlay plan={plan === "pro" ? "pro" : "trial"} />
+        </div>
       )}
     </div>
   );

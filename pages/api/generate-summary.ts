@@ -6,6 +6,11 @@ import { MyJwtPayload } from "../../type/types";
 import { wordAnalyzer } from "../../lib/chatAnalize";
 import { logOpenAIEvent } from "../../lib/cost/logUsageEvent";
 import { ApiType } from "../../lib/cost/constants";
+import { deductCreditsForChat } from "../../lib/credits/creditService";
+import {
+  getVoiceProvider,
+  type CharacterName,
+} from "../../lib/voice/voiceMapping";
 
 const prisma = new PrismaClient();
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
@@ -236,6 +241,34 @@ export default async function handler(
     };
 
     await storeAnalysisDB(chatId, analysisWithReview);
+
+    // Deduct credits after chat ends (after summary is successfully generated)
+    try {
+      // Get chat details to determine duration and character name
+      const durationMinutes = time || 3; // Default to 3 minutes if not set
+
+      // Fetch chat to get characterName
+      const chatForCredits = await prisma.chat.findUnique({
+        where: { id: chatId },
+        select: { characterName: true },
+      });
+
+      if (chatForCredits?.characterName) {
+        const characterName = chatForCredits.characterName as CharacterName;
+        const voiceProvider = getVoiceProvider(characterName);
+
+        await deductCreditsForChat(
+          decodedToken.userId,
+          chatId,
+          durationMinutes,
+          voiceProvider
+        );
+      }
+    } catch (creditError) {
+      // Log error but don't fail the summary generation
+      console.error("Error deducting credits:", creditError);
+      // Credit deduction failure shouldn't block the summary response
+    }
 
     // Return analysis with conversation review (can also be fetched separately via /api/chat/conversation-review)
     return res.status(200).json(analysisWithReview);
