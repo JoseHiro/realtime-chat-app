@@ -4,7 +4,7 @@ import Image from "next/image";
 import { AudioWaveform } from "lucide-react";
 
 import type { CharacterName } from "../../../lib/voice/voiceMapping";
-import { getAllCharacters } from "../../../lib/voice/voiceMapping";
+import { getAllCharacters, getCharacterImageUrl } from "../../../lib/voice/voiceMapping";
 import { calculateCreditsForCharacter } from "../../../lib/credits/characterCredits";
 
 type CharacterTimeSelectionProps = {
@@ -27,6 +27,11 @@ export const CharacterTimeSelection = ({
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const getCharacterImage = (characterName: CharacterName) => {
+    // First try to get from voice mapping config
+    const imageUrl = getCharacterImageUrl(characterName);
+    if (imageUrl) return imageUrl;
+
+    // Fallback to default images based on character name
     if (characterName === "Sakura") return "/img/female.jpg";
     if (characterName === "Ken") return "/img/man.jpg";
     return characterName.includes("Chica") || characterName === "Aiko"

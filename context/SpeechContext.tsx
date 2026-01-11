@@ -1,7 +1,7 @@
 // SpeechContext.tsx
 import React, { createContext, useContext, useState } from "react";
 
-interface SpeechContextType {
+export interface SpeechContextType {
   selectedLevel: string;
   setSelectedLevel: React.Dispatch<React.SetStateAction<string>>;
   selectedPoliteness: string;
@@ -37,7 +37,9 @@ interface SpeechContextType {
   selectedTime: number;
   setSelectedTime: React.Dispatch<React.SetStateAction<number>>;
   selectedCharacter: "Sakura" | "Ken" | "Chica" | "Haruki" | "Aiko" | "Ryo";
-  setSelectedCharacter: React.Dispatch<React.SetStateAction<"Sakura" | "Ken" | "Chica" | "Haruki" | "Aiko" | "Ryo">>;
+  setSelectedCharacter: React.Dispatch<
+    React.SetStateAction<"Sakura" | "Ken" | "Chica" | "Haruki" | "Aiko" | "Ryo">
+  >;
 }
 
 const SpeechContext = createContext<SpeechContextType>({
@@ -79,13 +81,6 @@ const SpeechContext = createContext<SpeechContextType>({
   setSelectedCharacter: () => {},
 });
 
-//
-//
-//
-//
-//
-//
-
 export const SpeechProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
@@ -106,7 +101,9 @@ export const SpeechProvider: React.FC<{ children: React.ReactNode }> = ({
   const [showHiragana, setShowHiragana] = useState(false); // show/hide hiragana reading for user messages
   const [creditsRemaining, setCreditsRemaining] = useState(0); // current credit balance
   const [selectedTime, setSelectedTime] = useState<number>(3); // selected chat duration in minutes (3, 5, or 10)
-  const [selectedCharacter, setSelectedCharacter] = useState<"Sakura" | "Ken" | "Chica" | "Haruki" | "Aiko" | "Ryo">("Sakura"); // selected character
+  const [selectedCharacter, setSelectedCharacter] = useState<
+    "Sakura" | "Ken" | "Chica" | "Haruki" | "Aiko" | "Ryo"
+  >("Sakura"); // selected character
 
   return (
     <SpeechContext.Provider
@@ -154,4 +151,4 @@ export const SpeechProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 };
 
-export const useSpeech = () => useContext(SpeechContext);
+export const useSpeech = (): SpeechContextType => useContext(SpeechContext);

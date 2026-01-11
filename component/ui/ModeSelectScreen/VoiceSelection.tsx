@@ -3,7 +3,7 @@ import { UserRound } from "lucide-react";
 import { SelectModeButton } from "../../button";
 import Image from "next/image";
 import type { CharacterName } from "../../../lib/voice/voiceMapping";
-import { getAllCharacters } from "../../../lib/voice/voiceMapping";
+import { getAllCharacters, getCharacterImageUrl } from "../../../lib/voice/voiceMapping";
 
 type VoiceSelectionProps = {
   selectedCharacter: CharacterName;
@@ -17,6 +17,11 @@ export const VoiceSelection = ({
   const characters = getAllCharacters();
   // Get character images (using placeholder for new characters - you'll need to add images)
   const getCharacterImage = (characterName: CharacterName) => {
+    // First try to get from voice mapping config
+    const imageUrl = getCharacterImageUrl(characterName);
+    if (imageUrl) return imageUrl;
+
+    // Fallback to default images based on character name
     if (characterName === "Sakura") return "/img/female.jpg";
     if (characterName === "Ken") return "/img/man.jpg";
     // For new characters, use placeholder or default image

@@ -122,46 +122,57 @@ export default async function handler(
 
     // Generate audio based on voice provider
     let audioBuffer: Buffer;
+    let usedProvider: Provider = Provider.AZURE; // Default to Azure
+
     if (chatVoiceProvider === "elevenlabs") {
-      // Use ElevenLabs TTS
+      // Try ElevenLabs TTS first, fallback to Azure if it fails
       const elevenLabsVoiceId = getElevenLabsVoiceId(characterName) || "hBWDuZMNs32sP5dKzMuc";
       const elevenLabsApiKey = process.env.ELEVEN_API_KEY;
-      if (!elevenLabsApiKey) {
-        throw new Error("ELEVEN_API_KEY is not set");
+
+      if (elevenLabsApiKey) {
+        try {
+          const elevenLabsResponse = await fetch(
+            `https://api.elevenlabs.io/v1/text-to-speech/${elevenLabsVoiceId}`,
+            {
+              method: "POST",
+              headers: {
+                "xi-api-key": elevenLabsApiKey,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                text: reply,
+                model_id: "eleven_multilingual_v2", // Use multilingual model for Japanese
+                voice_settings: { stability: 0.75, similarity_boost: 0.75 },
+              }),
+            }
+          );
+
+          if (elevenLabsResponse.ok) {
+            audioBuffer = Buffer.from(await elevenLabsResponse.arrayBuffer());
+            usedProvider = Provider.ELEVENLABS;
+
+            // Log ElevenLabs TTS usage
+            await logTTSEvent({
+              userId: decodedToken.userId,
+              chatId: chat.id,
+              provider: Provider.ELEVENLABS,
+              voice: elevenLabsVoiceId,
+              characters: reply.length,
+            });
+          } else {
+            // ElevenLabs failed, fall through to Azure TTS
+            const errorText = await elevenLabsResponse.text();
+            console.warn(`ElevenLabs TTS failed (${elevenLabsResponse.status}), falling back to Azure TTS:`, errorText);
+          }
+        } catch (error) {
+          // ElevenLabs request failed, fall through to Azure TTS
+          console.warn("ElevenLabs TTS error, falling back to Azure TTS:", error);
+        }
       }
+    }
 
-            const elevenLabsResponse = await fetch(
-              `https://api.elevenlabs.io/v1/text-to-speech/${elevenLabsVoiceId}`,
-              {
-                method: "POST",
-                headers: {
-                  "xi-api-key": elevenLabsApiKey,
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  text: reply,
-                  model_id: "eleven_multilingual_v2", // Use multilingual model for Japanese
-                  voice_settings: { stability: 0.75, similarity_boost: 0.75 },
-                }),
-              }
-            );
-
-      if (!elevenLabsResponse.ok) {
-        const errorText = await elevenLabsResponse.text();
-        throw new Error(`ElevenLabs TTS request failed: ${elevenLabsResponse.status} ${errorText}`);
-      }
-
-      audioBuffer = Buffer.from(await elevenLabsResponse.arrayBuffer());
-
-      // Log ElevenLabs TTS usage
-      await logTTSEvent({
-        userId: decodedToken.userId,
-        chatId: chat.id,
-        provider: Provider.ELEVENLABS,
-        voice: elevenLabsVoiceId,
-        characters: reply.length,
-      });
-    } else {
+    // Use Azure TTS if ElevenLabs wasn't used or failed
+    if (usedProvider === Provider.AZURE) {
       // Use Azure TTS
       const tokenUrl = `https://${serviceRegion}.api.cognitive.microsoft.com/sts/v1.0/issuetoken`;
       const tokenResponse = await fetch(tokenUrl, {

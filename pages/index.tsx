@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
+import Image from "next/image";
 import { RoundedButton } from "../component/button";
 import { LandingHeader } from "../component/ui/LandingHeader";
-import { Mic } from "lucide-react";
+import { Mic, Coffee, User, Volume2 } from "lucide-react";
 import { LandingFooter } from "../component/ui/LandingFooter";
 import { FeatureBody } from "../component/ui/LandingPage/FeatureBody";
+import { LoadingMessage } from "../component/loading";
 
 const chatMessages = [
   {
@@ -89,7 +91,7 @@ const Index = () => {
               </span>
             </h1>
 
-            <p className="text-xl text-gray-600 mb-8 leading-relaxed">
+            <p className="text-md text-gray-400 mb-8 leading-relaxed">
               Practice Japanese naturally with AI-powered conversations. Get
               instant grammar feedback, choose your difficulty level, and
               improve your skills in just 3-5 minutes a day.
@@ -98,7 +100,7 @@ const Index = () => {
             <div className="flex flex-col sm:flex-row gap-4 mb-12 md:mb-16 justify-center lg:justify-start">
               <RoundedButton
                 onClick={() => router.push("/signup?plan=trial")}
-                className="group bg-green-500 hover:bg-green-600 text-white px-8 py-4 text-lg font-semibold transition-all duration-300 hover:scale-105 hover:shadow-xl shadow-lg"
+                className="group bg-black hover:bg-gray-800 text-white px-8 py-4 text-lg font-semibold transition-all duration-300 hover:scale-105 hover:shadow-xl shadow-lg"
               >
                 Start Free Trial
                 <svg
@@ -133,7 +135,7 @@ const Index = () => {
               </div>
               <div className="flex items-center">
                 <span className="text-green-500 mr-1">✓</span>
-                Real-time feedback
+                Speaking Skills Feedback
               </div>
               <div className="flex items-center">
                 <span className="text-green-500 mr-1">✓</span>
@@ -148,14 +150,26 @@ const Index = () => {
               {/* Chat Header */}
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-gradient-to-r from-green-400 to-green-500 rounded-full flex items-center justify-center">
-                    <span className="text-white font-bold">AI</span>
+                  <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 border-2">
+                    <Image
+                      src="/img/man.jpg"
+                      alt="Japanese Sensei"
+                      width={40}
+                      height={40}
+                      className="object-cover w-full h-full"
+                    />
                   </div>
                   <div>
                     <div className="font-semibold">Japanese Sensei</div>
-                    <div className="text-xs text-green-500 flex items-center">
-                      <span className="w-2 h-2 bg-green-500 rounded-full mr-1 animate-pulse"></span>
-                      Online
+                    <div className="flex gap-1.5 mt-1">
+                      <div className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-purple-50 text-purple-700 border border-purple-100">
+                        <Coffee className="w-3 h-3 flex-shrink-0" />
+                        <span className="font-medium text-xs">Daily Life</span>
+                      </div>
+                      <div className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-100">
+                        <User className="w-3 h-3 flex-shrink-0" />
+                        <span className="font-medium text-xs">Casual</span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -180,13 +194,16 @@ const Index = () => {
                           className="animate-float"
                           style={{ animationDelay: `${index * 0.5}s` }}
                         >
-                          <div className="bg-gray-100 rounded-2xl rounded-bl-md p-3 max-w-xs">
+                          <div className="bg-gray-100 rounded-2xl rounded-bl-md p-3 max-w-xs relative">
                             <div className="text-sm">{message.text}</div>
                             {message.translation && (
                               <div className="text-xs text-gray-500 mt-1">
                                 {message.translation}
                               </div>
                             )}
+                            <div className="absolute bottom-2 right-2">
+                              <Volume2 className="w-3.5 h-3.5 text-gray-400" />
+                            </div>
                           </div>
                         </div>
                       ) : (
@@ -194,7 +211,7 @@ const Index = () => {
                           className="flex justify-end animate-float"
                           style={{ animationDelay: `${index * 0.5}s` }}
                         >
-                          <div className="bg-green-500 text-white rounded-2xl rounded-br-md p-3 max-w-xs">
+                          <div className="bg-gray-800 text-white rounded-2xl rounded-br-md p-3 max-w-xs">
                             <div className="text-sm">{message.text}</div>
                           </div>
                         </div>
@@ -203,22 +220,7 @@ const Index = () => {
                   ))}
 
                 {/* Typing Indicator */}
-                {isTyping && (
-                  <div className="flex items-center space-x-2 text-gray-400 animate-fade-in">
-                    <div className="flex space-x-1">
-                      <div className="w-2 h-2 bg-gray-300 rounded-full animate-bounce"></div>
-                      <div
-                        className="w-2 h-2 bg-gray-300 rounded-full animate-bounce"
-                        style={{ animationDelay: "0.1s" }}
-                      ></div>
-                      <div
-                        className="w-2 h-2 bg-gray-300 rounded-full animate-bounce"
-                        style={{ animationDelay: "0.2s" }}
-                      ></div>
-                    </div>
-                    <span className="text-xs">AI is thinking...</span>
-                  </div>
-                )}
+                {isTyping && <LoadingMessage characterName="Japanese Sensei" />}
               </div>
 
               {/* Input Area */}

@@ -23,7 +23,7 @@ export const GrammarCorrection = ({
   return (
     <div className="max-w-5xl mx-auto py-4">
       {/* Header */}
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex items-center justify-between gap-2 mb-4">
         <div>
           <h2 className="text-lg font-medium text-gray-900 mb-1">
             Grammar Correction

@@ -23,10 +23,8 @@ import { toast } from "sonner";
 import { Header } from "./Header";
 import { LevelSelection } from "./LevelSelection";
 import { PolitenessSelection } from "./PolitenessSelection";
-import { VoiceSelection } from "./VoiceSelection";
 import { ThemeSelection } from "./ThemeSelection";
 import { GrammarCorrection } from "./GrammarCorrection";
-import { TimeSelection } from "./TimeSelection";
 import { CreditCostDisplay } from "./CreditCostDisplay";
 import { CharacterTimeSelection } from "./CharacterTimeSelection";
 import themes from "../../../data/themes.json";
@@ -195,7 +193,7 @@ export const ModeSelectScreen = ({
   return (
     <div className="relative min-h-screen overflow-auto w-full">
       <div className="min-h-screen p-4 overflow-auto w-full">
-        <div className="max-w-4xl mx-auto py-8 mt-12">
+        <div className="max-w-4xl mx-auto py-8 mt-6">
           <Header
             username={username || "User"}
             subscriptionPlan={subscriptionPlan}

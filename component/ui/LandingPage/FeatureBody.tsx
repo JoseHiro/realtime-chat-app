@@ -100,22 +100,22 @@ export const FeatureBody = () => {
             <h2 className="text-4xl font-bold mb-4 text-gray-900">
               What Students Say
             </h2>
-            <p className="text-lg text-gray-600">
+            <p className="text-sm text-gray-500">
               Hear from learners who are improving their Japanese with Kaiwa Kun
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-white p-8 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors">
+            <div className="bg-white p-8 rounded-lg hover:border-gray-300 transition-colors">
               <div className="flex items-start mb-6">
                 <div className="w-14 h-14 bg-gray-900 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
                   <span className="text-white font-semibold text-lg">S</span>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 text-base mb-1">
+                  <h3 className="font-semibold text-gray-500 text-sm mb-1 font-serif italic">
                     Sarah M.
                   </h3>
-                  <p className="text-sm text-gray-500">Intermediate Learner</p>
+                  <p className="text-xs text-gray-500">Intermediate Learner</p>
                 </div>
               </div>
               <div className="flex mb-4">
@@ -129,23 +129,24 @@ export const FeatureBody = () => {
                   </svg>
                 ))}
               </div>
-              <p className="text-base text-gray-600 leading-relaxed">
+              {/* font written style */}
+              <p className="text-base text-sm text-gray-600 leading-relaxed font-serif italic">
                 &ldquo;Kaiwa Kun has been amazing for my Japanese practice. The
                 conversations feel natural, and the grammar feedback helps me
                 understand my mistakes. Highly recommend!&rdquo;
               </p>
             </div>
 
-            <div className="bg-white p-8 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors">
+            <div className="bg-white p-8 rounded-lg hover:border-gray-300 transition-colors">
               <div className="flex items-start mb-6">
                 <div className="w-14 h-14 bg-gray-900 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
                   <span className="text-white font-semibold text-lg">T</span>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 text-base mb-1">
+                  <h3 className="font-semibold text-gray-500 text-sm mb-1 font-serif italic">
                     Tomoya K.
                   </h3>
-                  <p className="text-sm text-gray-500">Advanced Learner</p>
+                  <p className="text-xs text-gray-500">Advanced Learner</p>
                 </div>
               </div>
               <div className="flex mb-4">
@@ -159,23 +160,23 @@ export const FeatureBody = () => {
                   </svg>
                 ))}
               </div>
-              <p className="text-base text-gray-600 leading-relaxed">
+              <p className="text-base text-sm text-gray-600 leading-relaxed font-serif italic">
                 &ldquo;As someone preparing for JLPT, the detailed feedback and
                 conversation summaries are incredibly valuable. It&apos;s like
                 having a personal tutor available anytime.&rdquo;
               </p>
             </div>
 
-            <div className="bg-white p-8 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors">
+            <div className="bg-white p-8 rounded-lg hover:border-gray-300 transition-colors">
               <div className="flex items-start mb-6">
                 <div className="w-14 h-14 bg-gray-900 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
                   <span className="text-white font-semibold text-lg">E</span>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 text-base mb-1">
+                  <h3 className="font-semibold text-gray-500 text-sm mb-1 font-serif italic">
                     Emily R.
                   </h3>
-                  <p className="text-sm text-gray-500">Beginner Learner</p>
+                  <p className="text-xs text-gray-500">Beginner Learner</p>
                 </div>
               </div>
               <div className="flex mb-4">
@@ -189,7 +190,7 @@ export const FeatureBody = () => {
                   </svg>
                 ))}
               </div>
-              <p className="text-base text-gray-600 leading-relaxed">
+              <p className="text-base text-sm text-gray-600 leading-relaxed font-serif italic">
                 &ldquo;I was nervous about speaking Japanese, but the platform
                 is so supportive. Starting with easy conversations built my
                 confidence, and now I&apos;m having longer chats!&rdquo;
@@ -201,10 +202,10 @@ export const FeatureBody = () => {
 
       <section className="py-20 bg-white border-t border-gray-200">
         <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
-          <h2 className="text-4xl font-bold mb-6 text-gray-900">
+          <h2 className="text-2xl font-bold mb-6 text-gray-900">
             Ready to Master Japanese?
           </h2>
-          <p className="text-lg mb-8 text-gray-600">
+          <p className="text-sm mb-8 text-gray-400">
             Join thousands of learners who are improving their Japanese skills
             through natural conversations.
           </p>
@@ -212,13 +213,13 @@ export const FeatureBody = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <RoundedButton
               onClick={() => router.push("/signup?plan=trial")}
-              className="bg-green-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-green-700 hover:scale-105 hover:shadow-lg shadow-md transition-all"
+              className="bg-black text-white px-6 py-2 rounded-lg text-sm font-semibold hover:bg-gray-800 hover:scale-105 hover:shadow-lg shadow-md transition-all"
             >
               Start Your Free Trial
             </RoundedButton>
             <RoundedButton
               onClick={() => router.push("/how-it-works")}
-              className="border-2 border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white px-8 py-4 rounded-lg text-lg font-semibold hover:scale-105 transition-all"
+              className="border-2 border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white px-8 py-4 rounded-lg text-sm font-semibold hover:scale-105 transition-all"
             >
               Learn More
             </RoundedButton>

@@ -1,21 +1,62 @@
 import React, { useMemo } from "react";
-import { BarChart3, CheckCircle, TrendingUp, BookOpen } from "lucide-react";
+import {
+  BarChart3,
+  CheckCircle,
+  TrendingUp,
+  BookOpen,
+  AlertCircle,
+} from "lucide-react";
 import { SectionContainer, SectionDescription } from "./Container";
-import { SectionTitle, SectionSubTitle } from "./SectionTitle";
-import { Analysis, Feedback } from "../../../type/types";
+import { SectionTitle } from "./SectionTitle";
+import { Analysis, Feedback, ConversationReview } from "../../../type/types";
+import { ImprovementTypeBadge } from "./ImprovementTypeBadge";
+import { GrammarErrorBadge } from "./GrammarErrorBadge";
+import { getImprovementTypesWithCounts } from "../../../lib/improvements/getImprovementTypes";
+import {
+  getGrammarErrorTypesWithCounts,
+  hasGrammarErrors,
+} from "../../../lib/grammar/getGrammarErrors";
 
 export const PerformanceContainer = React.memo(
-  ({ analysis, feedback }: { analysis: Analysis; feedback: Feedback }) => {
+  ({
+    analysis,
+    feedback,
+    conversation,
+  }: {
+    analysis: Analysis;
+    feedback: Feedback;
+    conversation?: ConversationReview | null;
+  }) => {
     // Limit to top 4 most important items
     const topStrengths = useMemo(
       () => (feedback.strengths || []).slice(0, 4),
       [feedback.strengths]
     );
 
-    const topImprovements = useMemo(
-      () => (feedback.improvements || []).slice(0, 4),
-      [feedback.improvements]
-    );
+    // Extract improvement types with counts from conversation data
+    // These replace the old feedback.improvements array
+    const improvementTypesWithCounts = useMemo(() => {
+      if (!conversation) return [];
+      return getImprovementTypesWithCounts(conversation).slice(0, 4); // Limit to 4
+    }, [conversation]);
+
+    // Extract grammar error types with counts from conversation data
+    const grammarErrorTypesWithCounts = useMemo(() => {
+      if (!conversation) return [];
+      return getGrammarErrorTypesWithCounts(conversation).slice(0, 4); // Limit to 4
+    }, [conversation]);
+
+    // Check if there are any grammar errors
+    const hasErrors = useMemo(() => {
+      if (!conversation) return false;
+      return hasGrammarErrors(conversation);
+    }, [conversation]);
+
+    // Check if there are user messages (to show the section even if no errors)
+    const hasUserMessages = useMemo(() => {
+      if (!conversation?.messages) return false;
+      return conversation.messages.some((msg) => msg.sender === "user");
+    }, [conversation]);
 
     return (
       <div className="space-y-6">
@@ -51,25 +92,55 @@ export const PerformanceContainer = React.memo(
           </SectionContainer>
         )}
 
-        {/* Key Improvements */}
-        {topImprovements.length > 0 && (
-          <SectionContainer
-            containerName="Key Improvements"
-            icon={TrendingUp}
-          >
-            <div className="space-y-3">
-              {topImprovements.map((improvement, index) => (
+        {/* Key Improvements - Notion-like design with improvement types */}
+        {improvementTypesWithCounts.length > 0 && (
+          <SectionContainer containerName="Key Improvements" icon={TrendingUp}>
+            <div className="flex flex-wrap gap-2">
+              {improvementTypesWithCounts.map(({ type }, index) => (
                 <div
                   key={index}
-                  className="flex items-start space-x-3 bg-blue-50 rounded-lg p-3 border border-blue-100"
+                  className="group inline-flex items-center gap-2 rounded-lg hover:border-gray-300 hover:shadow-sm transition-all cursor-default"
                 >
-                  <TrendingUp className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
-                  <SectionDescription>
-                    <p className="text-sm text-gray-800">{improvement}</p>
-                  </SectionDescription>
+                  <ImprovementTypeBadge type={type} />
                 </div>
               ))}
             </div>
+          </SectionContainer>
+        )}
+
+        {/* Grammar Errors - Show errors or positive message if no errors */}
+        {hasUserMessages && (
+          <SectionContainer
+            containerName="Grammar Errors"
+            icon={hasErrors ? AlertCircle : CheckCircle}
+          >
+            {hasErrors && grammarErrorTypesWithCounts.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {grammarErrorTypesWithCounts.map(({ type, count }, index) => (
+                  <div
+                    key={index}
+                    className="group inline-flex items-center gap-2 bg-white rounded-lg border border-gray-200 hover:border-gray-300 hover:shadow-sm transition-all cursor-default"
+                  >
+                    <GrammarErrorBadge type={type} />
+                    {count > 1 && (
+                      <span className="text-xs text-gray-500 font-medium">
+                        {count}
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="flex items-center gap-3 bg-green-50 rounded-lg p-4 border border-green-100">
+                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+                <SectionDescription>
+                  <p className="text-sm text-gray-800 font-medium">
+                    Great job! No major grammar errors detected in your
+                    conversation.
+                  </p>
+                </SectionDescription>
+              </div>
+            )}
           </SectionContainer>
         )}
 

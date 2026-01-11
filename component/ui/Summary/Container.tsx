@@ -1,4 +1,3 @@
-
 export const SectionContainer = ({
   children,
   containerName,
@@ -28,7 +27,7 @@ export const SectionDescription = ({
 }) => {
   return (
     <div
-      className={`bg-gray-50 rounded-lg p-4 text-sm text-gray-800 leading-relaxed ${className}`}
+      className={`rounded-lg p-4 text-sm text-gray-800 leading-relaxed ${className}`}
     >
       {children}
     </div>

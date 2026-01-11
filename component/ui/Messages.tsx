@@ -9,11 +9,13 @@ export const Messages = ({
   chatInfo,
   chatLoading,
   hiraganaReadingList,
+  characterName,
 }: {
   chatLoading: boolean;
   history: ChatType;
   chatInfo: { audioUrl: string; english: string }[];
   hiraganaReadingList: string[];
+  characterName?: string;
 }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   // const [currentPlayingId, setCurrentPlayingId] = useState<number | null>(null);
@@ -182,7 +184,7 @@ export const Messages = ({
       ))}
 
       {/* Loading Message */}
-      {chatLoading && <LoadingMessage />}
+      {chatLoading && <LoadingMessage characterName={characterName} />}
 
       <div ref={messagesEndRef} />
     </div>

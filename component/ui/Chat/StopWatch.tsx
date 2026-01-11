@@ -6,7 +6,9 @@ import { toast } from "sonner";
 
 export interface StopWatchProps {
   history: any;
-  setOverlayOpened: React.Dispatch<React.SetStateAction<boolean>> | ((value: boolean) => void);
+  setOverlayOpened:
+    | React.Dispatch<React.SetStateAction<boolean>>
+    | ((value: boolean) => void);
   chatDurationMinutes: number; // Duration in minutes
 }
 
@@ -92,6 +94,8 @@ export function StopWatch({
             // 時間切れ時の処理（自動で会話終了）
             if (!summaryCreatedRef.current) {
               summaryCreatedRef.current = true;
+              // Set chatEnded immediately so input is blocked even if modal is closed
+              setChatEnded(true);
               setOverlayOpened(true);
               handleCreateSummary();
             }
@@ -108,7 +112,7 @@ export function StopWatch({
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [isActive, timeLeft, handleCreateSummary, setOverlayOpened]);
+  }, [isActive, timeLeft, handleCreateSummary, setOverlayOpened, setChatEnded]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);

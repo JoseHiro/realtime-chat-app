@@ -61,6 +61,7 @@ export const Summary = ({
               <PerformanceContainer
                 analysis={summary.analysis}
                 feedback={summary.feedback}
+                conversation={conversationData}
               />
             )}
             {activeTab === "conversation" &&

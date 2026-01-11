@@ -239,7 +239,7 @@ export const Sidebar = () => {
             <button
               onClick={() => handleGoToSelectMode()}
               className={`
-                flex items-center gap-3 p-4 rounded-xl bg-white text-gray-600 mb-4 hover:bg-gray-100 transition-all duration-200 shadow-sm border border-gray-200 cursor-pointer
+                flex items-center gap-3 p-4 rounded-xl bg-white text-gray-600 mb-4 hover:bg-gray-100 transition-all duration-200 shadow-xs border border-gray-200 cursor-pointer
                 ${
                   isCollapsed
                     ? "justify-center border-none shadow-none px-2 py-2"
@@ -413,11 +413,13 @@ export const Sidebar = () => {
                           } plan`
                         : "No plan"}
                     </p>
-                    {subscriptionPlan && (subscriptionPlan === "pro" || subscriptionPlan === "premium") && (
-                      <p className="text-xs text-gray-500 mt-0.5 truncate">
-                        {creditsRemaining} credits
-                      </p>
-                    )}
+                    {subscriptionPlan &&
+                      (subscriptionPlan === "pro" ||
+                        subscriptionPlan === "premium") && (
+                        <p className="text-xs text-gray-500 mt-0.5 truncate">
+                          {creditsRemaining} credits
+                        </p>
+                      )}
                   </div>
                 )}
               </div>
