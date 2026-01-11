@@ -63,18 +63,17 @@ const Login = () => {
       <AuthHeader />
       <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="w-full max-w-md p-8 border border-gray-200 rounded-lg shadow-lg">
-          <h1 className="text-2xl font-bold mb-6 text-green-600 text-center">
+          <h1 className="text-2xl font-bold mb-6 text-black text-center">
             Login
           </h1>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             {/* Email */}
             <div>
-              <label className="block mb-1 font-medium text-gray-700">
-                Email
-              </label>
+              <label className="block mb-1 text-sm text-gray-500">Email</label>
               <input
                 type="email"
+                placeholder="you@example.com"
                 {...register("email", { required: "Email is required" })}
                 className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-400 text-black ${
                   errors.email ? "border-red-500" : "border-gray-300"
@@ -89,11 +88,12 @@ const Login = () => {
 
             {/* Password */}
             <div>
-              <label className="block mb-1 font-medium text-gray-700">
+              <label className="block mb-1 text-sm text-gray-500">
                 Password
               </label>
               <div className="relative">
                 <input
+                  placeholder="••••••••"
                   type={showPassword ? "text" : "password"}
                   {...register("password", {
                     required: "Password is required",
@@ -126,7 +126,7 @@ const Login = () => {
             <RoundedButton
               // type="submit"
               loading={loading}
-              className="w-full cursor-pointer bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition"
+              className="w-full cursor-pointer bg-black text-white py-2 px-4 rounded-md hover:bg-gray-800 transition"
             >
               Login
             </RoundedButton>

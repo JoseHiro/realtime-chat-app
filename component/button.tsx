@@ -33,19 +33,21 @@ export const RoundedButton = ({
       className={cn(
         "cursor-pointer flex items-center transition-all duration-300 justify-center relative",
         className,
-        disabled || loading ? "cursor-not-allowed" : "cursor-pointer",
+        disabled || loading
+          ? "cursor-not-allowed opacity-75"
+          : "cursor-pointer",
         "rounded-full" // Always apply rounded-full last to ensure it takes precedence
       )}
       onClick={onClick}
     >
       {loading && (
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
         </div>
       )}
       <div
-        className={`flex items-center justify-center ${
-          loading ? "invisible" : "visible"
+        className={`flex items-center justify-center transition-opacity duration-200 ${
+          loading ? "opacity-0" : "opacity-100"
         }`}
       >
         {children}

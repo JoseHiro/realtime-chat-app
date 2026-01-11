@@ -5,6 +5,7 @@ import { PrismaClient } from "@prisma/client";
 import { MyJwtPayload } from "../../../type/types";
 import { logOpenAIEvent } from "../../../lib/cost/logUsageEvent";
 import { ApiType } from "../../../lib/cost/constants";
+import { classifyImprovement } from "../../../lib/improvements/classifyImprovement";
 
 const prisma = new PrismaClient();
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
@@ -140,6 +141,25 @@ CRITICAL RULES:
 For improvements 1-2: Focus on grammar or vocabulary improvements (more natural or advanced ways to express the same idea)
 For improvement 3: Focus on conversation development - show how to ask back or develop the conversation further
 
+For each improvement, provide:
+- text: Improved Japanese sentence (with kanji)
+- reading: Hiragana reading (ひらがな)
+- english: English translation
+- focus: Grammar point or improvement explanation (English, be specific)
+- level: One of: "beginner", "beginner-intermediate", "intermediate", "intermediate-advanced", "advanced"
+- type: Classification category (REQUIRED, choose ONE from the following):
+  * "complete_sentence" - For incomplete sentences, fragments, or sentence structure issues
+  * "particle_usage" - For particle (を, が, は, に, で, etc.) mistakes or improvements
+  * "listing_and_conjunctions" - For listing items (や, そして) or connecting sentences
+  * "politeness_and_register" - For politeness level (です・ます vs plain form) or formality
+  * "opinion_expression" - For expressing opinions (と思います, と感じる, etc.)
+  * "conversation_expansion" - For developing conversation, asking follow-up questions (IMPROVEMENT 3 ONLY)
+  * "verb_forms" - For verb conjugation, て-form, た-form, potential, causative, passive
+  * "conditional_expressions" - For conditional forms (ば, たら, なら, と)
+  * "honorifics" - For keigo (尊敬語, 謙譲語)
+  * "vocabulary_choice" - For better word choice or more natural vocabulary
+  * "sentence_structure" - For word order, complex sentences, or general syntax
+
 IMPORTANT for Improvement 3 - Conversation Development:
 - MUST ALWAYS include a QUESTION to develop/continue the conversation
 - Should RESPOND APPROPRIATELY to what the assistant said first, THEN add a question
@@ -194,21 +214,24 @@ Output format (JSON only):
           "reading": "<hiragana reading>",
           "english": "<english translation>",
           "focus": "<grammar or vocabulary explanation in English>",
-          "level": "<difficulty level>"
+          "level": "<difficulty level>",
+          "type": "<classification category - see list above>"
         },
         {
           "text": "<second grammar/vocabulary improvement>",
           "reading": "<hiragana>",
           "english": "<english>",
           "focus": "<grammar or vocabulary explanation>",
-          "level": "<level>"
+          "level": "<level>",
+          "type": "<classification category>"
         },
         {
           "text": "<third improvement - respond to assistant's message (if they asked, answer first) then add a question to develop conversation>",
           "reading": "<hiragana>",
           "english": "<english>",
           "focus": "<explanation of how this responds to assistant and develops conversation with a question in English>",
-          "level": "<level>"
+          "level": "<level>",
+          "type": "conversation_expansion"
         }
       ]
     }
@@ -267,13 +290,25 @@ IMPORTANT:
               grammarCorrectByMessageId[msg.id] = true;
             }
 
-            // Store improvements
+            // Store improvements and apply fallback classification if needed
             if (
               msg.improvements &&
               Array.isArray(msg.improvements) &&
               msg.improvements.length > 0
             ) {
-              improvementsByMessageId[msg.id] = msg.improvements.slice(0, 3); // Ensure max 3
+              // Apply fallback classification for improvements missing type
+              const classifiedImprovements = msg.improvements.slice(0, 3).map((improvement: any) => {
+                // If AI didn't provide type, use fallback classification
+                if (!improvement.type && improvement.focus) {
+                  const classifiedType = classifyImprovement(improvement.focus);
+                  return {
+                    ...improvement,
+                    type: classifiedType, // Will be undefined if no match, which is fine
+                  };
+                }
+                return improvement;
+              });
+              improvementsByMessageId[msg.id] = classifiedImprovements;
             }
           }
         });

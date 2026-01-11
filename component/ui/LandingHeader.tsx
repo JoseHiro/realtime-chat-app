@@ -27,21 +27,21 @@ export const LandingHeader = () => {
         <div className="flex justify-between items-center h-16">
           <AppName />
           <div className="hidden md:flex items-center space-x-8">
-            <a
+            <Link
               href="#features"
-              className="text-gray-600 hover:text-green-600 transition-colors duration-200"
+              className="text-sm text-gray-500 hover:text-green-600 transition-colors duration-200"
             >
               Features
-            </a>
+            </Link>
             <Link
               href="/how-it-works"
-              className="text-gray-600 hover:text-green-600 transition-colors duration-200"
+              className="text-sm text-gray-500 hover:text-green-600 transition-colors duration-200"
             >
               How it Works
             </Link>
             <Link
               href="/pricing"
-              className="text-gray-600 hover:text-green-600 transition-colors duration-200"
+              className="text-sm text-gray-500 hover:text-green-600 transition-colors duration-200"
             >
               Pricing
             </Link>

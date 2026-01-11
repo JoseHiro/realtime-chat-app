@@ -11,6 +11,7 @@ import {
   getVoiceProvider,
   type CharacterName,
 } from "../../lib/voice/voiceMapping";
+import { classifyImprovement } from "../../lib/improvements/classifyImprovement";
 
 const prisma = new PrismaClient();
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
@@ -35,12 +36,24 @@ export default async function handler(
     return res.status(400).json({ error: "No data provided" });
   }
 
-  console.log(chatId, politeness, history);
+  // Ensure chatId is a number
+  const chatIdNumber =
+    typeof chatId === "string" ? parseInt(chatId, 10) : chatId;
+  if (isNaN(chatIdNumber)) {
+    return res.status(400).json({ error: "Invalid chatId" });
+  }
+
+  console.log(
+    "Generating summary for chatId:",
+    chatIdNumber,
+    "politeness:",
+    politeness
+  );
 
   try {
     // Fetch actual messages from database to get reading and english fields
     const dbMessages = await prisma.message.findMany({
-      where: { chatId },
+      where: { chatId: chatIdNumber },
       orderBy: { createdAt: "asc" },
       select: {
         id: true,
@@ -53,14 +66,31 @@ export default async function handler(
     });
 
     // Check actual database messages instead of history from request
-    console.log("dbMessages", dbMessages);
+    console.log(
+      `Found ${dbMessages?.length || 0} messages for chatId ${chatIdNumber}`
+    );
     if (!dbMessages || dbMessages.length < 3) {
+      console.log(`Not enough messages: ${dbMessages?.length || 0} < 3`);
       return res
         .status(204)
         .json({ message: "Not enough conversation for summary" });
     }
 
-    const wordData = await wordAnalyzer(dbMessages);
+    // Transform dbMessages to match wordAnalyzer's expected format (role/content)
+    const messagesForAnalysis = dbMessages.map((msg) => ({
+      role: msg.sender === "user" ? "user" : "assistant",
+      content: msg.message,
+    }));
+
+    let wordData: any = {};
+    try {
+      wordData = await wordAnalyzer(messagesForAnalysis);
+      console.log("wordData extracted:", JSON.stringify(wordData, null, 2));
+    } catch (error) {
+      console.error("Error analyzing vocabulary:", error);
+      // Continue with empty vocabulary if analysis fails
+      wordData = {};
+    }
 
     // Use dbMessages to generate conversation text instead of history from request
     const conversationText = dbMessages
@@ -78,7 +108,7 @@ export default async function handler(
         dbMessages,
         politeness,
         decodedToken.userId,
-        chatId
+        chatIdNumber
       );
     } catch (error) {
       console.error("Failed to generate conversation review:", error);
@@ -97,7 +127,7 @@ export default async function handler(
     - Maintain politeness level: "${politeness}"
 
     JSONのキー:
-    - title : title name based on the content
+    - title : title name based on the content (in English)
     - level : { label: Choose exactly one JLPT level from N5, N4, N3, N2, N1 that best represents the user's Japanese ability, reason: detailed reason in English }
 
     Output Example:
@@ -111,20 +141,12 @@ export default async function handler(
         "summary": "Overall summary of the conversation in English",
       },
       "analysis": {
-        "overview": "Performance assessment summary",
-        "skills": {
-          "flow": "Evaluation of the smoothness and naturalness of conversation (English)",
-          "comprehension": "Evaluation of the learner's understanding (English)",
-          "development": "Assessment of ability to expand conversation topics (English)",
-        },
+        "overview": "Comprehensive performance assessment analyzing vocabulary richness, grammar variety, conversation development, sentence complexity, and linguistic elements (English, 4-6 sentences)",
       },
       "feedback": {
         "strengths": [
-          "Strengths of the learner (English array)"
+          "Detailed strength with explanation, reasons, and examples from the conversation (English array - include as 1-3different strengths as genuinely observed in the conversation)"
         ],
-        "improvements": [
-          "Suggestions to improve conversation skills (English array)"
-        ]
         "commonMistakes": [
           "Typical repeated errors (English array)"
         ],
@@ -147,7 +169,37 @@ export default async function handler(
     - Only include Japanese sentences with grammatical errors or unnatural expressions. Do not include correct sentences or stylistic variations.
     - Provide detailed, specific feedback, not vague comments.
     - All evaluations and explanations are in English except the Japanese learner sentences.
-    - Japanese sentence corrections must preserve the indicated politeness (casual/formal).    `;
+    - Japanese sentence corrections must preserve the indicated politeness (casual/formal).
+
+    IMPORTANT - Overview Format (analysis.overview):
+    The "overview" field should be a comprehensive performance assessment that evaluates the learner's linguistic and conversational performance. This is DIFFERENT from "summary" (in meta.summary), which describes what the conversation was about. The "overview" should analyze HOW the learner performed.
+
+    The overview must evaluate the following aspects in a cohesive 4-6 sentence assessment:
+    1. Vocabulary richness: How diverse and varied was the vocabulary usage? Did the learner use varied words or repeat the same terms?
+    2. Grammar variety: Did the learner use multiple grammatical structures or repeat the same sentence patterns/structures?
+    3. Conversation development: Did the learner actively develop the conversation (asking questions, introducing topics, elaborating) or wait passively for the assistant to lead?
+    4. Sentence complexity: What was the typical sentence length (short/simple vs longer/complex sentences)?
+    5. Linguistic elements: How was the usage of conjunctions (そして、でも、しかし、etc.) and particles (は、が、を、に、で、etc.)?
+    6. Politeness consistency: Did the learner consistently use the selected politeness level (${politeness}) throughout the conversation?
+
+    Example format:
+    "The learner demonstrated [vocabulary assessment: rich/varied vs limited/repetitive]. [Grammar variety: used diverse structures vs repeated patterns]. In terms of conversation flow, [development: proactive vs reactive]. Sentences were generally [complexity: short/simple vs longer/complex], and the learner [conjunction/particle usage assessment]. Throughout the conversation, [politeness consistency assessment]."
+
+    Provide specific, observable examples when possible (e.g., "used particles like を and に correctly" or "tended to use short sentences averaging 5-7 words").
+
+    IMPORTANT - Strengths Format:
+    - Identify and list the learner's strengths based on what is ACTUALLY observed in the conversation. The number of strengths should reflect the learner's actual performance - do NOT force a specific number.
+    - Include as many different strengths as are genuinely present (could be 1, 2, 3, or more, depending on what the learner demonstrated).
+    - Each strength must be a detailed explanation (2-3 sentences) that includes:
+      1. What the strength is (e.g., "The student can engage in conversation correctly")
+      2. Why it demonstrates skill - explain the reasoning behind why this is a strength (e.g., "by asking questions instead of just responding, which shows active participation")
+      3. Where it was observed - provide specific examples from the conversation showing when/how this strength was demonstrated (e.g., "For example, when asked about plans, the student asked follow-up questions like 'どうですか？' which helped develop the dialogue further")
+    - Do NOT use simple bullet points like "Engagement in conversation" or "Ability to ask questions"
+    - Instead, provide full explanatory sentences that clearly state what, why, and where: "The student demonstrated strong conversational engagement by asking follow-up questions instead of just responding, which helped develop the dialogue naturally. For example, when discussing topics, the student actively participated by asking 'どうですか？' and similar questions, showing genuine interest in continuing the conversation."
+    - Always include reasons (why it's a strength) and specific references to where in the conversation this was observed (what the student said or did).
+    - Focus on observable behaviors and their positive impact on the conversation.
+    - Each strength should be DIFFERENT from the others - identify various aspects of the learner's performance (e.g., conversation engagement, grammar accuracy, vocabulary usage, cultural awareness, sentence complexity, etc.).
+    - Quality over quantity: It's better to have fewer genuine, well-explained strengths than to force multiple strengths that are not clearly demonstrated in the conversation.    `;
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
@@ -167,7 +219,7 @@ export default async function handler(
     if (completion.usage) {
       await logOpenAIEvent({
         userId: decodedToken.userId,
-        chatId: chatId,
+        chatId: chatIdNumber,
         apiType: ApiType.SUMMARY,
         model: "gpt-4o-mini",
         inputTokens: completion.usage.prompt_tokens || 0,
@@ -197,15 +249,33 @@ export default async function handler(
         .json({ error: "Failed to parse summary response" });
     }
 
-    const title = parsed.meta?.title || "Untitled Conversation";
-    const chat = await storeChatTitle(chatId, title);
+    // Ensure meta object exists
+    if (!parsed.meta) {
+      parsed.meta = {};
+    }
+
+    const title = parsed.meta.title || "Untitled Conversation";
+    const chat = await storeChatTitle(chatIdNumber, title);
     const { level, theme, time, createdAt } = chat;
 
-    if (parsed.meta) {
-      parsed.meta.selectedLevel = level;
-      parsed.meta.selectedTopic = theme;
-      parsed.meta.chatDuration = time;
-      parsed.meta.createdAt = createdAt;
+    // Add chat metadata to meta object (matching previous version format)
+    parsed.meta.title = title;
+    parsed.meta.selectedLevel = level;
+    parsed.meta.selectedTopic = theme;
+    parsed.meta.chatDuration = time;
+    parsed.meta.createdAt = createdAt;
+
+    // Ensure level object exists with label and reason
+    if (!parsed.meta.level || typeof parsed.meta.level !== "object") {
+      parsed.meta.level = {
+        label: parsed.meta.level || "N5",
+        reason: "Level assessment not available",
+      };
+    }
+
+    // Ensure summary exists
+    if (!parsed.meta.summary) {
+      parsed.meta.summary = "No summary available.";
     }
 
     if (parsed.analysis) {
@@ -233,6 +303,27 @@ export default async function handler(
 
     await increaseChatCount(decodedToken.userId);
 
+    // Ensure meta object is properly structured (matching previous version format)
+    if (!parsed.meta) {
+      parsed.meta = {};
+    }
+
+    // Validate and ensure all required meta fields exist
+    if (!parsed.meta.level || typeof parsed.meta.level !== "object") {
+      parsed.meta.level = {
+        label: typeof parsed.meta.level === "string" ? parsed.meta.level : "N5",
+        reason: "Level assessment not available",
+      };
+    }
+
+    if (!parsed.meta.title) {
+      parsed.meta.title = "Untitled Conversation";
+    }
+
+    if (!parsed.meta.summary) {
+      parsed.meta.summary = "No summary available.";
+    }
+
     // Store analysis with conversation review included
     // Use "conversation" key to match frontend expectation
     const analysisWithReview = {
@@ -240,7 +331,13 @@ export default async function handler(
       conversation: conversationReview || undefined, // Include if generated, matches SummaryType.conversation
     };
 
-    await storeAnalysisDB(chatId, analysisWithReview);
+    // Log the structure for debugging
+    console.log(
+      "Analysis with review structure:",
+      JSON.stringify(analysisWithReview.meta, null, 2)
+    );
+
+    await storeAnalysisDB(chatIdNumber, analysisWithReview);
 
     // Deduct credits after chat ends (after summary is successfully generated)
     try {
@@ -249,7 +346,7 @@ export default async function handler(
 
       // Fetch chat to get characterName
       const chatForCredits = await prisma.chat.findUnique({
-        where: { id: chatId },
+        where: { id: chatIdNumber },
         select: { characterName: true },
       });
 
@@ -259,7 +356,7 @@ export default async function handler(
 
         await deductCreditsForChat(
           decodedToken.userId,
-          chatId,
+          chatIdNumber,
           durationMinutes,
           voiceProvider
         );
@@ -274,7 +371,18 @@ export default async function handler(
     return res.status(200).json(analysisWithReview);
   } catch (error) {
     console.error("Summarization error:", error);
-    res.status(500).json({ error: "Failed to summarize text" });
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+    const errorStack = error instanceof Error ? error.stack : undefined;
+    console.error("Error details:", {
+      errorMessage,
+      errorStack,
+      chatId: chatIdNumber,
+    });
+    res.status(500).json({
+      error: "Failed to summarize text",
+      details: errorMessage,
+    });
   }
 }
 
@@ -394,6 +502,18 @@ For each improvement, provide:
 - english: English translation
 - focus: Grammar point or improvement explanation (English, be specific)
 - level: One of: "beginner", "beginner-intermediate", "intermediate", "intermediate-advanced", "advanced"
+- type: Classification category (REQUIRED, choose ONE from the following):
+  * "complete_sentence" - For incomplete sentences, fragments, or sentence structure issues
+  * "particle_usage" - For particle (を, が, は, に, で, etc.) mistakes or improvements
+  * "listing_and_conjunctions" - For listing items (や, そして) or connecting sentences
+  * "politeness_and_register" - For politeness level (です・ます vs plain form) or formality
+  * "opinion_expression" - For expressing opinions (と思います, と感じる, etc.)
+  * "conversation_expansion" - For developing conversation, asking follow-up questions (IMPROVEMENT 3 ONLY)
+  * "verb_forms" - For verb conjugation, て-form, た-form, potential, causative, passive
+  * "conditional_expressions" - For conditional forms (ば, たら, なら, と)
+  * "honorifics" - For keigo (尊敬語, 謙譲語)
+  * "vocabulary_choice" - For better word choice or more natural vocabulary
+  * "sentence_structure" - For word order, complex sentences, or general syntax
 
 Full conversation context (for reference - note the assistant message before each user message):
 ${JSON.stringify(formattedMessages, null, 2)}
@@ -439,21 +559,24 @@ Output format (JSON only - return ONLY user messages with improvements):
           "reading": "<hiragana reading>",
           "english": "<english translation>",
           "focus": "<grammar or vocabulary explanation in English>",
-          "level": "<difficulty level>"
+          "level": "<difficulty level>",
+          "type": "<classification category - see list above>"
         },
         {
           "text": "<second grammar/vocabulary improvement>",
           "reading": "<hiragana>",
           "english": "<english>",
           "focus": "<grammar or vocabulary explanation>",
-          "level": "<level>"
+          "level": "<level>",
+          "type": "<classification category>"
         },
         {
           "text": "<third improvement - respond to assistant's message (if they asked, answer first) then add a question to develop conversation>",
           "reading": "<hiragana>",
           "english": "<english>",
           "focus": "<explanation of how this responds to assistant and develops conversation with a question in English>",
-          "level": "<level>"
+          "level": "<level>",
+          "type": "conversation_expansion"
         }
       ]
     }
@@ -517,13 +640,29 @@ IMPORTANT:
               grammarCorrectByMessageId[msg.id] = true;
             }
 
-            // Store improvements
+            // Store improvements and apply fallback classification if needed
             if (
               msg.improvements &&
               Array.isArray(msg.improvements) &&
               msg.improvements.length > 0
             ) {
-              improvementsByMessageId[msg.id] = msg.improvements.slice(0, 3); // Ensure max 3
+              // Apply fallback classification for improvements missing type
+              const classifiedImprovements = msg.improvements
+                .slice(0, 3)
+                .map((improvement: any) => {
+                  // If AI didn't provide type, use fallback classification
+                  if (!improvement.type && improvement.focus) {
+                    const classifiedType = classifyImprovement(
+                      improvement.focus
+                    );
+                    return {
+                      ...improvement,
+                      type: classifiedType, // Will be undefined if no match, which is fine
+                    };
+                  }
+                  return improvement;
+                });
+              improvementsByMessageId[msg.id] = classifiedImprovements;
             }
           }
         });

@@ -7,6 +7,20 @@ export interface MyJwtPayload extends JwtPayload {
 // JLPT レベルの型
 export type JLPTLevel = "N5" | "N4" | "N3" | "N2" | "N1";
 
+// Improvement taxonomy types
+export type ImprovementType =
+  | "complete_sentence"
+  | "particle_usage"
+  | "listing_and_conjunctions"
+  | "politeness_and_register"
+  | "opinion_expression"
+  | "conversation_expansion"
+  | "verb_forms"
+  | "conditional_expressions"
+  | "honorifics"
+  | "vocabulary_choice"
+  | "sentence_structure";
+
 // 拡張サマリー型（新しいタイプ）
 export type SummaryData = {
   summary: string;
@@ -126,6 +140,7 @@ export type MessageImprovement = {
   english: string;
   focus: string;
   level: string;
+  type?: ImprovementType; // Optional taxonomy classification
 };
 
 export type GrammarPoint = {
@@ -192,7 +207,7 @@ export type Analysis = {
 
 export type Feedback = {
   strengths: string[];
-  improvements: string[];
+  improvements?: string[]; // Optional - now using improvement types from conversation instead
   commonMistakes: string[];
 };
 

@@ -224,7 +224,7 @@ const Signup = () => {
 
           {/* サインアップフォーム */}
           <div className="bg-white p-8 border border-gray-200 rounded-lg shadow-lg">
-            <h1 className="text-2xl font-bold mb-2 text-green-600 text-center">
+            <h1 className="text-2xl font-bold mb-2 text-black text-center">
               Create Your Account
             </h1>
             <p className="text-center text-gray-600 text-sm mb-6">

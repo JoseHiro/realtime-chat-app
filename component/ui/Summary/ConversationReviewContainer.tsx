@@ -16,6 +16,10 @@ import {
   ConversationMessage,
   MessageImprovement,
 } from "../../../type/types";
+import {
+  getCharacterImageUrl,
+  type CharacterName,
+} from "../../../lib/voice/voiceMapping";
 
 export const ConversationReviewContainer = React.memo(
   ({
@@ -59,6 +63,13 @@ export const ConversationReviewContainer = React.memo(
     // Get character image path based on character name
     const getCharacterImage = () => {
       console.log("characterName", characterName);
+      if (!characterName) return null;
+
+      // First try to get from voice mapping config
+      const imageUrl = getCharacterImageUrl(characterName as CharacterName);
+      if (imageUrl) return imageUrl;
+
+      // Fallback to default images
       if (characterName === "Sakura") {
         return "/img/female.jpg";
       } else if (characterName === "Ken") {
@@ -86,10 +97,13 @@ export const ConversationReviewContainer = React.memo(
                       <div className="flex flex-col items-end space-y-1 mb-1">
                         <div className="flex items-center justify-end space-x-2">
                           <span className="text-xs text-gray-500">
-                            {new Date(message.createdAt).toLocaleTimeString([], {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
+                            {new Date(message.createdAt).toLocaleTimeString(
+                              [],
+                              {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              }
+                            )}
                           </span>
                           {/* Grammar correctness indicator */}
                           {typeof (message as any).grammarCorrect ===
@@ -121,7 +135,7 @@ export const ConversationReviewContainer = React.memo(
                             </div>
                           )}
                       </div>
-                      <div className="rounded-lg p-3 border border-black">
+                      <div className="rounded-lg p-3 border border-gray-300">
                         <SectionDescription>
                           <div className="space-y-1">
                             <p className="text-sm text-gray-900 font-medium">
@@ -175,7 +189,7 @@ export const ConversationReviewContainer = React.memo(
                           })}
                         </span>
                       </div>
-                      <SectionDescription>
+                      <SectionDescription className="bg-gray-50 rounded-lg p-4 text-sm text-gray-800 leading-relaxed">
                         <div className="space-y-1">
                           <p className="text-sm text-gray-900 font-medium">
                             {message.message}

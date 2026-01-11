@@ -3,7 +3,13 @@
  */
 
 export type VoiceGender = "male" | "female";
-export type CharacterName = "Sakura" | "Ken" | "Chica" | "Haruki" | "Aiko" | "Ryo";
+export type CharacterName =
+  | "Sakura"
+  | "Ken"
+  | "Chica"
+  | "Haruki"
+  | "Aiko"
+  | "Ryo";
 
 interface VoiceConfig {
   characterName: CharacterName;
@@ -13,6 +19,7 @@ interface VoiceConfig {
   elevenLabsVoiceId?: string; // ElevenLabs voice ID for premium characters
   description: string;
   gender: VoiceGender;
+  imageUrl?: string; // Character icon/image URL
 }
 
 const VOICE_MAP: Record<CharacterName, VoiceConfig> = {
@@ -40,6 +47,7 @@ const VOICE_MAP: Record<CharacterName, VoiceConfig> = {
     elevenLabsVoiceId: "JTlYtJrcTzPC71hMLOxo", // Japanese voice for Chica
     description: "Energetic and cheerful with premium sound",
     gender: "female",
+    imageUrl: "/img/chica.jpg",
   },
   Haruki: {
     characterName: "Haruki",
@@ -49,6 +57,7 @@ const VOICE_MAP: Record<CharacterName, VoiceConfig> = {
     elevenLabsVoiceId: "hBWDuZMNs32sP5dKzMuc", // Japanese voice for Haruki
     description: "Warm and expressive with premium sound",
     gender: "male",
+    imageUrl: "/img/haruki.jpg",
   },
   Aiko: {
     characterName: "Aiko",
@@ -58,6 +67,7 @@ const VOICE_MAP: Record<CharacterName, VoiceConfig> = {
     elevenLabsVoiceId: "WQz3clzUdMqvBf0jswZQ", // Japanese voice for Aiko
     description: "Gentle and soothing with premium sound",
     gender: "female",
+    imageUrl: "/img/Aiko.jpg",
   },
   Ryo: {
     characterName: "Ryo",
@@ -67,6 +77,7 @@ const VOICE_MAP: Record<CharacterName, VoiceConfig> = {
     elevenLabsVoiceId: "8QgNyYugQ07X0LFdMABE", // Japanese voice for Ryo
     description: "Dynamic and engaging with premium sound",
     gender: "male",
+    imageUrl: "/img/Ryo.jpg",
   },
 };
 
@@ -79,9 +90,7 @@ const VOICE_GENDER_MAP: Record<VoiceGender, CharacterName> = {
 /**
  * Get character name and voice configuration from voice gender (legacy)
  */
-export function getVoiceConfig(
-  voiceGender: VoiceGender
-): VoiceConfig {
+export function getVoiceConfig(voiceGender: VoiceGender): VoiceConfig {
   const characterName = VOICE_GENDER_MAP[voiceGender];
   return VOICE_MAP[characterName];
 }
@@ -96,7 +105,9 @@ export function getCharacterName(voiceGender: VoiceGender): CharacterName {
 /**
  * Get voice configuration from character name
  */
-export function getVoiceConfigByCharacter(characterName: CharacterName): VoiceConfig {
+export function getVoiceConfigByCharacter(
+  characterName: CharacterName
+): VoiceConfig {
   return VOICE_MAP[characterName];
 }
 
@@ -121,7 +132,9 @@ export function getAzureVoiceGender(
 /**
  * Get voice provider (azure or elevenlabs) from character name
  */
-export function getVoiceProvider(characterName: CharacterName): "azure" | "elevenlabs" {
+export function getVoiceProvider(
+  characterName: CharacterName
+): "azure" | "elevenlabs" {
   const config = VOICE_MAP[characterName];
   return config?.voiceProvider || "azure";
 }
@@ -129,9 +142,21 @@ export function getVoiceProvider(characterName: CharacterName): "azure" | "eleve
 /**
  * Get ElevenLabs voice ID from character name
  */
-export function getElevenLabsVoiceId(characterName: CharacterName): string | undefined {
+export function getElevenLabsVoiceId(
+  characterName: CharacterName
+): string | undefined {
   const config = VOICE_MAP[characterName];
   return config?.elevenLabsVoiceId;
+}
+
+/**
+ * Get character image URL from character name
+ */
+export function getCharacterImageUrl(
+  characterName: CharacterName
+): string | undefined {
+  const config = VOICE_MAP[characterName];
+  return config?.imageUrl;
 }
 
 /**
@@ -144,6 +169,8 @@ export function getAllCharacters(): VoiceConfig[] {
 /**
  * Get characters by provider
  */
-export function getCharactersByProvider(provider: "azure" | "elevenlabs"): VoiceConfig[] {
-  return Object.values(VOICE_MAP).filter(c => c.voiceProvider === provider);
+export function getCharactersByProvider(
+  provider: "azure" | "elevenlabs"
+): VoiceConfig[] {
+  return Object.values(VOICE_MAP).filter((c) => c.voiceProvider === provider);
 }

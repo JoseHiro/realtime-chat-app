@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Pen, User, FileText, FileX, Loader2, Type } from "lucide-react";
+import { Pen, User, FileText, FileX, Loader2 } from "lucide-react";
 import { StopWatch } from "./StopWatch";
 import { SummaryContent } from "../SummaryContent";
 import { useSpeech } from "../../../context/SpeechContext";
@@ -18,6 +18,7 @@ import { Summary } from "../Summary";
 import { apiRequest } from "../../../lib/apiRequest";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
+import { getCharacterImageUrl, type CharacterName } from "../../../lib/voice/voiceMapping";
 
 export const ChatHeader = ({
   title,
@@ -115,6 +116,13 @@ export const ChatHeader = ({
 
   // Get character image path based on character name
   const getCharacterImage = () => {
+    if (!characterName) return null;
+
+    // First try to get from voice mapping config
+    const imageUrl = getCharacterImageUrl(characterName as CharacterName);
+    if (imageUrl) return imageUrl;
+
+    // Fallback to default images
     if (characterName === "Sakura") {
       return "/img/female.jpg";
     } else if (characterName === "Ken") {
@@ -257,6 +265,7 @@ export const ChatHeader = ({
               history={history}
               setOverlayOpened={setOverlayOpened}
               chatDurationMinutes={(selectedTime ?? 3) as number}
+              // chatDurationMinutes={1}
             />
           )}
           {summaryFetchLoading ? (

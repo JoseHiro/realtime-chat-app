@@ -11,41 +11,7 @@ import { PaymentPromotionContent } from "../component/ui/PaymentPromotionContent
 import { apiRequest } from "../lib/apiRequest";
 import { SummaryContent } from "../component/ui/SummaryContent";
 import { ChatHeader } from "../component/ui/Chat/ChatHeader";
-import { getCharacterName } from "../lib/voice/voiceMapping";
-// notes : common mistakes, tendencies,
-// vocabulary, natural word selection,
-// UI while the chat is thinking
-// when chat appears, scroll to bottom
-// fix your grammar during the conversation
-// formal learning explanation
-// casual form if its natural, streets corrects
-// simulation roleplay
-// cannot respond while AI talking
-
-// authenticate return to login page [x]
-// payment for trial account, after payment activate[x]
-// cancel message input after chat is completed[x]
-// generate original chat title after finishing chat[x]
-// reading for the kanji[x]
-// not enough chat data and won't get the summary[x]
-// loading starting chat[x] loading for data fetch[]
-// display username in the conversation[x]
-// use username in the conversation[x]
-// english reading[x]
-// popup message[x]
-// display summary for each chat page[x]
-// beautify chat style[x]
-// header fix [x]
-// selected chat bg color on the sidebar[x]
-// block reloading (Prevent stopping conversation)[]
-// homepage design[x]
-// analysis design[]
-// play audio[x]
-// audio sound design[]
-// generating chat design[x]
-// audio speed []
-// delete chat checklist in the settings []
-// summary collection page []
+import { toast } from "sonner";
 
 export const Chat = () => {
   const {
@@ -59,7 +25,6 @@ export const Chat = () => {
     setSummary,
     summary,
     summaryFetchLoading,
-    voiceGender,
     selectedCharacter,
   } = useSpeech();
 
@@ -105,50 +70,6 @@ export const Chat = () => {
     setSubscriptionPlan(data?.user.subscriptionPlan);
     setCreditsRemaining(data?.user.creditsRemaining || 0);
   }, [data, setCreditsRemaining]);
-
-  // Send messages to the API and get the response and audio
-  // const sendToAPI = async (messages: ChatType) => {
-  //   setChatLoading(true);
-
-  //   try {
-  //     const data = await apiRequest("/api/chat/generate-response", {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify({
-  //         messages,
-  //         politeness: selectedPoliteness,
-  //         level: selectedLevel,
-  //         // history,
-  //         checkGrammarMode,
-  //         chatId,
-  //       }),
-  //     });
-  //     setHistory((prev) => [
-  //       ...prev,
-  //       { role: "assistant", content: data.reply },
-  //     ]);
-  //     setChatLoading(false);
-  //     setHiraganaReadingList((prev) => [...prev, data.reading]);
-
-  //     if (data.audio) {
-  //       const audioBuffer = Uint8Array.from(atob(data.audio), (c) =>
-  //         c.charCodeAt(0)
-  //       );
-  //       const blob = new Blob([audioBuffer], { type: "audio/mpeg" });
-  //       const audioUrl = URL.createObjectURL(blob);
-  //       const audio = new Audio(audioUrl);
-  //       audio.play();
-  //       setChatInfo((prev) => [
-  //         ...prev,
-  //         { audioUrl: audioUrl, english: data.english },
-  //       ]);
-  //     }
-  //   } catch (error) {
-  //     console.error("sendToAPI error:", error);
-  //   } finally {
-  //     setChatLoading(false);
-  //   }
-  // };
 
   const sendToAPI = async (latestMessages: ChatType) => {
     setChatLoading(true);
@@ -232,6 +153,7 @@ export const Chat = () => {
             chatInfo={chatInfo}
             chatLoading={chatLoading}
             hiraganaReadingList={hiraganaReadingList}
+            characterName={selectedCharacter}
           />
           <VoiceInput
             setChatInfo={setChatInfo}

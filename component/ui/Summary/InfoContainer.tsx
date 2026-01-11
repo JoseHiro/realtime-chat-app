@@ -40,9 +40,9 @@ export const InfoContainer = React.memo(({ meta }: { meta: any }) => {
         {/* Overall Summary */}
         <div className="pt-6 border-t border-gray-200">
           <h3 className="text-base font-semibold text-gray-900 mb-4">
-            Overall Summary
+            Conversation Overview
           </h3>
-          <SectionDescription>
+          <SectionDescription className="bg-gray-50 rounded-lg p-4 text-sm text-gray-800 leading-relaxed">
             {meta?.summary || "No summary available."}
           </SectionDescription>
         </div>
@@ -50,7 +50,7 @@ export const InfoContainer = React.memo(({ meta }: { meta: any }) => {
 
       {/* Level Assessment */}
       <SectionContainer containerName="Level Assessment" icon={Award}>
-        <SectionDescription>
+        <SectionDescription className="bg-gray-50 rounded-lg p-4 text-sm text-gray-800 leading-relaxed">
           <div className="text-2xl font-bold text-gray-900 mb-2">
             {typeof meta?.level === "object"
               ? meta.level.label

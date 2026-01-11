@@ -94,6 +94,13 @@ export const VoiceInput = ({
   // }, []);
 
   const startRecording = () => {
+    if (chatEnded) {
+      toast.info("Chat session has ended", {
+        description: "You cannot record messages after the chat has finished.",
+        position: "top-center",
+      });
+      return;
+    }
     const recognition = initRecognition();
     if (!recognition || isRecording) return;
     setIsRecording(true);
@@ -113,6 +120,13 @@ export const VoiceInput = ({
 
   // voice input
   const handleSubmitAudio = async (text: string) => {
+    if (chatEnded) {
+      toast.info("Chat session has ended", {
+        description: "You cannot send messages after the chat has finished.",
+        position: "top-center",
+      });
+      return;
+    }
     if (!text.trim()) return;
     const latesMessageHistory = [...history, { role: "user", content: text }];
 
@@ -126,6 +140,13 @@ export const VoiceInput = ({
 
   // text input
   const handleDemoSubmit = (text: string) => {
+    if (chatEnded) {
+      toast.info("Chat session has ended", {
+        description: "You cannot send messages after the chat has finished.",
+        position: "top-center",
+      });
+      return;
+    }
     if (!text.trim()) return;
 
     const latesMessageHistory = [...history, { role: "user", content: text }];
@@ -150,7 +171,10 @@ export const VoiceInput = ({
               <input
                 type="text"
                 value={text}
-                className="border border-gray-300 rounded-lg p-2 w-full mb-4 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                disabled={chatEnded}
+                className={`border border-gray-300 rounded-lg p-2 w-full mb-4 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  chatEnded ? "opacity-50 cursor-not-allowed bg-gray-100" : ""
+                }`}
                 placeholder="音声入力はボタンを押して開始"
                 onChange={(e) => setText(e.target.value)}
                 onFocus={() => {
@@ -161,7 +185,12 @@ export const VoiceInput = ({
               />
               <button
                 onClick={() => handleDemoSubmit(text)}
-                className="border rounded-lg p-2 text-black"
+                disabled={chatEnded}
+                className={`border rounded-lg p-2 ${
+                  chatEnded
+                    ? "opacity-50 cursor-not-allowed bg-gray-100 text-gray-400"
+                    : "text-black cursor-pointer"
+                }`}
               >
                 Submit
               </button>
@@ -173,12 +202,14 @@ export const VoiceInput = ({
               onMouseUp={stopRecording}
               onTouchStart={startRecording}
               onTouchEnd={stopRecording}
-              className={`w-20 h-20 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg cursor-pointer ${
-                isRecording
-                  ? "bg-red-500 scale-110 shadow-red-500/30"
-                  : "bg-green-500 hover:bg-green-600 shadow-green-500/30"
-              } ${isAITalking ? "opacity-50 cursor-not-allowed" : ""}`}
-              disabled={isAITalking}
+              className={`w-20 h-20 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg ${
+                chatEnded || isAITalking
+                  ? "opacity-50 cursor-not-allowed bg-gray-400"
+                  : isRecording
+                  ? "bg-red-500 scale-110 shadow-red-500/30 cursor-pointer"
+                  : "bg-green-500 hover:bg-green-600 shadow-green-500/30 cursor-pointer"
+              }`}
+              disabled={chatEnded || isAITalking}
             >
               {isRecording ? (
                 <Square className="w-8 h-8 text-white" />
