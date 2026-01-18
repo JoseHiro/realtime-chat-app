@@ -22,7 +22,7 @@ export const SidebarAppName = ({ onClick }: { onClick: () => void }) => {
   return (
     <button
       onClick={onClick}
-      className="flex items-center gap-3 mb-8 hover:opacity-80 transition-opacity"
+      className="flex items-center gap-3 mb-1 hover:opacity-80 transition-opacity"
     >
       <h1 className="cursor-pointer pl-2 text-2xl font-bold bg-gradient-to-r from-green-600 via-blue-600 to-purple-600 bg-clip-text text-transparent">
         Kaiwa Kun

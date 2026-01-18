@@ -81,3 +81,19 @@ export const SummaryButton = ({
     </button>
   );
 };
+
+export const IconButton = ({
+  icon,
+  onClick,
+  className,
+}: {
+  icon: React.ReactNode;
+  onClick: () => void;
+  className?: string;
+}) => {
+  return (
+    <button className={className} onClick={onClick}>
+      {icon}
+    </button>
+  );
+};
