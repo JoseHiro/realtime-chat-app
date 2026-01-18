@@ -308,6 +308,99 @@ const Dashboard = () => {
             </div>
           </div>
 
+          {/* Daily Usage & Streaks */}
+          {/* Main Widget Card */}
+          <div className="relative overflow-hidden">
+            {/* Animated Background Blobs */}
+            <div className="absolute  -top-24 -right-24 w-48 h-48 bg-gray-200 rounded-full blur-3xl opacity-30 animate-pulse"></div>
+            <div
+              className="absolute -bottom-24 -left-24 w-48 h-48 bg-gray-300 rounded-full blur-3xl opacity-30 animate-pulse"
+              style={{ animationDelay: "2s" }}
+            ></div>
+            <div
+              className="absolute top-1/2 left-1/2 w-32 h-32 bg-gray-200 rounded-full blur-3xl opacity-20 animate-pulse"
+              style={{ animationDelay: "1s" }}
+            ></div>
+
+            {/* Glass Card */}
+            <div className="relative bg-black backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-gray-200">
+              {/* Header */}
+              <div className="flex items-center gap-3 mb-8">
+                <div className="w-14 h-14 bg-gray-900 rounded-2xl flex items-center justify-center shadow-lg transform hover:scale-110 transition-transform">
+                  <Flame className="w-7 h-7 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold text-white">Daily Usage</h2>
+                  <p className="text-sm text-gray-600">Track your progress</p>
+                </div>
+              </div>
+
+              {/* Stats Cards */}
+              <div className="grid grid-cols-2 gap-4 mb-8">
+                {/* Current Streak */}
+                <div className="relative overflow-hidden bg-gradient-to-br from-purple-500/20 to-pink-500/20 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-white/30 transition-all">
+                  <div className="absolute top-0 right-0 w-20 h-20 bg-purple-400/20 rounded-full blur-2xl"></div>
+                  <div className="relative">
+                    <div className="text-4xl font-black text-white mb-2 bg-gradient-to-r from-purple-200 to-pink-200 bg-clip-text text-transparent">
+                      {stats.currentStreak}
+                    </div>
+                    <div className="text-sm font-medium text-white/70">
+                      Day Streak
+                    </div>
+                  </div>
+                </div>
+
+                {/* Longest Streak */}
+                <div className="relative overflow-hidden bg-gradient-to-br from-blue-500/20 to-cyan-500/20 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-white/30 transition-all">
+                  <div className="absolute top-0 right-0 w-20 h-20 bg-blue-400/20 rounded-full blur-2xl"></div>
+                  <div className="relative">
+                    <div className="text-4xl font-black text-white mb-2 bg-gradient-to-r from-blue-200 to-cyan-200 bg-clip-text text-transparent">
+                      {stats.longestStreak}
+                    </div>
+                    <div className="text-sm font-medium text-white/70">
+                      Best Streak
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Motivation Message */}
+              <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-orange-500/20 to-pink-500/20 rounded-2xl mb-6 border border-orange-500/20">
+                <Flame className="w-5 h-5 text-orange-300 flex-shrink-0" />
+                <span className="text-sm font-medium text-white/90">
+                  Keep practicing daily to maintain your streak!
+                </span>
+              </div>
+
+              {/* 30-Day Heatmap */}
+              <div>
+                <h3 className="text-sm font-semibold text-white/80 mb-4 flex items-center gap-2">
+                  <span className="w-1 h-4 bg-gradient-to-b from-purple-400 to-pink-400 rounded-full"></span>
+                  Last 30 Days
+                </h3>
+                <div className="grid grid-cols-10 gap-2">
+                  {stats.last30Days.map((hasChat, index) => (
+                    <div
+                      key={index}
+                      className={`aspect-square rounded-lg transition-all duration-300 hover:scale-110 ${
+                        hasChat
+                          ? "bg-white"
+                          : "bg-white/5 border border-white/10 hover:border-white/30"
+                      }`}
+                      title={
+                        hasChat
+                          ? `Activity on ${new Date(
+                              Date.now() - (29 - index) * 24 * 60 * 60 * 1000
+                            ).toLocaleDateString()}`
+                          : "No activity"
+                      }
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Main Content Grid */}
           <div className="grid lg:grid-cols-3 gap-6">
             {/* Left Column - Wider */}
@@ -390,68 +483,6 @@ const Dashboard = () => {
                       })}
                     </div>
                   )}
-                </div>
-              </div>
-
-              {/* Daily Usage & Streaks */}
-              <div className="bg-white border border-gray-200 rounded-lg">
-                <div className="p-6 border-b border-gray-200">
-                  <h2 className="text-xl font-semibold text-gray-900">
-                    Daily Usage
-                  </h2>
-                </div>
-                <div className="p-6">
-                  <div className="mb-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <div>
-                        <div className="text-3xl font-bold text-gray-900 mb-1">
-                          {stats.currentStreak}
-                        </div>
-                        <div className="text-sm text-gray-600">Day Streak</div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-lg font-semibold text-gray-900 mb-1">
-                          {stats.longestStreak}
-                        </div>
-                        <div className="text-sm text-gray-600">
-                          Longest Streak
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Flame className="w-5 h-5 text-orange-500" />
-                      <span className="text-sm text-gray-600">
-                        Keep practicing daily to maintain your streak!
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* 30-Day Heatmap */}
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-900 mb-3">
-                      Last 30 Days
-                    </h3>
-                    <div className="grid grid-cols-15 gap-1">
-                      {stats.last30Days.map((hasChat, index) => (
-                        <div
-                          key={index}
-                          className={`aspect-square rounded ${
-                            hasChat
-                              ? "bg-gray-900"
-                              : "bg-gray-100 border border-gray-200"
-                          }`}
-                          title={
-                            hasChat
-                              ? `Activity on ${new Date(
-                                  Date.now() -
-                                    (29 - index) * 24 * 60 * 60 * 1000
-                                ).toLocaleDateString()}`
-                              : ""
-                          }
-                        />
-                      ))}
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>

@@ -60,7 +60,7 @@ export const SummaryContent = ({
             <h3 className="text-2xl font-semibold text-gray-900 mb-3">
               Generating Summary
             </h3>
-            <p className="text-gray-600 text-base mb-8">
+            <p className="text-gray-400 text-sm mb-8">
               Analyzing your conversation...
             </p>
             <div className="flex items-center justify-center gap-2">
@@ -98,14 +98,14 @@ export const SummaryContent = ({
             <h2 className="text-2xl font-semibold text-gray-900 mb-3">
               Conversation Finished
             </h2>
-            <p className="text-gray-600 mb-8">
+            <p className="text-gray-500 text-sm mb-8">
               Good job! Please check the summary of your conversation.
             </p>
 
             <RoundedButton
               onClick={() => setSummaryOpened(true)}
               loading={summaryFetchLoading}
-              className="px-8 py-3 bg-gray-900 text-white rounded-lg hover:bg-black transition-colors border-2 border-gray-900 font-medium shadow-sm mx-auto"
+              className="px-8 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors border-2 border-gray-900 font-medium shadow-sm mx-auto"
             >
               View Summary
             </RoundedButton>

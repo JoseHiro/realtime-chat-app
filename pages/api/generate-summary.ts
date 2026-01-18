@@ -16,6 +16,19 @@ import { classifyImprovement } from "../../lib/improvements/classifyImprovement"
 const prisma = new PrismaClient();
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 
+// Configure API route timeout (Vercel allows up to 60s for Pro, 10s for Hobby)
+// For longer operations, consider using background jobs or streaming
+export const config = {
+  api: {
+    responseLimit: false,
+    bodyParser: {
+      sizeLimit: "10mb",
+    },
+    // Note: maxDuration is set via route segment config in Next.js 13+
+    // For Vercel: Hobby plan = 10s, Pro = 60s, Enterprise = 300s
+  },
+};
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -44,11 +57,12 @@ export default async function handler(
   }
 
   console.log(
-    "Generating summary for chatId:",
-    chatIdNumber,
-    "politeness:",
-    politeness
+    `[Summary] Starting generation for chatId: ${chatIdNumber}, politeness: ${politeness}`
   );
+
+  // Set a longer timeout for the response (if supported by platform)
+  // Note: This doesn't work on Vercel serverless - use route segment config instead
+  res.setTimeout(300000); // 5 minutes (may not work on all platforms)
 
   try {
     // Fetch actual messages from database to get reading and english fields
@@ -67,10 +81,14 @@ export default async function handler(
 
     // Check actual database messages instead of history from request
     console.log(
-      `Found ${dbMessages?.length || 0} messages for chatId ${chatIdNumber}`
+      `[Summary] Found ${
+        dbMessages?.length || 0
+      } messages for chatId ${chatIdNumber}`
     );
     if (!dbMessages || dbMessages.length < 3) {
-      console.log(`Not enough messages: ${dbMessages?.length || 0} < 3`);
+      console.log(
+        `[Summary] Not enough messages: ${dbMessages?.length || 0} < 3`
+      );
       return res
         .status(204)
         .json({ message: "Not enough conversation for summary" });
@@ -84,10 +102,11 @@ export default async function handler(
 
     let wordData: any = {};
     try {
+      console.log("[Summary] Starting vocabulary analysis...");
       wordData = await wordAnalyzer(messagesForAnalysis);
-      console.log("wordData extracted:", JSON.stringify(wordData, null, 2));
+      console.log("[Summary] Vocabulary analysis completed");
     } catch (error) {
-      console.error("Error analyzing vocabulary:", error);
+      console.error("[Summary] Error analyzing vocabulary:", error);
       // Continue with empty vocabulary if analysis fails
       wordData = {};
     }
@@ -104,15 +123,34 @@ export default async function handler(
     // For now, we'll generate it here but it can be moved to a separate endpoint call if needed
     let conversationReview = null;
     try {
-      conversationReview = await generateConversationReview(
+      console.log("[Summary] Starting conversation review generation...");
+      // Add timeout wrapper for conversation review generation
+      const reviewPromise = generateConversationReview(
         dbMessages,
         politeness,
         decodedToken.userId,
         chatIdNumber
       );
+
+      // Set a timeout of 45 seconds for conversation review (to leave time for main summary)
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(
+          () =>
+            reject(new Error("Conversation review timeout after 45 seconds")),
+          45000
+        )
+      );
+
+      conversationReview = await Promise.race([reviewPromise, timeoutPromise]);
+      console.log("[Summary] Conversation review generated successfully");
     } catch (error) {
-      console.error("Failed to generate conversation review:", error);
-      // Continue without conversation review if it fails
+      console.error("[Summary] Failed to generate conversation review:", error);
+      console.error(
+        "[Summary] Error details:",
+        error instanceof Error ? error.message : String(error)
+      );
+      // Continue without conversation review if it fails - this is not critical
+      conversationReview = null;
     }
 
     const prompt = `
@@ -172,36 +210,68 @@ export default async function handler(
     - Japanese sentence corrections must preserve the indicated politeness (casual/formal).
 
     IMPORTANT - Overview Format (analysis.overview):
-    The "overview" field should be a comprehensive performance assessment that evaluates the learner's linguistic and conversational performance. This is DIFFERENT from "summary" (in meta.summary), which describes what the conversation was about. The "overview" should analyze HOW the learner performed.
+    The "overview" field should be a comprehensive, BALANCED performance assessment that evaluates the learner's linguistic and conversational performance. This is DIFFERENT from "summary" (in meta.summary), which describes what the conversation was about. The "overview" should analyze HOW the learner performed.
 
-    The overview must evaluate the following aspects in a cohesive 4-6 sentence assessment:
-    1. Vocabulary richness: How diverse and varied was the vocabulary usage? Did the learner use varied words or repeat the same terms?
-    2. Grammar variety: Did the learner use multiple grammatical structures or repeat the same sentence patterns/structures?
-    3. Conversation development: Did the learner actively develop the conversation (asking questions, introducing topics, elaborating) or wait passively for the assistant to lead?
-    4. Sentence complexity: What was the typical sentence length (short/simple vs longer/complex sentences)?
-    5. Linguistic elements: How was the usage of conjunctions (そして、でも、しかし、etc.) and particles (は、が、を、に、で、etc.)?
-    6. Politeness consistency: Did the learner consistently use the selected politeness level (${politeness}) throughout the conversation?
+    CRITICAL: The overview MUST be BALANCED - include BOTH strengths (what the learner did well) AND areas for improvement (what could be better). Do NOT focus only on negatives or only on positives. A balanced assessment acknowledges both what the learner is doing well and what they can improve.
 
-    Example format:
-    "The learner demonstrated [vocabulary assessment: rich/varied vs limited/repetitive]. [Grammar variety: used diverse structures vs repeated patterns]. In terms of conversation flow, [development: proactive vs reactive]. Sentences were generally [complexity: short/simple vs longer/complex], and the learner [conjunction/particle usage assessment]. Throughout the conversation, [politeness consistency assessment]."
+    The overview must evaluate the following aspects in a cohesive 4-6 sentence assessment, ensuring balance:
+    1. Vocabulary richness: How diverse and varied was the vocabulary usage? Did the learner use varied words or repeat the same terms? Did the user use advanced vocabulary? (Acknowledge both strengths and limitations)
+    2. Grammar variety: Did the learner use multiple grammatical structures or repeat the same sentence patterns/structures? (Highlight what structures were used well AND what could be expanded)
+    3. Conversation development: Did the learner actively develop the conversation (asking questions, introducing topics, elaborating) or wait passively for the assistant to lead? (Recognize active participation AND suggest ways to engage more)
+    4. Sentence complexity: What was the typical sentence length (short/simple vs longer/complex sentences)? (Note appropriate complexity where present AND opportunities for more sophisticated structures)
+    5. Linguistic elements: How was the usage of conjunctions (そして、でも、しかし、etc.) and particles (は、が、を、に、で、etc.)? (Acknowledge correct usage AND areas where usage could be enhanced)
+    6. Politeness consistency: Did the learner consistently use the selected politeness level (${politeness}) throughout the conversation? (Note consistency where present AND any inconsistencies)
 
-    Provide specific, observable examples when possible (e.g., "used particles like を and に correctly" or "tended to use short sentences averaging 5-7 words").
+    Example format (BALANCED):
+    "The learner demonstrated [vocabulary assessment: acknowledge both strengths like 'used appropriate technical terms' AND areas for growth like 'could expand vocabulary range']. [Grammar variety: recognize structures used well AND suggest expansion]. In terms of conversation flow, [development: highlight active participation AND suggest further engagement techniques]. Sentences were generally [complexity: note appropriate complexity where present AND opportunities for more sophisticated structures], and the learner [conjunction/particle usage: acknowledge correct usage AND suggest enhancements]. Throughout the conversation, [politeness consistency: note consistency AND any areas for improvement]."
+
+    BALANCE REQUIREMENTS:
+    - If you mention a limitation, also mention a corresponding strength
+    - If you highlight a strength, also note an area for growth
+    - Use phrases like "while... could also..." or "demonstrated... though could enhance..." to create balance
+    - Avoid all-negative or all-positive assessments
+    - Provide specific, observable examples for both strengths and areas for improvement (e.g., "used particles like を and に correctly, though could incorporate more complex particles like によって" or "tended to use short sentences averaging 5-7 words, which were clear and appropriate, though could experiment with longer, more complex structures")
 
     IMPORTANT - Strengths Format:
+    - CRITICAL: Strengths must focus ONLY on JAPANESE LANGUAGE SKILLS and CONVERSATION ABILITY, NOT on topic knowledge, domain expertise, or understanding of the subject matter.
+    - DO NOT evaluate: understanding of topics, critical thinking about subjects, domain knowledge, or content expertise.
+    - DO evaluate: Japanese vocabulary usage, grammar accuracy, sentence structure, conversation skills, linguistic elements (particles, conjunctions), politeness usage, question formation, dialogue development, sentence complexity, etc.
+
     - Identify and list the learner's strengths based on what is ACTUALLY observed in the conversation. The number of strengths should reflect the learner's actual performance - do NOT force a specific number.
     - Include as many different strengths as are genuinely present (could be 1, 2, 3, or more, depending on what the learner demonstrated).
     - Each strength must be a detailed explanation (2-3 sentences) that includes:
-      1. What the strength is (e.g., "The student can engage in conversation correctly")
-      2. Why it demonstrates skill - explain the reasoning behind why this is a strength (e.g., "by asking questions instead of just responding, which shows active participation")
-      3. Where it was observed - provide specific examples from the conversation showing when/how this strength was demonstrated (e.g., "For example, when asked about plans, the student asked follow-up questions like 'どうですか？' which helped develop the dialogue further")
+      1. What the LANGUAGE/CONVERSATION strength is (e.g., "The student demonstrated effective use of question particles" or "The student showed good conversational engagement through follow-up questions")
+      2. Why it demonstrates LANGUAGE skill - explain the reasoning behind why this is a linguistic/conversational strength (e.g., "by using appropriate question particles like か and の, which shows understanding of Japanese question formation" or "by asking follow-up questions using natural Japanese structures, which demonstrates active conversation participation")
+      3. Where it was observed - provide specific examples from the conversation showing the JAPANESE LANGUAGE usage (e.g., "For example, the student asked '日本で個人アプリを開発してそれだけ食べていけるぐらいの開発をした人はいる？' which demonstrates correct use of complex sentence structure with relative clauses and appropriate question formation")
     - Do NOT use simple bullet points like "Engagement in conversation" or "Ability to ask questions"
-    - Instead, provide full explanatory sentences that clearly state what, why, and where: "The student demonstrated strong conversational engagement by asking follow-up questions instead of just responding, which helped develop the dialogue naturally. For example, when discussing topics, the student actively participated by asking 'どうですか？' and similar questions, showing genuine interest in continuing the conversation."
-    - Always include reasons (why it's a strength) and specific references to where in the conversation this was observed (what the student said or did).
-    - Focus on observable behaviors and their positive impact on the conversation.
-    - Each strength should be DIFFERENT from the others - identify various aspects of the learner's performance (e.g., conversation engagement, grammar accuracy, vocabulary usage, cultural awareness, sentence complexity, etc.).
-    - Quality over quantity: It's better to have fewer genuine, well-explained strengths than to force multiple strengths that are not clearly demonstrated in the conversation.    `;
+    - Instead, provide full explanatory sentences that clearly state what LANGUAGE skill, why it's a linguistic strength, and where it was observed: "The student demonstrated strong conversational engagement in Japanese by asking follow-up questions using natural sentence structures, which helped develop the dialogue naturally. For example, when discussing topics, the student actively participated by asking 'どうですか？' using appropriate question formation, showing ability to maintain conversation flow in Japanese."
+    - Always include reasons (why it's a LANGUAGE strength) and specific references to the JAPANESE LANGUAGE used in the conversation (what Japanese structures, vocabulary, or conversation techniques the student demonstrated).
+    - Focus on observable LANGUAGE behaviors and their positive impact on the Japanese conversation.
+    - Each strength should be DIFFERENT from the others - identify various aspects of the learner's JAPANESE LANGUAGE performance (e.g., conversation engagement in Japanese, grammar accuracy, vocabulary variety, particle usage, sentence complexity, politeness consistency, question formation, etc.).
+    - Quality over quantity: It's better to have fewer genuine, well-explained LANGUAGE strengths than to force multiple strengths that are not clearly demonstrated in the conversation.
 
-    const completion = await openai.chat.completions.create({
+    Examples of CORRECT strengths (focus on language structures used in follow-up questions):
+    - "The student demonstrated effective use of complex sentence structures when asking follow-up questions by combining multiple clauses with relative clauses, as seen in '日本で個人アプリを開発してそれだけ食べていけるぐらいの開発をした人はいる？' which shows mastery of Japanese relative clause formation (連体修飾) and appropriate question particle usage (か)."
+    - "The learner showed good conversational engagement in Japanese by asking follow-up questions using natural Japanese structures like 'どうですか？', demonstrating ability to use appropriate question formation patterns and maintain dialogue flow through proper use of question particles."
+    - "The student effectively used follow-up questions to develop the conversation, demonstrating strong Japanese language skills through the use of appropriate question structures. For example, when asking 'それだけ食べていけるぐらいの開発をした人はいる？', the student correctly used the relative clause structure with ぐらい to express degree, showing mastery of complex Japanese grammar in question formation."
+    - "The learner demonstrated natural Japanese conversation flow by asking follow-up questions using appropriate sentence structures. For instance, the question '日本で個人アプリを開発して...' shows effective use of topic markers (で), verb forms (開発して), and complex relative clauses, demonstrating advanced Japanese sentence construction skills."
+
+    Key points for evaluating follow-up questions as strengths:
+    - Focus on the Japanese language structures used (particles, verb forms, sentence patterns, relative clauses, etc.)
+    - Highlight the grammatical complexity or accuracy of the question formation
+    - Note how the Japanese structures demonstrate language skill, not topic knowledge
+    - Reference specific Japanese elements: particles (か, の, は, が, を, に, で), verb forms, sentence patterns, relative clauses, etc.
+
+    Examples of INCORRECT strengths (focus on topic knowledge - DO NOT USE):
+    - "The student showed understanding of app development concepts" (this is about topic knowledge, not language)
+    - "The learner demonstrated critical thinking about the subject matter" (this is about thinking, not Japanese skills)
+    - "The student understood the importance of user feedback" (this is about domain knowledge, not language ability)
+    - "The learner actively engaged by asking relevant questions about app development" (focuses on topic relevance, not Japanese language structures)
+    - "The student showed curiosity about the subject" (focuses on interest/topic, not language skills)    `;
+
+    console.log("[Summary] Starting main summary generation...");
+    // Add timeout for main summary generation (60 seconds)
+    const summaryPromise = openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
         {
@@ -214,6 +284,19 @@ export default async function handler(
         },
       ],
     });
+
+    const summaryTimeoutPromise = new Promise<never>((_, reject) =>
+      setTimeout(
+        () => reject(new Error("Summary generation timeout after 60 seconds")),
+        60000
+      )
+    );
+
+    const completion = await Promise.race([
+      summaryPromise,
+      summaryTimeoutPromise,
+    ]);
+    console.log("[Summary] Main summary generated successfully");
 
     // Log usage for summary generation
     if (completion.usage) {
@@ -235,15 +318,18 @@ export default async function handler(
       try {
         parsed = JSON.parse(jsonMatch[0]);
       } catch (error) {
+        console.error("[Summary] Failed to parse JSON:", error);
         return res
           .status(500)
           .json({ error: "Failed to summarize text", details: error });
       }
     } else {
+      console.error("[Summary] No JSON found in response");
       return res.status(500).json({ error: "Failed to summarize text" });
     }
 
     if (!parsed) {
+      console.error("[Summary] Parsed result is null or undefined");
       return res
         .status(500)
         .json({ error: "Failed to parse summary response" });
@@ -333,7 +419,7 @@ export default async function handler(
 
     // Log the structure for debugging
     console.log(
-      "Analysis with review structure:",
+      "[Summary] Analysis with review structure:",
       JSON.stringify(analysisWithReview.meta, null, 2)
     );
 
@@ -363,18 +449,19 @@ export default async function handler(
       }
     } catch (creditError) {
       // Log error but don't fail the summary generation
-      console.error("Error deducting credits:", creditError);
+      console.error("[Summary] Error deducting credits:", creditError);
       // Credit deduction failure shouldn't block the summary response
     }
 
+    console.log(`[Summary] Successfully completed for chatId: ${chatIdNumber}`);
     // Return analysis with conversation review (can also be fetched separately via /api/chat/conversation-review)
     return res.status(200).json(analysisWithReview);
   } catch (error) {
-    console.error("Summarization error:", error);
+    console.error("[Summary] Summarization error:", error);
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error";
     const errorStack = error instanceof Error ? error.stack : undefined;
-    console.error("Error details:", {
+    console.error("[Summary] Error details:", {
       errorMessage,
       errorStack,
       chatId: chatIdNumber,
@@ -416,7 +503,7 @@ const storeAnalysisDB = async (chatId: number, analysisJson: any) => {
 };
 
 const storeChatTitle = async (chatId: number, title: string) => {
-  console.log("Updating chat title to:", title);
+  console.log("[Summary] Updating chat title to:", title);
   const chat = await prisma.chat.update({
     where: { id: chatId },
     data: { title, time: 3 },
@@ -589,7 +676,11 @@ IMPORTANT:
 - Improvement 3 should show how to continue/develop the conversation (asking back, adding context, etc.)
 `;
 
-    const completion = await openai.chat.completions.create({
+    console.log(
+      `[Summary] Generating improvements for ${userMessages.length} user messages...`
+    );
+    // Add timeout for conversation review OpenAI call (45 seconds)
+    const reviewCompletionPromise = openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
         {
@@ -598,6 +689,22 @@ IMPORTANT:
         },
       ],
     });
+
+    const reviewTimeoutPromise = new Promise<never>((_, reject) =>
+      setTimeout(
+        () =>
+          reject(
+            new Error("Conversation review OpenAI timeout after 45 seconds")
+          ),
+        45000
+      )
+    );
+
+    const completion = await Promise.race([
+      reviewCompletionPromise,
+      reviewTimeoutPromise,
+    ]);
+    console.log("[Summary] Conversation review OpenAI call completed");
 
     // Log usage for conversation review generation
     if (completion.usage) {
@@ -716,7 +823,10 @@ IMPORTANT:
         },
       };
     } catch (error) {
-      console.error("Failed to parse conversation review JSON:", error);
+      console.error(
+        "[Summary] Failed to parse conversation review JSON:",
+        error
+      );
       // Fallback: return messages without improvements
       return {
         conversationId: chatId,
@@ -730,7 +840,7 @@ IMPORTANT:
       };
     }
   } catch (error) {
-    console.error("Error generating conversation review:", error);
+    console.error("[Summary] Error generating conversation review:", error);
     // Fallback: return messages without improvements
     return {
       conversationId: chatId,

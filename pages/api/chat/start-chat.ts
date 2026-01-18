@@ -56,12 +56,14 @@ export default async function handler(
   // Get time from request (default: 3 minutes)
   const time = chatDuration || 3;
 
-  const prompt = `あなたは日本語会話の練習相手です。以下の条件で会話を始めてください。
+  const prompt = `あなたは日本語会話の練習相手です。あなたの名前は${characterName}です。
+以下の条件で会話を始めてください。
 - 学習者のレベル: ${level}
 - テーマ: ${theme}
 - 会話の丁寧さ ${politeness}
 - 最初の発話はシンプルで自然な質問にしてください。
 - 会話は一文から始め、相手が答えやすいようにしましょう。
+- 自分の名前は${characterName}であることを覚えておいてください。名前を聞かれたら「${characterName}です」または「${characterName}と言います」と自然に答えてください。
 
 レベル別の制約:
 - 初級: 語彙は日常的な単語だけを使用し、文は短く。

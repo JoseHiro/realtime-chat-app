@@ -12,7 +12,7 @@ export const Summary = ({
   summary,
   characterName,
 }: {
-  summary: SummaryType;
+  summary: SummaryType | null | undefined;
   characterName?: string;
 }) => {
   const [activeTab, setActiveTab] = useState("info");
@@ -23,9 +23,23 @@ export const Summary = ({
   }, []);
   console.log(summary);
 
+  // Handle case when summary is not available
+  if (!summary) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center p-8">
+          <p className="text-gray-600 mb-2">No summary data available.</p>
+          <p className="text-sm text-gray-500">
+            Summary will appear here once generated.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   // Use mock data as fallback when conversation data is not available from API
   const conversationData: ConversationReview | null = useMemo(() => {
-    if (summary.conversation && summary.conversation.messages?.length > 0) {
+    if (summary?.conversation && summary.conversation.messages?.length > 0) {
       return summary.conversation;
     }
     // Fallback to mock data for testing
@@ -38,7 +52,7 @@ export const Summary = ({
         .metadata as ConversationReview["metadata"];
     }
     return fallback;
-  }, [summary.conversation]);
+  }, [summary?.conversation]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -54,13 +68,13 @@ export const Summary = ({
           {/* Main Content Area */}
           <div className="lg:col-span-3">
             {/* Conversation Info Tab */}
-            {activeTab === "info" && <InfoContainer meta={summary.meta} />}
+            {activeTab === "info" && <InfoContainer meta={summary?.meta} />}
 
             {/* Performance Tab - Overview, Strengths, Improvements, Vocabulary */}
             {activeTab === "performance" && (
               <PerformanceContainer
-                analysis={summary.analysis}
-                feedback={summary.feedback}
+                analysis={summary?.analysis}
+                feedback={summary?.feedback}
                 conversation={conversationData}
               />
             )}
@@ -83,7 +97,7 @@ export const Summary = ({
 
             {/* Growth Path Tab */}
             {activeTab === "milestone" && (
-              <MilestoneContainer milestone={summary.milestone} />
+              <MilestoneContainer milestone={summary?.milestone} />
             )}
           </div>
         </div>
