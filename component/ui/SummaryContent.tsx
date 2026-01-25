@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { Clock, MessageCircle, Loader2 } from "lucide-react";
 import { Summary } from "./Summary";
-import { RoundedButton } from "../button";
+import { RoundedButton } from "../shared/button";
 import { toast } from "sonner";
 
 export const SummaryContent = ({

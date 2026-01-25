@@ -1,4 +1,4 @@
-import { cn } from "../src/lib/utils";
+import { cn } from "../../src/lib/utils";
 
 type SelectModeButtonType = {
   children: any;
@@ -6,6 +6,7 @@ type SelectModeButtonType = {
   onClick?: () => void;
   disabled?: boolean;
   loading?: boolean;
+  variant?: "green" | "gray" | "blue" | "white" | "black";
 };
 
 export const SelectModeButton = ({
@@ -20,23 +21,34 @@ export const SelectModeButton = ({
   );
 };
 
+const COLOR = {
+  green:
+    "bg-green-500 hover:bg-green-600 text-white transition-all duration-200 hover:scale-105",
+  gray: "bg-gray-500 hover:bg-gray-600 text-white",
+  blue: "bg-blue-500 hover:bg-blue-600 text-white",
+  white: "bg-white text-green-600 hover:bg-green-50 border border-green-200",
+  black: "bg-black text-white hover:bg-gray-800",
+};
+
 export const RoundedButton = ({
   disabled,
   children,
   className,
   onClick,
+  variant = "black",
   loading,
 }: SelectModeButtonType) => {
   return (
     <button
       disabled={disabled || loading}
       className={cn(
-        "cursor-pointer flex items-center transition-all duration-300 justify-center relative",
+        "cursor-pointer px-6 py-2 shadow-md hover:shadow-lg flex items-center transition-all duration-300 justify-center relative",
         className,
         disabled || loading
           ? "cursor-not-allowed opacity-75"
           : "cursor-pointer",
-        "rounded-full" // Always apply rounded-full last to ensure it takes precedence
+        COLOR[variant as keyof typeof COLOR],
+        "rounded-full", // Always apply rounded-full last to ensure it takes precedence
       )}
       onClick={onClick}
     >

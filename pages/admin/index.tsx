@@ -12,7 +12,7 @@ import {
   Coins,
   FileText,
 } from "lucide-react";
-import { RoundedButton } from "../../component/button";
+import { RoundedButton } from "../../component/shared/button";
 
 interface AdminStats {
   totalUsers: number;

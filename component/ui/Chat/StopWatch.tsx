@@ -80,7 +80,7 @@ export function StopWatch({
 
   // Initialize timeLeft when chatDurationMinutes changes
   useEffect(() => {
-    setTimeLeft(chatDurationMinutes * 60);
+    setTimeLeft(60 * 60);
   }, [chatDurationMinutes]);
 
   useEffect(() => {

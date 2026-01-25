@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { useSpeech } from "../../../context/SpeechContext";
 import { ChatType } from "../../../type/types";
-import { RoundedButton } from "../../button";
+import { RoundedButton } from "../../shared/button";
 import { BlockUseOverlay } from "../../overlay";
 import { apiRequest } from "../../../lib/apiRequest";
 import { toast } from "sonner";
@@ -141,26 +141,13 @@ export const ModeSelectScreen = ({
           }),
         });
 
-        setHistory((prev) => [
-          ...prev,
-          { role: "assistant", content: data.reply },
-        ]);
-        setChatId(Number(data.chatId));
-        setHiraganaReadingList((prev) => [...prev, data.reading]);
-
-        if (data.audio) {
-          const audioBuffer = Uint8Array.from(atob(data.audio), (c) =>
-            c.charCodeAt(0)
-          );
-          const blob = new Blob([audioBuffer], { type: "audio/mpeg" });
-          const audioUrl = URL.createObjectURL(blob);
-          const audio = new Audio(audioUrl);
-          audio.play();
-          setChatInfo((prev) => [
-            ...prev,
-            { audioUrl: audioUrl, english: data.english },
-          ]);
-          setChatMode(true);
+        // For Realtime API, we just get chatId and metadata
+        // No initial message or audio - Realtime API handles everything
+        if (data.chatId) {
+          setChatId(Number(data.chatId));
+          setChatMode(true); // Start chat mode - Realtime session will initialize in new.tsx
+        } else {
+          throw new Error("Failed to create chat - no chatId returned");
         }
       } catch (error) {
         console.error(error);
@@ -182,10 +169,7 @@ export const ModeSelectScreen = ({
     selectedCharacter,
     loading,
     handleRefreshPreviousData,
-    setHistory,
     setChatId,
-    setHiraganaReadingList,
-    setChatInfo,
     setChatMode,
     setPaymentOverlay,
   ]);

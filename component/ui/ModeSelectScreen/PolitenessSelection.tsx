@@ -2,7 +2,7 @@ import React from "react";
 import { FaPersonWalkingLuggage } from "react-icons/fa6";
 import { User } from "lucide-react";
 import politenesses from "../../../data/politenesses.json";
-import { SelectModeButton } from "../../button";
+import { SelectModeButton } from "../../shared/button";
 import { ButtonContents } from "./ButtonContents";
 
 type PolitenessSelectionProps = {

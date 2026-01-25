@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Image from "next/image";
-import { RoundedButton } from "../component/button";
-import { LandingHeader } from "../component/ui/LandingHeader";
+import { RoundedButton } from "../component/shared/button";
+import { LandingHeader } from "../component/ui/LandingPage/LandingHeader";
 import { Mic, Coffee, User, Volume2 } from "lucide-react";
-import { LandingFooter } from "../component/ui/LandingFooter";
+import { LandingFooter } from "../component/ui/LandingPage/LandingFooter";
 import { FeatureBody } from "../component/ui/LandingPage/FeatureBody";
 import { LoadingMessage } from "../component/loading";
 
@@ -119,7 +119,7 @@ const Index = () => {
               </RoundedButton>
               <RoundedButton
                 onClick={() => router.push("/login")}
-                className="border border-green-200 text-green-600 hover:text-green-700 hover:border-green-300 hover:bg-green-50 font-medium px-6 py-3 rounded-full transition-all duration-200"
+                variant="white"
               >
                 Already have an account? Login
               </RoundedButton>

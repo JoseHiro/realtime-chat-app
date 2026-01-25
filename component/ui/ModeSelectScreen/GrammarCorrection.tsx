@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { MdAutoFixHigh } from "react-icons/md";
 import { Lock, User } from "lucide-react";
 import corrections from "../../../data/corrections.json";
-import { SelectModeButton } from "../../button";
+import { SelectModeButton } from "../../shared/button";
 import { ButtonContents } from "./ButtonContents";
 
 type GrammarCorrectionProps = {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import { RoundedButton } from "../button";
-import { AppName } from "./AppName";
+import { RoundedButton } from "../../shared/button";
+import { AppName } from "../AppName";
 import Link from "next/link";
 
 export const LandingHeader = () => {
@@ -47,7 +47,7 @@ export const LandingHeader = () => {
             </Link>
             <RoundedButton
               onClick={() => router.push("/login")}
-              className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 transition-all duration-200 hover:scale-105 shadow-md hover:shadow-lg"
+              variant="green"
             >
               Start Learning
             </RoundedButton>

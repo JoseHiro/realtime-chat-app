@@ -1,6 +1,6 @@
 import React from "react";
 import { FeatureCard } from "./FeatureCard";
-import { RoundedButton } from "../../button";
+import { RoundedButton } from "../../shared/button";
 import { useRouter } from "next/router";
 import Link from "next/link";
 
@@ -219,7 +219,7 @@ export const FeatureBody = () => {
             </RoundedButton>
             <RoundedButton
               onClick={() => router.push("/how-it-works")}
-              className="border-2 border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white px-8 py-4 rounded-lg text-sm font-semibold hover:scale-105 transition-all"
+              variant="white"
             >
               Learn More
             </RoundedButton>

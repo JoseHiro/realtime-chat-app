@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { useRouter } from "next/router";
-import { RoundedButton } from "../component/button";
-import { LandingHeader } from "../component/ui/LandingHeader";
+import { RoundedButton } from "../component/shared/button";
+import { LandingHeader } from "../component/ui/LandingPage/LandingHeader";
 import { PricingType, FAQType } from "../type/types";
-import { LandingFooter } from "../component/ui/LandingFooter";
+import { LandingFooter } from "../component/ui/LandingPage/LandingFooter";
 
 const Pricing = () => {
   const router = useRouter();
@@ -133,8 +133,8 @@ const Pricing = () => {
           plan.popular
             ? "border-green-500"
             : plan.disabled
-            ? "border-gray-200"
-            : "border-gray-100 hover:border-green-200"
+              ? "border-gray-200"
+              : "border-gray-100 hover:border-green-200"
         } ${plan.disabled ? "opacity-75" : ""}`}
       >
         <div className="text-center mb-8">

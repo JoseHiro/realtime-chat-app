@@ -54,7 +54,7 @@ model Chat {
   creditTransactions CreditTransaction[]
 
   // Credit system fields
-  voiceProvider String? // "azure" or "elevenlabs"
+  voiceProvider String? // "azure", "elevenlabs", or "realtime"
   creditsUsed   Int?
 }
 

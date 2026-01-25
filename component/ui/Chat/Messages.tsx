@@ -1,8 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
-import { MessageSquare, Volume2 } from "lucide-react";
-import { LoadingMessage } from "../loading";
-import { ChatType } from "../../type/types";
-import { AssistantMessageBox, UserMessageBox } from "./Chat/Message";
+import { LoadingMessage } from "../../loading";
+import { ChatType } from "../../../type/types";
+import { AssistantMessageBox, UserMessageBox } from "./Message";
 
 export const Messages = ({
   history,
@@ -34,7 +33,7 @@ export const Messages = ({
   return (
     <div className="flex-1 overflow-y-auto p-4 lg:p-6 space-y-6 bg-gradient-to-b from-slate-50 to-gray-50">
       {/* Display Mode Toggle */}
-      <div className="sticky top-4 z-[1] flex justify-center mb-4">
+      {/* <div className="sticky top-4 z-[1] flex justify-center mb-4">
         <div className="bg-white/95 backdrop-blur-sm rounded-xl border border-gray-200 p-1 flex shadow-sm">
           <button
             onClick={() => setDisplayMode("audio")}
@@ -59,7 +58,7 @@ export const Messages = ({
             Text
           </button>
         </div>
-      </div>
+      </div> */}
 
       {/* Messages */}
       {history.map((message: { role: string; content: string }, id: number) => (
@@ -79,7 +78,11 @@ export const Messages = ({
             />
           )}
           {message.role === "user" && (
-            <UserMessageBox id={id} text={message.content} reading={undefined} />
+            <UserMessageBox
+              id={id}
+              text={message.content}
+              reading={undefined}
+            />
           )}
           {/* <div
             className={`max-w-md lg:max-w-2xl transform transition-all duration-300 ${

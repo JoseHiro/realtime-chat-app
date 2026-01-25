@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/router";
 import { useQuery } from "@tanstack/react-query";
-import { RoundedButton } from "../component/button";
+import { RoundedButton } from "../component/shared/button";
 
 const PaymentSuccess = () => {
   const router = useRouter();
@@ -23,9 +23,9 @@ const PaymentSuccess = () => {
       if (!res.ok) throw new Error("Failed to fetch payment status");
       return res.json();
     },
-   refetchInterval: (query) => {
+    refetchInterval: (query) => {
       // 型安全にアクセス
-      if (query.state.status === 'success' && query.state.data) {
+      if (query.state.status === "success" && query.state.data) {
         const data = query.state.data as PaymentStatus;
         return data.subscriptionStatus === "active" ? false : 3000;
       }
@@ -38,7 +38,7 @@ const PaymentSuccess = () => {
     //     // 2秒後にリダイレクト
     //     setTimeout(() => {
     //       setIsRedirecting(true);
-      //       router.push("/new");
+    //       router.push("/new");
     //     }, 2000);
     //   }
     // },
@@ -136,10 +136,10 @@ const PaymentSuccess = () => {
             {isLoading
               ? "Verifying Payment..."
               : error
-              ? "Verification Failed"
-              : payment?.subscriptionStatus !== "active"
-              ? "Setting Up Account..."
-              : "🎉 Welcome to Kaiwa Kun!"}
+                ? "Verification Failed"
+                : payment?.subscriptionStatus !== "active"
+                  ? "Setting Up Account..."
+                  : "🎉 Welcome to Kaiwa Kun!"}
           </h1>
 
           {/* Dynamic Description */}
@@ -147,10 +147,10 @@ const PaymentSuccess = () => {
             {isLoading
               ? "Please wait while we confirm your subscription and prepare your account."
               : error
-              ? "We encountered an issue verifying your payment. Please try again."
-              : payment?.subscriptionStatus !== "active"
-              ? "Payment received! We're now activating your subscription and preparing your Japanese learning experience."
-              : "Your subscription is now active! You have unlimited access to AI-powered Japanese conversations. Let's start your learning journey! 🚀"}
+                ? "We encountered an issue verifying your payment. Please try again."
+                : payment?.subscriptionStatus !== "active"
+                  ? "Payment received! We're now activating your subscription and preparing your Japanese learning experience."
+                  : "Your subscription is now active! You have unlimited access to AI-powered Japanese conversations. Let's start your learning journey! 🚀"}
           </p>
 
           {/* Dynamic Content Based on State */}

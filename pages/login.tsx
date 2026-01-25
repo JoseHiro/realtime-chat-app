@@ -2,9 +2,9 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
-import { AuthHeader } from "../component/ui/LandingHeader";
+import { AuthHeader } from "../component/ui/LandingPage/LandingHeader";
 import { toast } from "sonner";
-import { RoundedButton } from "../component/button";
+import { RoundedButton } from "../component/shared/button";
 import { Eye, EyeOff } from "lucide-react";
 
 type LoginFormInputs = {
