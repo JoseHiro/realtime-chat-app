@@ -2,8 +2,8 @@ import React from "react";
 import { Eye, EyeOff, Type, Mic, BookOpen, MoreVertical } from "lucide-react";
 
 interface SettingsToolbarProps {
-  textOpen: boolean;
-  setTextOpen: (open: boolean) => void;
+  MessagesTextOpenMode: boolean;
+  setMessagesTextOpenMode: (open: boolean) => void;
   textInputMode: boolean;
   setTextInputMode: (mode: boolean) => void;
   hiraganaReading: boolean;
@@ -41,14 +41,14 @@ const ToolbarButton = ({
 );
 
 export const SettingsToolbar = ({
-  textOpen,
-  setTextOpen,
   textInputMode,
   setTextInputMode,
   hiraganaReading,
   setHiraganaReading,
   settingsOpen,
   setSettingOpen,
+  MessagesTextOpenMode,
+  setMessagesTextOpenMode,
 }: SettingsToolbarProps) => {
   return (
     <div className="max-w-4xl mx-auto mt-4 flex items-center justify-end gap-2">
@@ -56,13 +56,13 @@ export const SettingsToolbar = ({
         <div className="flex items-center gap-2">
           {/* Text Open Toggle */}
           <ToolbarButton
-            onClick={() => setTextOpen(!textOpen)}
-            isActive={textOpen}
+            onClick={() => setMessagesTextOpenMode(!MessagesTextOpenMode)}
+            isActive={MessagesTextOpenMode}
             activeColorClass="text-gray-500"
             inactiveColorClass="text-gray-600 hover:bg-gray-300"
-            title={textOpen ? "Hide text" : "Show text"}
+            title={MessagesTextOpenMode ? "Hide text" : "Show text"}
           >
-            {textOpen ? (
+            {MessagesTextOpenMode ? (
               <Eye className="w-4 h-4" />
             ) : (
               <EyeOff className="w-4 h-4" />
@@ -90,7 +90,11 @@ export const SettingsToolbar = ({
             isActive={hiraganaReading}
             activeColorClass="text-green-500"
             inactiveColorClass="bg-gray-100 text-gray-600 hover:bg-gray-300"
-            title={hiraganaReading ? "Hide hiragana reading" : "Show hiragana reading"}
+            title={
+              hiraganaReading
+                ? "Hide hiragana reading"
+                : "Show hiragana reading"
+            }
           >
             <BookOpen className="w-4 h-4" />
           </ToolbarButton>
@@ -100,7 +104,7 @@ export const SettingsToolbar = ({
       {/* Settings Toggle Button */}
       <ToolbarButton
         onClick={() => setSettingOpen(!settingsOpen)}
-        isActive={false} 
+        isActive={false}
         inactiveColorClass="bg-gray-100 text-gray-600 hover:bg-gray-300"
         title={settingsOpen ? "Hide settings" : "Show settings"}
       >

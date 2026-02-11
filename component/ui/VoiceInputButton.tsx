@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import { Mic, Square } from "lucide-react";
 import { ChatType } from "../../type/types";
-import { useSpeech } from "../../context/SpeechContext";
+import { useChatSession } from "../../context/ChatSessionContext";
 import { toast } from "sonner";
 
 // Type declarations for SpeechRecognition
@@ -34,7 +34,7 @@ export const VoiceInput = ({
   const [isRecording, setIsRecording] = useState(false);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const [isAITalking] = useState(false);
-  const { chatEnded } = useSpeech();
+  const { chatEnded } = useChatSession();
 
   const initRecognition = () => {
     if (recognitionRef.current) return recognitionRef.current;

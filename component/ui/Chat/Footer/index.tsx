@@ -4,39 +4,25 @@ import { InputArea } from "./InputArea";
 import { SettingsToolbar } from "./SettingsToolbar";
 
 interface ChatFooterProps {
-  isConnected: boolean;
-  isUserSpeaking: boolean;
-  isAgentSpeaking: boolean;
-  textOpen: boolean;
-  setTextOpen: (open: boolean) => void;
+  MessagesTextOpenMode: boolean;
+  setMessagesTextOpenMode: (open: boolean) => void;
   textInputMode: boolean;
   setTextInputMode: (mode: boolean) => void;
   hiraganaReading: boolean;
   setHiraganaReading: (enabled: boolean) => void;
-  onSendMessage?: (message: string) => void;
+  sendTextMessage?: (message: string) => void;
 }
 
 export const ChatFooter = ({
-  isConnected,
-  isUserSpeaking,
-  isAgentSpeaking,
-  textOpen,
-  setTextOpen,
+  setMessagesTextOpenMode,
+  MessagesTextOpenMode,
   textInputMode,
   setTextInputMode,
   hiraganaReading,
   setHiraganaReading,
-  onSendMessage,
+  sendTextMessage,
 }: ChatFooterProps) => {
   const [settingsOpen, setSettingOpen] = useState(false);
-  const [message, setMessage] = useState("");
-
-  const handleSend = () => {
-    if (message.trim() && onSendMessage) {
-      onSendMessage(message);
-      setMessage("");
-    }
-  };
 
   return (
     <div
@@ -47,24 +33,16 @@ export const ChatFooter = ({
       <div className="flex flex-col space-y-2">
         <div className="flex items-center gap-4 justify-center">
           {textInputMode ? (
-            <InputArea
-              message={message}
-              setMessage={setMessage}
-              onSend={handleSend}
-            />
+            <InputArea sendTextMessage={sendTextMessage} />
           ) : (
-            <VoiceStatus
-              isConnected={isConnected}
-              isUserSpeaking={isUserSpeaking}
-              isAgentSpeaking={isAgentSpeaking}
-            />
+            <VoiceStatus />
           )}
         </div>
       </div>
 
       <SettingsToolbar
-        textOpen={textOpen}
-        setTextOpen={setTextOpen}
+        MessagesTextOpenMode={MessagesTextOpenMode}
+        setMessagesTextOpenMode={setMessagesTextOpenMode}
         textInputMode={textInputMode}
         setTextInputMode={setTextInputMode}
         hiraganaReading={hiraganaReading}

@@ -22,7 +22,7 @@ export const ActionButton = ({
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`w-full p-6 rounded-lg border border-gray-200 text-left transition-all ${
+      className={`p-6 rounded-lg border text-left transition-all shadow-[0_0_10px_rgba(0,0,0,0.1)] ${
         disabled
           ? "opacity-50 cursor-not-allowed"
           : "hover:border-black hover:shadow-sm cursor-pointer"

@@ -8,8 +8,8 @@ const Streaks = () => {
       title="Steaks"
       className="border-none bg-white text-black flex flex-col gap-2"
     >
-      <div className="flex gap-2">
-        <Flame className="w-4 h-4 text-red-500" />
+      <div className="flex gap-2 items-center">
+        <Flame className="w-8 h-8 text-red-500" />
         <div>
           <p className="text-2xl font-bold">19</p>
           <p> days</p>

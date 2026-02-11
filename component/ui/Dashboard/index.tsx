@@ -1,8 +1,10 @@
 import React, { useMemo } from "react";
 import { ChatDataType } from "../../../type/types";
-import Strengths from "./Strengths";
 import { Header } from "./Header";
 import { DashBoardLeft } from "./DashBoardLeft";
+import { ActionButton } from "./ActionButton";
+import { MessageSquare, Users } from "lucide-react";
+import { useRouter } from "next/router";
 
 type ExtendedChatDataType = ChatDataType & {
   time?: number;
@@ -18,6 +20,7 @@ export const DashboardContent = ({
   username,
   chatsData,
 }: DashboardContentProps) => {
+  const router = useRouter();
   // Calculate stats
   const stats = useMemo(() => {
     if (!chatsData?.chats) {
@@ -51,11 +54,27 @@ export const DashboardContent = ({
   }, [chatsData]);
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6 space-y-6">
+    <div className="bg-white rounded-xl p-6 mb-6 space-y-6">
       <Header username={username} stats={stats} />
-      <div className="flex flex-col lg:flex-row gap-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[60%_40%] gap-6">
         <DashBoardLeft />
-        <Strengths />
+        <div className="flex flex-col gap-2 pl-4 pr-4 sm:pl-0 sm:pr-0 lg:pl-0 lg:pr-4">
+          <h3 className="text-black">Practices</h3>
+          <ActionButton
+            icon={MessageSquare}
+            title="Start Conversation"
+            description="Practice Japanese with AI characters. Choose your level, theme, and character."
+            onClick={() => router.push("/new")}
+          />
+          <ActionButton
+            icon={Users}
+            title="Role Play Chat"
+            description="Practice real-world scenarios like job interviews, restaurant orders, and more."
+            onClick={() => router.push("/new")}
+            disabled
+            comingSoon
+          />
+        </div>
       </div>
     </div>
   );

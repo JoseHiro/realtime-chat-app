@@ -1,11 +1,11 @@
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "../lib/apiRequest";
-import { useSpeech } from "../context/SpeechContext";
+import { useUser } from "../context/UserContext";
 import { Dashboard as DashboardComponent } from "../component/ui/Dashboard/Dashboard";
 
 const Dashboard = () => {
-  const { username } = useSpeech();
+  const { username } = useUser();
 
   const { data: userData, isLoading: userLoading } = useQuery({
     queryKey: ["user"],

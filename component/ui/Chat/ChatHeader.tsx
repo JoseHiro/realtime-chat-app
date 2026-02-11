@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { Pen, User, FileText, FileX, Loader2 } from "lucide-react";
 import { StopWatch } from "./StopWatch";
 import { SummaryContent } from "../SummaryContent";
-import { useSpeech } from "../../../context/SpeechContext";
+import { useChatSession } from "../../../context/ChatSessionContext";
+import { useSummary } from "../../../context/SummaryContext";
 import Image from "next/image";
 import {
   UserCheck,
@@ -47,14 +48,9 @@ export const ChatHeader = ({
   const [summaryOpened, setSummaryOpened] = useState<boolean>(false);
   const [isEditingChatTitle, setIsEditingChatTitle] = useState(false);
   const queryClient = useQueryClient();
-  const {
-    summaryFetchLoading,
-    summary,
-    selectedLevel,
-    selectedPoliteness,
-    selectedTheme,
-    selectedTime,
-  } = useSpeech();
+  const { selectedLevel, selectedPoliteness, selectedTheme, selectedTime } =
+    useChatSession();
+  const { summaryFetchLoading, summary } = useSummary();
 
   const getLevelLabel = () => {
     const levelMap = {

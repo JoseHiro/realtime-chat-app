@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Clock } from "lucide-react";
 import { apiRequest } from "../../../lib/apiRequest";
-import { useSpeech } from "../../../context/SpeechContext";
+import { useChatSession } from "../../../context/ChatSessionContext";
+import { useSummary } from "../../../context/SummaryContext";
 import { toast } from "sonner";
 
 export interface StopWatchProps {
@@ -21,14 +22,9 @@ export function StopWatch({
   const [isActive, setIsActive] = useState(true);
   const summaryCreatedRef = useRef(false);
 
-  const {
-    selectedPoliteness,
-    chatId,
-    setChatEnded,
-    setChatId,
-    setSummary,
-    setSummaryFetchLoading,
-  } = useSpeech();
+  const { selectedPoliteness, chatId, setChatEnded, setChatId } =
+    useChatSession();
+  const { setSummary, setSummaryFetchLoading } = useSummary();
 
   const handleCreateSummary = useCallback(async () => {
     setSummaryFetchLoading(true);

@@ -1,154 +1,16 @@
-// SpeechContext.tsx
-import React, { createContext, useContext, useState } from "react";
+/**
+ * Legacy re-exports. Prefer importing from the specific context modules:
+ * - ChatSessionContext (useChatSession)
+ * - UserContext (useUser)
+ * - SummaryContext (useSummary)
+ * - UIPreferencesContext (useUIPreferences)
+ */
 
-export interface SpeechContextType {
-  selectedLevel: string;
-  setSelectedLevel: React.Dispatch<React.SetStateAction<string>>;
-  selectedPoliteness: string;
-  setSelectedPoliteness: React.Dispatch<React.SetStateAction<string>>;
-  selectedTheme: string;
-  setSelectedTheme: React.Dispatch<React.SetStateAction<string>>;
-  customTheme: string;
-  setCustomTheme: React.Dispatch<React.SetStateAction<string>>;
-  checkGrammarMode: boolean;
-  setCheckGrammarMode: React.Dispatch<React.SetStateAction<boolean>>;
-  chatId: null | number;
-  setChatId: React.Dispatch<React.SetStateAction<number | null>>;
-  chatMode: boolean;
-  setChatMode: React.Dispatch<React.SetStateAction<boolean>>;
-  chatEnded: boolean;
-  setChatEnded: React.Dispatch<React.SetStateAction<boolean>>;
-  username: string;
-  setUsername: React.Dispatch<React.SetStateAction<string>>;
-  subscriptionPlan: string;
-  setSubscriptionPlan: React.Dispatch<React.SetStateAction<string>>;
-  summary: any;
-  setSummary: React.Dispatch<React.SetStateAction<any>>;
-  summaryFetchLoading: boolean;
-  setSummaryFetchLoading: React.Dispatch<React.SetStateAction<boolean>>;
-  isMuted: boolean;
-  setIsMuted: React.Dispatch<React.SetStateAction<boolean>>;
-  voiceGender: "male" | "female";
-  setVoiceGender: React.Dispatch<React.SetStateAction<"male" | "female">>;
-  showHiragana: boolean;
-  setShowHiragana: React.Dispatch<React.SetStateAction<boolean>>;
-  creditsRemaining: number;
-  setCreditsRemaining: React.Dispatch<React.SetStateAction<number>>;
-  selectedTime: number;
-  setSelectedTime: React.Dispatch<React.SetStateAction<number>>;
-  selectedCharacter: "Sakura" | "Ken" | "Chica" | "Haruki" | "Aiko" | "Ryo";
-  setSelectedCharacter: React.Dispatch<
-    React.SetStateAction<"Sakura" | "Ken" | "Chica" | "Haruki" | "Aiko" | "Ryo">
-  >;
-}
-
-const SpeechContext = createContext<SpeechContextType>({
-  selectedLevel: "",
-  setSelectedLevel: () => {},
-  selectedPoliteness: "",
-  setSelectedPoliteness: () => {},
-  selectedTheme: "",
-  setSelectedTheme: () => {},
-  customTheme: "",
-  setCustomTheme: () => {},
-  checkGrammarMode: false,
-  setCheckGrammarMode: () => {},
-  chatId: null,
-  setChatId: () => {},
-  chatMode: false,
-  setChatMode: () => {},
-  chatEnded: false,
-  setChatEnded: () => {},
-  username: "",
-  setUsername: () => {},
-  subscriptionPlan: "",
-  setSubscriptionPlan: () => {},
-  summary: null,
-  setSummary: () => {},
-  summaryFetchLoading: false,
-  setSummaryFetchLoading: () => {},
-  isMuted: false,
-  setIsMuted: () => {},
-  voiceGender: "female",
-  setVoiceGender: () => {},
-  showHiragana: false,
-  setShowHiragana: () => {},
-  creditsRemaining: 0,
-  setCreditsRemaining: () => {},
-  selectedTime: 3,
-  setSelectedTime: () => {},
-  selectedCharacter: "Sakura",
-  setSelectedCharacter: () => {},
-});
-
-export const SpeechProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
-  const [selectedLevel, setSelectedLevel] = useState<string>(""); // selected level for the chat
-  const [selectedPoliteness, setSelectedPoliteness] = useState<string>(""); // selected politeness level for the chat
-  const [selectedTheme, setSelectedTheme] = useState<string>(""); // selected chat topic for the chat
-  const [customTheme, setCustomTheme] = useState<string>(""); // custom topic for the chat
-  const [checkGrammarMode, setCheckGrammarMode] = useState<boolean>(false); // selected grammar check mode for the chat
-  const [chatId, setChatId] = useState<number | null>(null); // current chat ID
-  const [chatMode, setChatMode] = useState<boolean>(false); // selected chat or audio mode in the message section of the chat
-  const [chatEnded, setChatEnded] = useState<boolean>(false);
-  const [username, setUsername] = useState<string>("");
-  const [subscriptionPlan, setSubscriptionPlan] = useState<string>(""); // selected subscription plan
-  const [summary, setSummary] = useState(null); // chat summary
-  const [summaryFetchLoading, setSummaryFetchLoading] = useState(false); // summary generating loading
-  const [isMuted, setIsMuted] = useState(false); // speech mute mode
-  const [voiceGender, setVoiceGender] = useState<"male" | "female">("female"); // voice gender preference
-  const [showHiragana, setShowHiragana] = useState(false); // show/hide hiragana reading for user messages
-  const [creditsRemaining, setCreditsRemaining] = useState(0); // current credit balance
-  const [selectedTime, setSelectedTime] = useState<number>(3); // selected chat duration in minutes (3, 5, or 10)
-  const [selectedCharacter, setSelectedCharacter] = useState<
-    "Sakura" | "Ken" | "Chica" | "Haruki" | "Aiko" | "Ryo"
-  >("Sakura"); // selected character
-
-  return (
-    <SpeechContext.Provider
-      value={{
-        selectedPoliteness,
-        setSelectedPoliteness,
-        selectedLevel,
-        setSelectedLevel,
-        selectedTheme,
-        setSelectedTheme,
-        customTheme,
-        setCustomTheme,
-        checkGrammarMode,
-        setCheckGrammarMode,
-        chatId,
-        setChatId,
-        chatMode,
-        setChatMode,
-        chatEnded,
-        setChatEnded,
-        username,
-        setUsername,
-        subscriptionPlan,
-        setSubscriptionPlan,
-        summary,
-        setSummary,
-        summaryFetchLoading,
-        setSummaryFetchLoading,
-        isMuted,
-        setIsMuted,
-        voiceGender,
-        setVoiceGender,
-        showHiragana,
-        setShowHiragana,
-        creditsRemaining,
-        setCreditsRemaining,
-        selectedTime,
-        setSelectedTime,
-        selectedCharacter,
-        setSelectedCharacter,
-      }}
-    >
-      {children}
-    </SpeechContext.Provider>
-  );
-};
-
-export const useSpeech = (): SpeechContextType => useContext(SpeechContext);
+export { useChatSession } from "./ChatSessionContext";
+export type { ChatSessionContextType, CharacterName } from "./ChatSessionContext";
+export { useUser } from "./UserContext";
+export type { UserContextType } from "./UserContext";
+export { useSummary } from "./SummaryContext";
+export type { SummaryContextType } from "./SummaryContext";
+export { useUIPreferences } from "./UIPreferencesContext";
+export type { UIPreferencesContextType } from "./UIPreferencesContext";

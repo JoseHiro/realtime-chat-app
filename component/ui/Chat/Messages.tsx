@@ -9,16 +9,17 @@ export const Messages = ({
   chatLoading,
   hiraganaReadingList,
   characterName,
+  MessagesTextOpenMode,
 }: {
   chatLoading: boolean;
   history: ChatType;
   chatInfo: { audioUrl: string; english: string }[];
   hiraganaReadingList: string[];
   characterName?: string;
+  MessagesTextOpenMode: boolean;
 }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   // const [currentPlayingId, setCurrentPlayingId] = useState<number | null>(null);
-  const [displayMode, setDisplayMode] = useState<"audio" | "text">("audio");
 
   // Auto-scroll when new messages arrive
   useEffect(() => {
@@ -33,32 +34,6 @@ export const Messages = ({
   return (
     <div className="flex-1 overflow-y-auto p-4 lg:p-6 space-y-6 bg-gradient-to-b from-slate-50 to-gray-50">
       {/* Display Mode Toggle */}
-      {/* <div className="sticky top-4 z-[1] flex justify-center mb-4">
-        <div className="bg-white/95 backdrop-blur-sm rounded-xl border border-gray-200 p-1 flex shadow-sm">
-          <button
-            onClick={() => setDisplayMode("audio")}
-            className={`cursor-pointer flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-              displayMode === "audio"
-                ? "bg-emerald-500 text-white shadow-sm transform scale-105"
-                : "text-gray-600 hover:text-gray-800 hover:bg-gray-50"
-            }`}
-          >
-            <Volume2 className="w-4 h-4" />
-            Audio
-          </button>
-          <button
-            onClick={() => setDisplayMode("text")}
-            className={`cursor-pointer flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-              displayMode === "text"
-                ? "bg-emerald-500 text-white shadow-sm transform scale-105"
-                : "text-gray-600 hover:text-gray-800 hover:bg-gray-50"
-            }`}
-          >
-            <MessageSquare className="w-4 h-4" />
-            Text
-          </button>
-        </div>
-      </div> */}
 
       {/* Messages */}
       {history.map((message: { role: string; content: string }, id: number) => (
@@ -70,7 +45,7 @@ export const Messages = ({
         >
           {message.role === "assistant" && (
             <AssistantMessageBox
-              displayMode={displayMode}
+              MessagesTextOpenMode={MessagesTextOpenMode}
               text={message.content}
               reading={hiraganaReadingList[id]}
               id={id}
@@ -82,6 +57,7 @@ export const Messages = ({
               id={id}
               text={message.content}
               reading={undefined}
+              MessagesTextOpenMode={MessagesTextOpenMode}
             />
           )}
           {/* <div
