@@ -12,7 +12,7 @@ import {
 } from "../../../lib/voice/voiceMapping";
 import { logOpenAIEvent, logTTSEvent } from "../../../lib/cost/logUsageEvent";
 import { ApiType, Provider } from "../../../lib/cost/constants";
-import { verifyAuth } from "../../../middleware/middleware";
+import { verifyAuth } from "../../../middleware/auth";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 const prisma = new PrismaClient();

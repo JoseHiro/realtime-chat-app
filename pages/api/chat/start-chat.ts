@@ -1,9 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { OpenAI } from "openai";
-// import { logUsage } from "../../../lib/loggingData/logger";
-import { verifyAuth } from "../../../middleware/middleware";
+// import { logUsage } from "../../../lib/logging-data/logger";
+import { verifyAuth } from "../../../middleware/auth";
 import { PrismaClient } from "@prisma/client";
-import { MyJwtPayload } from "../../../type/types";
+import { MyJwtPayload } from "../../../types/types";
 import {
   getCharacterName,
   getVoiceConfig,
@@ -34,29 +34,49 @@ export default async function handler(
   if (!decodedToken) {
     return res.status(401).json({ error: "Not authenticated" });
   }
+  const {
+    level,
+    theme,
+    politeness,
+    characterName = "Sakura",
+    time = 3,
+  } = req.body;
 
   try {
-    const openaiRes = await fetch(
-      "https://api.openai.com/v1/realtime/sessions",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "gpt-4o-realtime-preview",
-          voice: "alloy",
-          input_audio_transcription: {
-            model: "whisper-1", //generate text from audio
-            language: "ja",
-          },
-        }),
-      },
-    );
+    // const openaiRes = await fetch(
+    //   "https://api.openai.com/v1/realtime/sessions",
+    //   {
+    //     method: "POST",
+    //     headers: {
+    //       Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+    //       "Content-Type": "application/json",
+    //     },
+    //     body: JSON.stringify({
+    //       model: "gpt-4o-realtime-preview",
+    //       voice: "alloy",
+    //       input_audio_transcription: {
+    //         model: "whisper-1", //generate text from audio
+    //         language: "ja",
+    //       },
+    //     }),
+    //   },
+    // );
 
-    const data = await openaiRes.json();
-    return res.status(200).json(data);
+    const newChat = await prisma.chat.create({
+      data: {
+        userId: decodedToken.userId,
+        title: "Free chat",
+        theme: theme,
+        politeness: politeness,
+        level: level,
+        characterName: characterName,
+        time: time,
+        // voiceProvider: chatVoiceProvider,
+      },
+    });
+
+    // const data = await openaiRes.json();
+    return res.status(200).json(newChat);
   } catch (error) {
     console.error("OpenAI API error:", error);
     return res.status(500).json({ error: "Failed to generate conversation" });

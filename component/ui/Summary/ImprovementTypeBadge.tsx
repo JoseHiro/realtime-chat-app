@@ -1,5 +1,5 @@
 import React from "react";
-import { ImprovementType } from "../../../type/types";
+import { ImprovementType } from "../../../types/types";
 import {
   getImprovementTypeLabel,
   getImprovementTypeColor,

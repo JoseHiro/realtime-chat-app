@@ -1,4 +1,4 @@
-import { ConversationReview, ImprovementType } from "../../type/types";
+import { ConversationReview, ImprovementType } from "../../types/types";
 
 /**
  * Extracts improvement types from conversation review data

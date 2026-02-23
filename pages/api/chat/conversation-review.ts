@@ -1,8 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import OpenAI from "openai";
-import { verifyAuth } from "../../../middleware/middleware";
+import { verifyAuth } from "../../../middleware/auth";
 import { PrismaClient } from "@prisma/client";
-import { MyJwtPayload } from "../../../type/types";
+import { MyJwtPayload } from "../../../types/types";
 import { logOpenAIEvent } from "../../../lib/cost/logUsageEvent";
 import { ApiType } from "../../../lib/cost/constants";
 import { classifyImprovement } from "../../../lib/improvements/classifyImprovement";

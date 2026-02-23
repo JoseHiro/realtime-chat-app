@@ -3,7 +3,7 @@ import NextExercise from "./NextExercise";
 import Reviews from "./Reviews";
 import Streaks from "./Streaks";
 
-export const DashBoardLeft = () => {
+export const DashboardLeft = () => {
   return (
     <div className="flex flex-col gap-2">
       <Streaks />

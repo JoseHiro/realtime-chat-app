@@ -1,7 +1,7 @@
 // Save message from Realtime API to database
 import type { NextApiRequest, NextApiResponse } from "next";
 import { saveMessage } from "../../../lib/message/messageService";
-import { verifyAuth } from "../../../middleware/middleware";
+import { verifyAuth } from "../../../middleware/auth";
 import { OpenAI } from "openai";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });

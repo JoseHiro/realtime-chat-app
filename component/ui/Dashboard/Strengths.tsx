@@ -1,5 +1,5 @@
 import React from "react";
-import { Container } from "./shard/container";
+import { Container } from "./shared/container";
 import { CheckCircle2, TrendingUp, Star } from "lucide-react";
 
 const Strengths = () => {

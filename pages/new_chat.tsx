@@ -7,12 +7,12 @@ import { useChatSession } from "../context/ChatSessionContext";
 import { useSummary } from "../context/SummaryContext";
 import { PaymentPromotionContent } from "../component/ui/PaymentPromotionContent";
 import { SummaryContent } from "../component/ui/SummaryContent";
-import { ChatHeader } from "../component/ui/Chat/ChatHeader";
-import { StopWatch } from "../component/ui/Chat/StopWatch";
+import { ChatHeader } from "../component/ui/Chat/Header";
 import { ChatFooter } from "../component/ui/Chat/Footer";
 import { useBeginConversation } from "../features/new-chat";
 import { useUserData } from "../features/user-trail";
 import { toast } from "sonner";
+import { apiRequest } from "../lib/apiRequest";
 
 export const Chat = () => {
   const {
@@ -73,6 +73,8 @@ export const Chat = () => {
       setChatId,
       setChatMode,
       setHistory,
+      setHiraganaReadingList,
+      setChatInfo,
       selectedLevel: selectedLevel ?? "",
       selectedTheme: selectedTheme ?? "",
       customTheme: customTheme ?? "",
@@ -86,7 +88,6 @@ export const Chat = () => {
       {/* サイドバー */}
       <Sidebar />
       {!chatMode ? (
-        // <div className="relative min-h-screen bg-gradient-to-br from-gray-50 to-green-50 overflow-auto w-full">
         <ModeSelectScreen
           setHistory={setHistory}
           setChatInfo={setChatInfo}
@@ -99,7 +100,6 @@ export const Chat = () => {
           handleBeginConversation={handleBeginConversation}
         />
       ) : (
-        // </div>
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-green-50 w-full flex flex-col justify-between">
           <ChatHeader
             title="Chat"
@@ -125,16 +125,6 @@ export const Chat = () => {
             setHiraganaReading={setHiraganaReading}
             sendTextMessage={sendTextMessage}
           />
-          {/* Timer */}
-          {chatId && selectedTime && (
-            <div className="absolute top-20 right-4">
-              <StopWatch
-                history={history}
-                setOverlayOpened={setOverlayOpened}
-                chatDurationMinutes={selectedTime}
-              />
-            </div>
-          )}
         </div>
       )}
 

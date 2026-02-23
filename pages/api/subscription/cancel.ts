@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import Stripe from "stripe";
-import { verifyAuth } from "../../../middleware/middleware";
-import { MyJwtPayload } from "../../../type/types";
+import { verifyAuth } from "../../../middleware/auth";
+import { MyJwtPayload } from "../../../types/types";
 import { PrismaClient } from "@prisma/client";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY_LIVE!);

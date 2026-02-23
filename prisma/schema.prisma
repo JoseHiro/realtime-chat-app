@@ -152,3 +152,109 @@ model CreditTransaction {
   @@index([type])
   @@index([createdAt])
 }
+
+
+// --------------------------------------
+// 学習の階層構造
+// --------------------------------------
+
+model Chapter {
+  id          String   @id @default(cuid())
+  title       String
+  order       Int
+  // 💡 追加：章全体のタグ（"Elementary", "Business" など）
+  tags        String[]
+  lessons     Lesson[]
+  createdAt   DateTime @default(now())
+}
+
+model Lesson {
+  id          String       @id @default(cuid())
+  chapterId   String
+  chapter     Chapter      @relation(fields: [chapterId], references: [id])
+  title       String
+  order       Int
+  // 💡 追加：レッスンごとのタグ（"Polite", "Adjective" など）
+  tags        String[]
+  tasks       LessonTask[]
+}
+
+model LessonTask {
+  lessonId    String
+  taskId      String
+  order       Int
+  lesson      Lesson       @relation(fields: [lessonId], references: [id])
+  task        Task         @relation(fields: [taskId], references: [id])
+  @@id([lessonId, taskId])
+}
+
+// --------------------------------------
+// タスク（問題）本体
+// --------------------------------------
+
+model Task {
+  id             String       @id @default(cuid())
+  type           TaskType
+  mode           TaskMode
+
+  targetJapanese String?      // メインの正解（例: "私は学生です"）
+
+  // 💡 追加：複数正解の許容リスト
+  // 例: ["わたしはがくせいです", "ぼくはがくせいです", "わたしはがくせいだ"]
+  // 音声認識の結果（ひらがな）がこのリストのどれかに一致すれば正解とする
+  acceptedAnswers String[]
+
+  english        String?
+  audioUrl       String?
+
+  mainVocabularyId String?
+  mainVocabulary   Vocabulary? @relation("MainVocab", fields: [mainVocabularyId], references: [id])
+
+  vocabularies   TaskVocabulary[]
+  lessons        LessonTask[]
+}
+
+enum TaskType {
+  SENTENCE
+  VOCAB
+}
+
+enum TaskMode {
+  MIMIC
+  TRANSLATE
+}
+
+// --------------------------------------
+// 単語マスター
+// --------------------------------------
+
+model Vocabulary {
+  id          String   @id @default(cuid())
+  kanji       String?
+  hiragana    String
+  meaning     String
+  // 💡 追加：単語レベルのタグ（"Noun", "Verb", "JLPT_N5" など）
+  tags        String[]
+  audioUrl    String?
+
+  tasksAsMain Task[]   @relation("MainVocab")
+  tasksIncluded TaskVocabulary[]
+}
+
+// --------------------------------------
+// 中間テーブル
+// --------------------------------------
+
+model TaskVocabulary {
+  taskId       String
+  vocabularyId String
+  startIndex   Int
+  endIndex     Int
+
+  // 💡 追加：この文章内での特別な意味や補足（必要であれば）
+  customMeaning String?
+
+  task         Task       @relation(fields: [taskId], references: [id])
+  vocabulary   Vocabulary @relation(fields: [vocabularyId], references: [id])
+  @@id([taskId, vocabularyId, startIndex])
+}

@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { useChatSession } from "../../../context/ChatSessionContext";
 import { useUser } from "../../../context/UserContext";
-import { ChatType } from "../../../type/types";
+import { ChatType } from "../../../types/types";
 import { RoundedButton } from "../../shared/button";
 import { BlockUseOverlay } from "../../overlay";
 import { Header } from "./Header";
@@ -104,8 +104,8 @@ export const ModeSelectScreen = ({
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-gray-50 to-green-50 overflow-auto w-full">
       <div className="relative min-h-screen overflow-auto w-full">
-        <div className="min-h-screen p-4 overflow-auto w-full">
-          <div className="max-w-4xl mx-auto py-8 mt-6">
+        <div className="min-h-screen px-4 overflow-auto w-full">
+          <div className="max-w-4xl mx-auto py-8 ">
             <Header
               username={username || "User"}
               subscriptionPlan={subscriptionPlan}

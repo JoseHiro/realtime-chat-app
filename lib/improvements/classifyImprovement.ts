@@ -1,4 +1,4 @@
-import { ImprovementType } from "../../type/types";
+import { ImprovementType } from "../../types/types";
 
 /**
  * Classifies an improvement based on its focus text.

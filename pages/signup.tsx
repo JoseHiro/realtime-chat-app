@@ -157,7 +157,7 @@ const Signup = () => {
       } else {
         toast.success("Successfully signed up!");
         if (plan === "trial") {
-          router.push("/new");
+          router.push("/new_chat");
         } else {
           startStripeSession();
         }

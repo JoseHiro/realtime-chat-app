@@ -28,22 +28,25 @@ export const ActionButton = ({
           : "hover:border-black hover:shadow-sm cursor-pointer"
       }`}
     >
-      <div className="flex items-start justify-between mb-4">
-        <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+      <div className="flex items-start gap-4 justify-between mb-4">
+        <div className="w-12 h-12 shrink-0 bg-gray-100 rounded-lg flex items-center justify-center">
           <Icon className="w-6 h-6 text-gray-900" />
         </div>
-        {comingSoon && (
-          <div className="px-3 py-1 bg-gray-100 rounded-full">
-            <span className="text-xs font-medium text-gray-600">
-              Coming Soon
-            </span>
-          </div>
-        )}
+        <div className="flex-1 min-w-0">
+          <h3 className="text-lg font-medium text-gray-900 mb-1">{title}</h3>
+          {comingSoon && (
+            <div className="px-3 py-1 bg-gray-100 rounded-full inline-block mt-1">
+              <span className="text-xs font-medium text-gray-600">
+                Coming Soon
+              </span>
+            </div>
+          )}
+        </div>
         {!disabled && !comingSoon && (
-          <ArrowRight className="w-5 h-5 text-gray-400" />
+          <ArrowRight className="w-5 h-5 shrink-0 text-gray-400" />
         )}
       </div>
-      <h3 className="text-lg font-medium text-gray-900 mb-2">{title}</h3>
+
       <p className="text-sm text-gray-600">{description}</p>
     </button>
   );

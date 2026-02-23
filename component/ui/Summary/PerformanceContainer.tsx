@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import { SectionContainer, SectionDescription } from "./Container";
 import { SectionTitle } from "./SectionTitle";
-import { Analysis, Feedback, ConversationReview } from "../../../type/types";
+import { Analysis, Feedback, ConversationReview } from "../../../types/types";
 import { ImprovementTypeBadge } from "./ImprovementTypeBadge";
 import { GrammarErrorBadge } from "./GrammarErrorBadge";
 import { getImprovementTypesWithCounts } from "../../../lib/improvements/getImprovementTypes";

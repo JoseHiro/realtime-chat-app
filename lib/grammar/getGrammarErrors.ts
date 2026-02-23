@@ -1,4 +1,4 @@
-import { ConversationReview } from "../../type/types";
+import { ConversationReview } from "../../types/types";
 import {
   GrammarErrorType,
   classifyGrammarError,

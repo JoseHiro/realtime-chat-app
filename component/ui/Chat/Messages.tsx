@@ -1,6 +1,6 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useEffect } from "react";
 import { LoadingMessage } from "../../loading";
-import { ChatType } from "../../../type/types";
+import { ChatType } from "../../../types/types";
 import { AssistantMessageBox, UserMessageBox } from "./Message";
 
 export const Messages = ({
@@ -36,30 +36,32 @@ export const Messages = ({
       {/* Display Mode Toggle */}
 
       {/* Messages */}
-      {history.map((message: { role: string; content: string }, id: number) => (
-        <div
-          key={id}
-          className={`flex gap-4 transition-all duration-300 ease-out ${
-            message.role === "user" ? "justify-end" : "justify-start"
-          }`}
-        >
-          {message.role === "assistant" && (
-            <AssistantMessageBox
-              MessagesTextOpenMode={MessagesTextOpenMode}
-              text={message.content}
-              reading={hiraganaReadingList[id]}
-              id={id}
-              chatInfo={chatInfo}
-            />
-          )}
-          {message.role === "user" && (
-            <UserMessageBox
-              id={id}
-              text={message.content}
-              reading={undefined}
-              MessagesTextOpenMode={MessagesTextOpenMode}
-            />
-          )}
+      {history.map((message: { role: string; content: string }, index: number) => {
+        const assistantIndex =
+          message.role === "assistant"
+            ? history
+                .slice(0, index)
+                .filter((m) => m.role === "assistant").length
+            : 0;
+        return (
+          <div
+            key={index}
+            className={`flex gap-4 transition-all duration-300 ease-out ${
+              message.role === "user" ? "justify-end" : "justify-start"
+            }`}
+          >
+            {message.role === "assistant" && (
+              <AssistantMessageBox
+                MessagesTextOpenMode={MessagesTextOpenMode}
+                text={message.content}
+                reading={hiraganaReadingList[assistantIndex] ?? ""}
+                id={assistantIndex}
+                chatInfo={chatInfo}
+              />
+            )}
+            {message.role === "user" && (
+              <UserMessageBox id={index} text={message.content} />
+            )}
           {/* <div
             className={`max-w-md lg:max-w-2xl transform transition-all duration-300 ${
               message.role === "user" ? "order-1" : ""
@@ -159,8 +161,9 @@ export const Messages = ({
               <User className="w-5 h-5 text-white" />
             </div>
           )} */}
-        </div>
-      ))}
+          </div>
+        );
+      })}
 
       {/* Loading Message */}
       {chatLoading && <LoadingMessage characterName={characterName} />}

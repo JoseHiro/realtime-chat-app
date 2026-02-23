@@ -2,7 +2,7 @@ import React from "react";
 import { AlertCircle, CheckCircle, TrendingUp } from "lucide-react";
 import { SectionContainer, SectionDescription } from "./Container";
 import { SectionTitle, SectionSubTitle } from "./SectionTitle";
-import { Feedback } from "../../../type/types";
+import { Feedback } from "../../../types/types";
 
 export const FeedbackContainer = React.memo(
   ({ feedback }: { feedback: Feedback }) => {

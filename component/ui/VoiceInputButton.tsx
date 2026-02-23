@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 import { Mic, Square } from "lucide-react";
-import { ChatType } from "../../type/types";
+import { ChatType } from "../../types/types";
 import { useChatSession } from "../../context/ChatSessionContext";
 import { toast } from "sonner";
 

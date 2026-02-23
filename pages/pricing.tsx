@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/router";
 import { RoundedButton } from "../component/shared/button";
 import { LandingHeader } from "../component/ui/LandingPage/LandingHeader";
-import { PricingType, FAQType } from "../type/types";
+import { PricingType, FAQType } from "../types/types";
 import { LandingFooter } from "../component/ui/LandingPage/LandingFooter";
 
 const Pricing = () => {
@@ -347,7 +347,7 @@ const Pricing = () => {
               Start Free Trial
             </RoundedButton>
             <RoundedButton
-              onClick={() => router.push("/new")}
+              onClick={() => router.push("/new_chat")}
               className="border-2 border-white text-white hover:bg-white hover:text-green-600 px-8 py-4 text-lg font-semibold hover:scale-105 transition-all duration-200"
             >
               Try Demo

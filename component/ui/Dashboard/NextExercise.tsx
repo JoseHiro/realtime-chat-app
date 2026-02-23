@@ -1,5 +1,5 @@
 import React from "react";
-import { Container } from "./shard/container";
+import { Container } from "./shared/container";
 import { BookOpen, ArrowRight } from "lucide-react";
 
 interface NextExerciseProps {

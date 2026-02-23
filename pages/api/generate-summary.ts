@@ -1,9 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import OpenAI from "openai";
-import { verifyAuth } from "../../middleware/middleware";
+import { verifyAuth } from "../../middleware/auth";
 import { PrismaClient } from "@prisma/client";
-import { MyJwtPayload } from "../../type/types";
-import { wordAnalyzer } from "../../lib/chatAnalize";
+import { MyJwtPayload } from "../../types/types";
+import { wordAnalyzer } from "../../lib/chatAnalyze";
 import { logOpenAIEvent } from "../../lib/cost/logUsageEvent";
 import { ApiType } from "../../lib/cost/constants";
 import { deductCreditsForChat } from "../../lib/credits/creditService";

@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback } from "react";
 import { useRouter } from "next/router";
 import { ChevronRight } from "lucide-react";
-import { ChatDataType } from "../../type/types";
+import { ChatDataType } from "../../types/types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useChatSession } from "../../context/ChatSessionContext";
 import { useUser } from "../../context/UserContext";
@@ -95,7 +95,7 @@ export const Sidebar = () => {
     setChatMode(false);
     setChatEnded(false);
     setChatId(null);
-    router.push("/new");
+    router.push("/new_chat");
   }, [chatId, setChatMode, setChatEnded, setChatId, router]);
 
   const handleSetMuted = useCallback(() => {

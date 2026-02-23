@@ -1,5 +1,5 @@
 import React from "react";
-import { Container } from "./shard/container";
+import { Container } from "./shared/container";
 import { CheckCircle2, Clock } from "lucide-react";
 
 interface Review {
