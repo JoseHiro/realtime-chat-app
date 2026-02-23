@@ -1,7 +1,7 @@
 import { Play, Pause, Languages } from "lucide-react";
 import React, { useRef, useState } from "react";
 import { SoundWave } from "./SoundWave";
-import { useSpeech } from "../../../context/SpeechContext";
+import { useUIPreferences } from "../../../context/UIPreferencesContext";
 import { toast } from "sonner";
 
 export const AssistantMessageBox = ({
@@ -11,6 +11,7 @@ export const AssistantMessageBox = ({
   chatInfo,
   id,
   english,
+  MessagesTextOpenMode,
 }: {
   text: string;
   reading: string;
@@ -18,15 +19,17 @@ export const AssistantMessageBox = ({
   chatInfo?: { audioUrl: string; english: string }[];
   id: number;
   english?: string;
+  textOpen?: boolean;
+  MessagesTextOpenMode: boolean;
 }) => {
-  const { isMuted } = useSpeech();
+  const { isMuted } = useUIPreferences();
   const [currentPlayingId, setCurrentPlayingId] = useState<number | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [displayEnglishSentence, setDisplayEnglishSentence] = useState<
     null | number
   >(null);
 
-  // const { isMuted } = useSpeech();
+  // const { isMuted } = useUIPreferences();
   // Create audioList from chatInfo if available
   // const audioList = chatInfo?.map(info => info.audioUrl) ?? [];
 
@@ -101,35 +104,41 @@ export const AssistantMessageBox = ({
         </div>
       ) : (
         <div className="border-gray-100">
-          <p className="text-sm lg:text-base leading-relaxed">{text}</p>
+          {MessagesTextOpenMode && (
+            <p className="text-sm lg:text-base leading-relaxed">{text}</p>
+          )}
 
-          <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100">
-            <p className="text-[10px] text-gray-400 leading-relaxed font-light tracking-wide">
-              {reading}
-            </p>
+          {MessagesTextOpenMode && (
+            <>
+              <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100">
+                <p className="text-[10px] text-gray-400 leading-relaxed font-light tracking-wide">
+                  {reading}
+                </p>
 
-            {((chatInfo && chatInfo[id]?.english !== "") ||
-              english !== null) && (
-              <button
-                onClick={() => handleDisplayEnglishSentence(id)}
-                className={`p-1.5 rounded-md transition-all hover:bg-gray-100 ${
-                  displayEnglishSentence === id
-                    ? "bg-green-50 text-green-600"
-                    : "text-gray-400"
-                }`}
-                title="Show translation"
-              >
-                <Languages className="w-4 h-4" />
-              </button>
-            )}
-          </div>
+                {((chatInfo && chatInfo[id]?.english !== "") ||
+                  english !== null) && (
+                  <button
+                    onClick={() => handleDisplayEnglishSentence(id)}
+                    className={`p-1.5 rounded-md transition-all hover:bg-gray-100 ${
+                      displayEnglishSentence === id
+                        ? "bg-green-50 text-green-600"
+                        : "text-gray-400"
+                    }`}
+                    title="Show translation"
+                  >
+                    <Languages className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
 
-          {displayEnglishSentence === id && (
-            <div className="mt-2 pt-2 border-t border-gray-100">
-              <p className="text-sm text-gray-600 italic leading-relaxed">
-                {(chatInfo && chatInfo[id]?.english) || english}
-              </p>
-            </div>
+              {displayEnglishSentence === id && (
+                <div className="mt-2 pt-2 border-t border-gray-100">
+                  <p className="text-sm text-gray-600 italic leading-relaxed">
+                    {(chatInfo && chatInfo[id]?.english) || english}
+                  </p>
+                </div>
+              )}
+            </>
           )}
         </div>
       )}
@@ -137,7 +146,15 @@ export const AssistantMessageBox = ({
   );
 };
 
-export const UserMessageBox = ({ text, id }: { text: string; id: number }) => {
+export const UserMessageBox = ({
+  text,
+  id,
+  textOpen = true,
+}: {
+  text: string;
+  id: number;
+  textOpen?: boolean;
+}) => {
   return (
     <div
       style={{ animationDelay: `${id * 0.5}s` }}
@@ -145,7 +162,9 @@ export const UserMessageBox = ({ text, id }: { text: string; id: number }) => {
     >
       <div className="p-4 rounded-2xl shadow-sm transition-all duration-200 hover:shadow-md bg-white text-gray-900 border border-gray-200 bg-gradient-to-br from-slate-700 to-gray-800 text-white ml-auto">
         <div className="border-gray-100">
-          <p className="text-sm lg:text-base leading-relaxed">{text}</p>
+          {textOpen && (
+            <p className="text-sm lg:text-base leading-relaxed">{text}</p>
+          )}
         </div>
       </div>
     </div>

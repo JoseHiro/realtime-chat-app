@@ -1,6 +1,6 @@
 import React from "react";
 import { Clock } from "lucide-react";
-import { SelectModeButton } from "../../button";
+import { SelectModeButton } from "../../shared/button";
 
 type TimeSelectionProps = {
   selectedTime: number; // 3, 5, or 10 (minutes)

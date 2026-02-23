@@ -208,7 +208,7 @@ describe("Render Signup component", () => {
       expect(successMock).toHaveBeenCalledWith("Successfully signed up!", {
         position: "top-center",
       });
-      expect(pushMock).toHaveBeenCalledWith("/new");
+      expect(pushMock).toHaveBeenCalledWith("/new_chat");
     });
   });
 

@@ -15,8 +15,9 @@ interface VoiceConfig {
   characterName: CharacterName;
   azureVoiceName: string;
   azureVoiceGender: "Male" | "Female";
-  voiceProvider: "azure" | "elevenlabs"; // Which TTS provider this character uses
+  voiceProvider: "azure" | "elevenlabs" | "realtime"; // Which TTS provider this character uses
   elevenLabsVoiceId?: string; // ElevenLabs voice ID for premium characters
+  realtimeVoice?: string; // Realtime API voice name (alloy, echo, shimmer, etc.)
   description: string;
   gender: VoiceGender;
   imageUrl?: string; // Character icon/image URL
@@ -27,7 +28,8 @@ const VOICE_MAP: Record<CharacterName, VoiceConfig> = {
     characterName: "Sakura",
     azureVoiceName: "ja-JP-NanamiNeural",
     azureVoiceGender: "Female",
-    voiceProvider: "azure",
+    voiceProvider: "realtime", // Using Realtime API now
+    realtimeVoice: "shimmer", // Soft, warm voice matching her friendly nature
     description: "Natural, warm, and friendly",
     gender: "female",
   },
@@ -35,7 +37,8 @@ const VOICE_MAP: Record<CharacterName, VoiceConfig> = {
     characterName: "Ken",
     azureVoiceName: "ja-JP-KeitaNeural",
     azureVoiceGender: "Male",
-    voiceProvider: "azure",
+    voiceProvider: "realtime", // Using Realtime API now
+    realtimeVoice: "echo", // Clear, professional voice matching his confident style
     description: "Clear, confident, and professional",
     gender: "male",
   },
@@ -43,8 +46,9 @@ const VOICE_MAP: Record<CharacterName, VoiceConfig> = {
     characterName: "Chica",
     azureVoiceName: "ja-JP-NanamiNeural", // Fallback, but uses ElevenLabs
     azureVoiceGender: "Female",
-    voiceProvider: "elevenlabs",
-    elevenLabsVoiceId: "JTlYtJrcTzPC71hMLOxo", // Japanese voice for Chica
+    voiceProvider: "realtime", // Using Realtime API now
+    realtimeVoice: "coral", // Bright, energetic voice matching her cheerful personality
+    elevenLabsVoiceId: "JTlYtJrcTzPC71hMLOxo", // Keep for reference
     description: "Energetic and cheerful with premium sound",
     gender: "female",
     imageUrl: "/img/chica.jpg",
@@ -53,8 +57,9 @@ const VOICE_MAP: Record<CharacterName, VoiceConfig> = {
     characterName: "Haruki",
     azureVoiceName: "ja-JP-KeitaNeural", // Fallback, but uses ElevenLabs
     azureVoiceGender: "Male",
-    voiceProvider: "elevenlabs",
-    elevenLabsVoiceId: "hBWDuZMNs32sP5dKzMuc", // Japanese voice for Haruki
+    voiceProvider: "realtime", // Using Realtime API now
+    realtimeVoice: "sage", // Calm, thoughtful voice matching his warm style
+    elevenLabsVoiceId: "hBWDuZMNs32sP5dKzMuc", // Keep for reference
     description: "Warm and expressive with premium sound",
     gender: "male",
     imageUrl: "/img/haruki.jpg",
@@ -63,8 +68,9 @@ const VOICE_MAP: Record<CharacterName, VoiceConfig> = {
     characterName: "Aiko",
     azureVoiceName: "ja-JP-AoiNeural", // Different Azure fallback voice to distinguish from Sakura
     azureVoiceGender: "Female",
-    voiceProvider: "elevenlabs",
-    elevenLabsVoiceId: "WQz3clzUdMqvBf0jswZQ", // Japanese voice for Aiko
+    voiceProvider: "realtime", // Using Realtime API now
+    realtimeVoice: "verse", // Expressive, dynamic voice matching her gentle nature
+    elevenLabsVoiceId: "WQz3clzUdMqvBf0jswZQ", // Keep for reference
     description: "Gentle and soothing with premium sound",
     gender: "female",
     imageUrl: "/img/Aiko.jpg",
@@ -73,8 +79,9 @@ const VOICE_MAP: Record<CharacterName, VoiceConfig> = {
     characterName: "Ryo",
     azureVoiceName: "ja-JP-KeitaNeural", // Fallback, but uses ElevenLabs
     azureVoiceGender: "Male",
-    voiceProvider: "elevenlabs",
-    elevenLabsVoiceId: "8QgNyYugQ07X0LFdMABE", // Japanese voice for Ryo
+    voiceProvider: "realtime", // Using Realtime API now
+    realtimeVoice: "ash", // Deep, resonant voice matching his dynamic style
+    elevenLabsVoiceId: "8QgNyYugQ07X0LFdMABE", // Keep for reference
     description: "Dynamic and engaging with premium sound",
     gender: "male",
     imageUrl: "/img/Ryo.jpg",
@@ -130,13 +137,21 @@ export function getAzureVoiceGender(
 }
 
 /**
- * Get voice provider (azure or elevenlabs) from character name
+ * Get voice provider (azure, elevenlabs, or realtime) from character name
  */
 export function getVoiceProvider(
   characterName: CharacterName
-): "azure" | "elevenlabs" {
+): "azure" | "elevenlabs" | "realtime" {
   const config = VOICE_MAP[characterName];
-  return config?.voiceProvider || "azure";
+  return config?.voiceProvider || "realtime";
+}
+
+/**
+ * Get Realtime API voice name from character name
+ */
+export function getRealtimeVoice(characterName: CharacterName): string {
+  const config = VOICE_MAP[characterName];
+  return config?.realtimeVoice || "alloy"; // Default to alloy if not specified
 }
 
 /**

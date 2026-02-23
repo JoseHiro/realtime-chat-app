@@ -1,9 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { OpenAI } from "openai";
-// import { logUsage } from "../../../lib/loggingData/logger";
-import { verifyAuth } from "../../../middleware/middleware";
+// import { logUsage } from "../../../lib/logging-data/logger";
+import { verifyAuth } from "../../../middleware/auth";
 import { PrismaClient } from "@prisma/client";
-import { MyJwtPayload } from "../../../type/types";
+import { MyJwtPayload } from "../../../types/types";
 import {
   getCharacterName,
   getVoiceConfig,
@@ -23,7 +23,7 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
@@ -34,52 +34,35 @@ export default async function handler(
   if (!decodedToken) {
     return res.status(401).json({ error: "Not authenticated" });
   }
-
-  const { level, theme, politeness, characterName: requestedCharacterName, chatDuration, voiceGender } = req.body;
-  if (!level || !theme) {
-    return res.status(400).json({ error: "Text is required" });
-  }
-
-  // Get character name - either from characterName or fallback to voiceGender (for backward compatibility)
-  let characterName: CharacterName;
-  if (requestedCharacterName && ["Sakura", "Ken", "Chica", "Haruki", "Aiko", "Ryo"].includes(requestedCharacterName)) {
-    characterName = requestedCharacterName as CharacterName;
-  } else {
-    // Fallback to legacy voiceGender mapping
-    const gender: VoiceGender = voiceGender || "female";
-    characterName = getCharacterName(gender);
-  }
-
-  const voiceConfig = getVoiceConfigByCharacter(characterName);
-  const chatVoiceProvider = getVoiceProvider(characterName);
-
-  // Get time from request (default: 3 minutes)
-  const time = chatDuration || 3;
-
-  const prompt = `あなたは日本語会話の練習相手です。あなたの名前は${characterName}です。
-以下の条件で会話を始めてください。
-- 学習者のレベル: ${level}
-- テーマ: ${theme}
-- 会話の丁寧さ ${politeness}
-- 最初の発話はシンプルで自然な質問にしてください。
-- 会話は一文から始め、相手が答えやすいようにしましょう。
-- 自分の名前は${characterName}であることを覚えておいてください。名前を聞かれたら「${characterName}です」または「${characterName}と言います」と自然に答えてください。
-
-レベル別の制約:
-- 初級: 語彙は日常的な単語だけを使用し、文は短く。
-- 中級: 語彙は日常的＋少し抽象的な単語を使用し、文はやや長く。
-- 上級: 難しい語彙や敬語も含め、複雑な構文を使ってもよい。
-
-会話スタイルの指定:
-- "casual" の場合: 「〜だ」「〜する」などカジュアルな口調を使い、「です・ます調」は使わない。
-- "polite" の場合: 「〜です」「〜ます」などの丁寧語を使う。
-
-必ずレベルの条件を反映してください。
-`;
+  const {
+    level,
+    theme,
+    politeness,
+    characterName = "Sakura",
+    time = 3,
+  } = req.body;
 
   try {
-    // initiate chat
-    const chat = await prisma.chat.create({
+    // const openaiRes = await fetch(
+    //   "https://api.openai.com/v1/realtime/sessions",
+    //   {
+    //     method: "POST",
+    //     headers: {
+    //       Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+    //       "Content-Type": "application/json",
+    //     },
+    //     body: JSON.stringify({
+    //       model: "gpt-4o-realtime-preview",
+    //       voice: "alloy",
+    //       input_audio_transcription: {
+    //         model: "whisper-1", //generate text from audio
+    //         language: "ja",
+    //       },
+    //     }),
+    //   },
+    // );
+
+    const newChat = await prisma.chat.create({
       data: {
         userId: decodedToken.userId,
         title: "Free chat",
@@ -88,201 +71,93 @@ export default async function handler(
         level: level,
         characterName: characterName,
         time: time,
-        voiceProvider: chatVoiceProvider,
+        // voiceProvider: chatVoiceProvider,
       },
     });
 
-    if (!chat) {
-      return res.status(400).json({ error: "Failed to created chat" });
-    }
-
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [{ role: "system", content: prompt }],
-    });
-
-    // Log OpenAI usage
-    if (completion.usage) {
-      await logOpenAIEvent({
-        userId: decodedToken.userId,
-        chatId: chat.id,
-        apiType: ApiType.CHAT,
-        model: "gpt-4o-mini",
-        inputTokens: completion.usage.prompt_tokens || 0,
-        outputTokens: completion.usage.completion_tokens || 0,
-        messageCount: 1,
-      });
-    }
-
-    const raw = completion.choices[0]?.message?.content ?? "";
-    const reply = raw.replace(/^\d+\.\s*/, "").trim();
-    const { reading, english } = await addReading(
-      reply,
-      decodedToken.userId,
-      chat.id
-    );
-
-    // Generate audio based on voice provider
-    let audioBuffer: Buffer;
-    let usedProvider: Provider = Provider.AZURE; // Default to Azure
-
-    if (chatVoiceProvider === "elevenlabs") {
-      // Try ElevenLabs TTS first, fallback to Azure if it fails
-      const elevenLabsVoiceId = getElevenLabsVoiceId(characterName) || "hBWDuZMNs32sP5dKzMuc";
-      const elevenLabsApiKey = process.env.ELEVEN_API_KEY;
-
-      if (elevenLabsApiKey) {
-        try {
-          const elevenLabsResponse = await fetch(
-            `https://api.elevenlabs.io/v1/text-to-speech/${elevenLabsVoiceId}`,
-            {
-              method: "POST",
-              headers: {
-                "xi-api-key": elevenLabsApiKey,
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                text: reply,
-                model_id: "eleven_multilingual_v2", // Use multilingual model for Japanese
-                voice_settings: { stability: 0.75, similarity_boost: 0.75 },
-              }),
-            }
-          );
-
-          if (elevenLabsResponse.ok) {
-            audioBuffer = Buffer.from(await elevenLabsResponse.arrayBuffer());
-            usedProvider = Provider.ELEVENLABS;
-
-            // Log ElevenLabs TTS usage
-            await logTTSEvent({
-              userId: decodedToken.userId,
-              chatId: chat.id,
-              provider: Provider.ELEVENLABS,
-              voice: elevenLabsVoiceId,
-              characters: reply.length,
-            });
-          } else {
-            // ElevenLabs failed, fall through to Azure TTS
-            const errorText = await elevenLabsResponse.text();
-            console.warn(`ElevenLabs TTS failed (${elevenLabsResponse.status}), falling back to Azure TTS:`, errorText);
-          }
-        } catch (error) {
-          // ElevenLabs request failed, fall through to Azure TTS
-          console.warn("ElevenLabs TTS error, falling back to Azure TTS:", error);
-        }
-      }
-    }
-
-    // Use Azure TTS if ElevenLabs wasn't used or failed
-    if (usedProvider === Provider.AZURE) {
-      // Use Azure TTS
-      const tokenUrl = `https://${serviceRegion}.api.cognitive.microsoft.com/sts/v1.0/issuetoken`;
-      const tokenResponse = await fetch(tokenUrl, {
-        method: "POST",
-        headers: {
-          "Ocp-Apim-Subscription-Key": speechKey,
-          "Content-Length": "0",
-        },
-      });
-
-      if (!tokenResponse.ok) {
-        throw new Error(`Azure Token Error: ${tokenResponse.statusText}`);
-      }
-
-      const accessToken = await tokenResponse.text();
-      // SSML構築
-      const ssml = `
-      <speak version='1.0' xml:lang='ja-JP' xmlns:mstts="http://www.w3.org/2001/mstts">
-        <voice xml:lang='ja-JP' xml:gender='${voiceConfig.azureVoiceGender}' name='${voiceConfig.azureVoiceName}'>
-          <mstts:express-as style="sad" styledegree="1.0">
-            <prosody rate="1.0">
-              ${reply}
-            </prosody>
-          </mstts:express-as>
-        </voice>
-      </speak>
-      `;
-
-      const ttsUrl = `https://${serviceRegion}.tts.speech.microsoft.com/cognitiveservices/v1`;
-      const ttsResponse = await fetch(ttsUrl, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/ssml+xml",
-          "X-Microsoft-OutputFormat": "audio-24khz-48kbitrate-mono-mp3",
-          "User-Agent": "NodeJS-TTS",
-        },
-        body: ssml,
-      });
-
-      if (!ttsResponse.ok) {
-        const errorText = await ttsResponse.text();
-        throw new Error(`TTS request failed: ${ttsResponse.status} ${errorText}`);
-      }
-
-      audioBuffer = Buffer.from(await ttsResponse.arrayBuffer());
-
-      // Log Azure TTS usage
-      await logTTSEvent({
-        userId: decodedToken.userId,
-        chatId: chat.id,
-        provider: Provider.AZURE,
-        voice: voiceConfig.azureVoiceName,
-        characters: reply.length,
-      });
-    }
-
-    // if (process.env.NODE_ENV === "development") {
-    //   const usage = completion.usage; // open ai usage
-    //   const charCount = reply.length; // azure usage
-    //   const openaiCost = ((usage?.total_tokens ?? 0) / 1000) * 0.015;
-    //   const azureCost = (charCount / 1000000) * 16;
-    //   logUsage({
-    //     chatId: chat.id,
-    //     timestamp: new Date().toISOString(),
-    //     level,
-    //     theme,
-    //     politeness,
-    //     openai: {
-    //       model: "gpt-4o-mini",
-    //       prompt_tokens: usage?.prompt_tokens ?? 0,
-    //       completion_tokens: usage?.completion_tokens ?? 0,
-    //       total_tokens: usage?.total_tokens ?? 0,
-    //       estimated_cost_usd: openaiCost,
-    //     },
-    //     azure_tts: {
-    //       voice: "ja-JP-NanamiNeural",
-    //       characters: charCount,
-    //       estimated_cost_usd: azureCost,
-    //     },
-    //   });
-    // }
-
-    // chat message store in DB
-    const message = await prisma.message.create({
-      data: {
-        chatId: chat.id,
-        sender: "assistant",
-        message: reply,
-        reading: reading,
-        english: english,
-      },
-    });
-
-    res.setHeader("Content-Type", "application/json");
-    res.status(200).json({
-      reply: reply,
-      chatId: chat.id,
-      messageId: message.id,
-      audio: audioBuffer.toString("base64"), // フロントでは base64 を再生用に変換
-      reading: reading,
-      english: english,
-    });
+    // const data = await openaiRes.json();
+    return res.status(200).json(newChat);
   } catch (error) {
     console.error("OpenAI API error:", error);
     return res.status(500).json({ error: "Failed to generate conversation" });
   }
 }
+
+//   const { level, theme, politeness, characterName: requestedCharacterName, chatDuration, voiceGender } = req.body;
+//   if (!level || !theme) {
+//     return res.status(400).json({ error: "Text is required" });
+//   }
+
+//   // Get character name - either from characterName or fallback to voiceGender (for backward compatibility)
+//   let characterName: CharacterName;
+//   if (requestedCharacterName && ["Sakura", "Ken", "Chica", "Haruki", "Aiko", "Ryo"].includes(requestedCharacterName)) {
+//     characterName = requestedCharacterName as CharacterName;
+//   } else {
+//     // Fallback to legacy voiceGender mapping
+//     const gender: VoiceGender = voiceGender || "female";
+//     characterName = getCharacterName(gender);
+//   }
+
+//   const voiceConfig = getVoiceConfigByCharacter(characterName);
+//   const chatVoiceProvider = getVoiceProvider(characterName);
+
+//   // Get time from request (default: 3 minutes)
+//   const time = chatDuration || 3;
+
+//   const prompt = `あなたは日本語会話の練習相手です。あなたの名前は${characterName}です。
+// 以下の条件で会話を始めてください。
+// - 学習者のレベル: ${level}
+// - テーマ: ${theme}
+// - 会話の丁寧さ ${politeness}
+// - 最初の発話はシンプルで自然な質問にしてください。
+// - 会話は一文から始め、相手が答えやすいようにしましょう。
+// - 自分の名前は${characterName}であることを覚えておいてください。名前を聞かれたら「${characterName}です」または「${characterName}と言います」と自然に答えてください。
+
+// レベル別の制約:
+// - 初級: 語彙は日常的な単語だけを使用し、文は短く。
+// - 中級: 語彙は日常的＋少し抽象的な単語を使用し、文はやや長く。
+// - 上級: 難しい語彙や敬語も含め、複雑な構文を使ってもよい。
+
+// 会話スタイルの指定:
+// - "casual" の場合: 「〜だ」「〜する」などカジュアルな口調を使い、「です・ます調」は使わない。
+// - "polite" の場合: 「〜です」「〜ます」などの丁寧語を使う。
+
+// 必ずレベルの条件を反映してください。
+// `;
+
+//   try {
+//     // initiate chat
+//     const chat = await prisma.chat.create({
+//       data: {
+//         userId: decodedToken.userId,
+//         title: "Free chat",
+//         theme: theme,
+//         politeness: politeness,
+//         level: level,
+//         characterName: characterName,
+//         time: time,
+//         voiceProvider: chatVoiceProvider,
+//       },
+//     });
+
+//     if (!chat) {
+//       return res.status(400).json({ error: "Failed to created chat" });
+//     }
+
+// res.setHeader("Content-Type", "application/json");
+// res.status(200).json({
+//   chatId: chat.id,
+//   characterName: characterName,
+//   level: level,
+//   theme: theme,
+//   politeness: politeness,
+//   time: time,
+// });
+// } catch (error) {
+//   console.error("OpenAI API error:", error);
+//   return res.status(500).json({ error: "Failed to generate conversation" });
+// }
+// }
 
 // Add reading japanese since some might have kanji
 const addReading = async (text: string, userId?: string, chatId?: number) => {

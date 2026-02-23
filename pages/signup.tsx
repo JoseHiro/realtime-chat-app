@@ -3,11 +3,11 @@ import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 import { startStripeSession } from "../lib/stripe/startSession";
-import { AuthHeader } from "../component/ui/LandingHeader";
+import { AuthHeader } from "../component/ui/LandingPage/LandingHeader";
 import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { RoundedButton } from "../component/button";
+import { RoundedButton } from "../component/shared/button";
 import { Eye, EyeOff, Check, X } from "lucide-react";
 import Link from "next/link";
 
@@ -157,7 +157,7 @@ const Signup = () => {
       } else {
         toast.success("Successfully signed up!");
         if (plan === "trial") {
-          router.push("/new");
+          router.push("/new_chat");
         } else {
           startStripeSession();
         }

@@ -6,7 +6,7 @@ import { jwtVerify } from "jose";
 export async function middleware(req: NextRequest) {
   const token = req.cookies.get("access_token")?.value;
   const adminToken = req.cookies.get("admin_token")?.value;
-  const protectedPaths = ["/new", "/settings"];
+  const protectedPaths = ["/new_chat", "/settings"];
   const authPages = ["/login", "/signup"];
   const adminPaths = ["/admin"];
   const adminLoginPath = "/admin/login";
@@ -62,11 +62,11 @@ export async function middleware(req: NextRequest) {
 
   // ログイン済みでログイン・サインアップページ → ダッシュボードへ
   if (authPages.some((p) => path.startsWith(p)) && isLoggedIn) {
-    return NextResponse.redirect(new URL("/new", req.url));
+    return NextResponse.redirect(new URL("/new_chat", req.url));
   }
 
   if (path === "/" && isLoggedIn) {
-    return NextResponse.redirect(new URL("/new", req.url));
+    return NextResponse.redirect(new URL("/new_chat", req.url));
   }
 
   // 未ログイン状態でsignupページに行こうとするとプラン選択ページに戻る

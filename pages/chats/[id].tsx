@@ -8,7 +8,7 @@ import {
   UserMessageBox,
 } from "../../component/ui/Chat/Message";
 import { TimeStamp } from "../../component/ui/Chat/TimeStamp";
-import { ChatHeader } from "../../component/ui/Chat/ChatHeader";
+import { ChatHeader } from "../../component/ui/Chat/Header";
 
 type Message = {
   id: string;
@@ -45,6 +45,8 @@ const ChatPage = () => {
     },
     enabled: !!id,
   });
+
+  console.log(chat);
 
   return (
     <div className="relative w-full h-screen flex">
@@ -87,14 +89,11 @@ const ChatPage = () => {
                       reading={message.reading || ""}
                       english={message.english || ""}
                       id={index}
+                      MessagesTextOpenMode={true}
                     />
                   )}
                   {message.sender === "user" && (
-                    <UserMessageBox
-                      id={index}
-                      text={message.message}
-                      reading={message.reading || undefined}
-                    />
+                    <UserMessageBox id={index} text={message.message} />
                   )}
                   <TimeStamp time={message.createdAt} />
                 </div>

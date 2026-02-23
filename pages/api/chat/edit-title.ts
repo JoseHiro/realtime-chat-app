@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { PrismaClient } from "@prisma/client";
-import { verifyAuth } from "../../../middleware/middleware";
-import { MyJwtPayload } from "../../../type/types";
+import { verifyAuth } from "../../../middleware/auth";
+import { MyJwtPayload } from "../../../types/types";
 
 const prisma = new PrismaClient();
 

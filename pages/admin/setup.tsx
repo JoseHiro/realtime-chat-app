@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { apiRequest } from "../../lib/apiRequest";
 import { toast } from "sonner";
 import { Shield, CheckCircle2 } from "lucide-react";
-import { RoundedButton } from "../../component/button";
+import { RoundedButton } from "../../component/shared/button";
 
 const AdminSetup = () => {
   const router = useRouter();

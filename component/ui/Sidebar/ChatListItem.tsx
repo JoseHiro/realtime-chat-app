@@ -1,6 +1,6 @@
 import React, { useMemo, useCallback } from "react";
 import { Ellipsis } from "lucide-react";
-import { ChatDataType } from "../../../type/types";
+import { ChatDataType } from "../../../types/types";
 import { ChatItemMenu } from "./ChatItemMenu";
 import {
   Coffee,

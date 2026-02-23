@@ -15,7 +15,7 @@ import {
   ConversationReview,
   ConversationMessage,
   MessageImprovement,
-} from "../../../type/types";
+} from "../../../types/types";
 import {
   getCharacterImageUrl,
   type CharacterName,

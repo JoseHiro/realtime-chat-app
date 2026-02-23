@@ -4,8 +4,4 @@ export const Skeleton = ({ className }: { className?: string }) => (
   </div>
 );
 
-// 使い方
-{
-  /* <Skeleton className="w-64 h-4" />
-<Skeleton className="w-32 h-4 mt-2" /> */
-}
+// Usage: <Skeleton className="w-64 h-4" />, <Skeleton className="w-32 h-4 mt-2" />

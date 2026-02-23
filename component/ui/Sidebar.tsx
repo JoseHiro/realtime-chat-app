@@ -1,9 +1,11 @@
 import { useState, useMemo, useCallback } from "react";
 import { useRouter } from "next/router";
 import { ChevronRight } from "lucide-react";
-import { ChatDataType } from "../../type/types";
+import { ChatDataType } from "../../types/types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useSpeech } from "../../context/SpeechContext";
+import { useChatSession } from "../../context/ChatSessionContext";
+import { useUser } from "../../context/UserContext";
+import { useUIPreferences } from "../../context/UIPreferencesContext";
 import { apiRequest } from "../../lib/apiRequest";
 import { toast } from "sonner";
 import { MobileMenuButton } from "./Sidebar/MobileMenuButton";
@@ -15,17 +17,9 @@ import { UserInfoSection } from "./Sidebar/UserInfoSection";
 import { SidebarActions } from "./Sidebar/SidebarActions";
 
 export const Sidebar = () => {
-  const {
-    setChatMode,
-    setChatEnded,
-    setChatId,
-    setIsMuted,
-    isMuted,
-    chatId,
-    username,
-    subscriptionPlan,
-    creditsRemaining,
-  } = useSpeech();
+  const { setChatMode, setChatEnded, setChatId, chatId } = useChatSession();
+  const { username, subscriptionPlan, creditsRemaining } = useUser();
+  const { isMuted, setIsMuted } = useUIPreferences();
   const router = useRouter();
   const [activeChat, setActiveChat] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -101,7 +95,7 @@ export const Sidebar = () => {
     setChatMode(false);
     setChatEnded(false);
     setChatId(null);
-    router.push("/new");
+    router.push("/new_chat");
   }, [chatId, setChatMode, setChatEnded, setChatId, router]);
 
   const handleSetMuted = useCallback(() => {

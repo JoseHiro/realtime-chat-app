@@ -1,8 +1,7 @@
-import React, { useRef, useState, useEffect } from "react";
-import { MessageSquare, Volume2 } from "lucide-react";
-import { LoadingMessage } from "../loading";
-import { ChatType } from "../../type/types";
-import { AssistantMessageBox, UserMessageBox } from "./Chat/Message";
+import React, { useRef, useEffect } from "react";
+import { LoadingMessage } from "../../loading";
+import { ChatType } from "../../../types/types";
+import { AssistantMessageBox, UserMessageBox } from "./Message";
 
 export const Messages = ({
   history,
@@ -10,16 +9,17 @@ export const Messages = ({
   chatLoading,
   hiraganaReadingList,
   characterName,
+  MessagesTextOpenMode,
 }: {
   chatLoading: boolean;
   history: ChatType;
   chatInfo: { audioUrl: string; english: string }[];
   hiraganaReadingList: string[];
   characterName?: string;
+  MessagesTextOpenMode: boolean;
 }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   // const [currentPlayingId, setCurrentPlayingId] = useState<number | null>(null);
-  const [displayMode, setDisplayMode] = useState<"audio" | "text">("audio");
 
   // Auto-scroll when new messages arrive
   useEffect(() => {
@@ -34,53 +34,34 @@ export const Messages = ({
   return (
     <div className="flex-1 overflow-y-auto p-4 lg:p-6 space-y-6 bg-gradient-to-b from-slate-50 to-gray-50">
       {/* Display Mode Toggle */}
-      <div className="sticky top-4 z-[1] flex justify-center mb-4">
-        <div className="bg-white/95 backdrop-blur-sm rounded-xl border border-gray-200 p-1 flex shadow-sm">
-          <button
-            onClick={() => setDisplayMode("audio")}
-            className={`cursor-pointer flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-              displayMode === "audio"
-                ? "bg-emerald-500 text-white shadow-sm transform scale-105"
-                : "text-gray-600 hover:text-gray-800 hover:bg-gray-50"
-            }`}
-          >
-            <Volume2 className="w-4 h-4" />
-            Audio
-          </button>
-          <button
-            onClick={() => setDisplayMode("text")}
-            className={`cursor-pointer flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-              displayMode === "text"
-                ? "bg-emerald-500 text-white shadow-sm transform scale-105"
-                : "text-gray-600 hover:text-gray-800 hover:bg-gray-50"
-            }`}
-          >
-            <MessageSquare className="w-4 h-4" />
-            Text
-          </button>
-        </div>
-      </div>
 
       {/* Messages */}
-      {history.map((message: { role: string; content: string }, id: number) => (
-        <div
-          key={id}
-          className={`flex gap-4 transition-all duration-300 ease-out ${
-            message.role === "user" ? "justify-end" : "justify-start"
-          }`}
-        >
-          {message.role === "assistant" && (
-            <AssistantMessageBox
-              displayMode={displayMode}
-              text={message.content}
-              reading={hiraganaReadingList[id]}
-              id={id}
-              chatInfo={chatInfo}
-            />
-          )}
-          {message.role === "user" && (
-            <UserMessageBox id={id} text={message.content} reading={undefined} />
-          )}
+      {history.map((message: { role: string; content: string }, index: number) => {
+        const assistantIndex =
+          message.role === "assistant"
+            ? history
+                .slice(0, index)
+                .filter((m) => m.role === "assistant").length
+            : 0;
+        return (
+          <div
+            key={index}
+            className={`flex gap-4 transition-all duration-300 ease-out ${
+              message.role === "user" ? "justify-end" : "justify-start"
+            }`}
+          >
+            {message.role === "assistant" && (
+              <AssistantMessageBox
+                MessagesTextOpenMode={MessagesTextOpenMode}
+                text={message.content}
+                reading={hiraganaReadingList[assistantIndex] ?? ""}
+                id={assistantIndex}
+                chatInfo={chatInfo}
+              />
+            )}
+            {message.role === "user" && (
+              <UserMessageBox id={index} text={message.content} />
+            )}
           {/* <div
             className={`max-w-md lg:max-w-2xl transform transition-all duration-300 ${
               message.role === "user" ? "order-1" : ""
@@ -180,8 +161,9 @@ export const Messages = ({
               <User className="w-5 h-5 text-white" />
             </div>
           )} */}
-        </div>
-      ))}
+          </div>
+        );
+      })}
 
       {/* Loading Message */}
       {chatLoading && <LoadingMessage characterName={characterName} />}

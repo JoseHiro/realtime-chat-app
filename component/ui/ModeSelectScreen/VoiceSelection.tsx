@@ -1,9 +1,12 @@
 import React from "react";
 import { UserRound } from "lucide-react";
-import { SelectModeButton } from "../../button";
+import { SelectModeButton } from "../../shared/button";
 import Image from "next/image";
 import type { CharacterName } from "../../../lib/voice/voiceMapping";
-import { getAllCharacters, getCharacterImageUrl } from "../../../lib/voice/voiceMapping";
+import {
+  getAllCharacters,
+  getCharacterImageUrl,
+} from "../../../lib/voice/voiceMapping";
 
 type VoiceSelectionProps = {
   selectedCharacter: CharacterName;
@@ -45,7 +48,9 @@ export const VoiceSelection = ({
   return (
     <div className="mb-4">
       <div className="flex justify-between items-center">
-        <h2 className="text-xl text-gray-700 mb-2 mt-10">Choose Your Character</h2>
+        <h2 className="text-xl text-gray-700 mb-2 mt-10">
+          Choose Your Character
+        </h2>
         <div className="bg-gray-100 rounded-full p-2">
           <UserRound className="w-6 h-6 text-gray-700" />
         </div>
@@ -74,7 +79,9 @@ export const VoiceSelection = ({
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
                 {isSelected && (
-                  <div className={`absolute top-2 right-2 w-5 h-5 ${getCharacterColorClass(character.characterName)} rounded-full flex items-center justify-center z-10`}>
+                  <div
+                    className={`absolute top-2 right-2 w-5 h-5 ${getCharacterColorClass(character.characterName)} rounded-full flex items-center justify-center z-10`}
+                  >
                     <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
                   </div>
                 )}

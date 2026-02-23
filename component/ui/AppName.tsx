@@ -1,18 +1,28 @@
-import { Sparkles } from "lucide-react";
 import { useRouter } from "next/router";
+import Image from "next/image";
 
 export const AppName = () => {
   const router = useRouter();
   return (
     <div className="flex items-center gap-3">
-      <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
-        <Sparkles className="w-5 h-5 text-white" />
-      </div>
+      <Image
+        src="/img/logo.png"
+        alt="Kaiwa Kun Logo"
+        width={40}
+        height={40}
+        className="object-contain"
+      />
       <button
         onClick={() => router.push("/")}
-        className="cursor-pointer text-2xl font-bold bg-gradient-to-r from-green-600 via-blue-600 to-purple-600 bg-clip-text text-transparent"
+        className="cursor-pointer"
       >
-        Kaiwa Kun Demo
+        <Image
+          src="/img/title_logo.png"
+          alt="Kaiwa Kun"
+          width={150}
+          height={40}
+          className="object-contain"
+        />
       </button>
     </div>
   );
@@ -24,9 +34,20 @@ export const SidebarAppName = ({ onClick }: { onClick: () => void }) => {
       onClick={onClick}
       className="flex items-center gap-3 mb-1 hover:opacity-80 transition-opacity"
     >
-      <h1 className="cursor-pointer pl-2 text-2xl font-bold bg-gradient-to-r from-green-600 via-blue-600 to-purple-600 bg-clip-text text-transparent">
-        Kaiwa Kun
-      </h1>
+      <Image
+        src="/img/logo.png"
+        alt="Kaiwa Kun Logo"
+        width={40}
+        height={40}
+        className="object-contain"
+      />
+      <Image
+        src="/img/title_logo.png"
+        alt="Kaiwa Kun"
+        width={120}
+        height={32}
+        className="object-contain"
+      />
     </button>
   );
 };

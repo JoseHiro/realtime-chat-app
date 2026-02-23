@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useCallback } from "react";
-import { SummaryType, ConversationReview } from "../../type/types";
+import { SummaryType, ConversationReview } from "../../types/types";
 import { SummaryNavigation } from "./Summary/SummaryNavigation";
 import { SectionHeader } from "./Summary/SectionHeader";
 import { InfoContainer } from "./Summary/InfoContainer";
