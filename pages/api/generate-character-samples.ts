@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { getAllCharacters, getElevenLabsVoiceId, type CharacterName } from "../../lib/voice/voiceMapping";
+import { getAllCharacters, getElevenLabsVoiceId } from "../../lib/voice/voiceMapping";
 import { promises as fs } from "fs";
 import path from "path";
 

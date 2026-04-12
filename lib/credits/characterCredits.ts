@@ -4,7 +4,7 @@
 
 import type { CharacterName } from "../../lib/voice/voiceMapping";
 import { getVoiceProvider } from "../../lib/voice/voiceMapping";
-import { calculateCreditsForChat, type VoiceProvider } from "./calculateCredits";
+import { calculateCreditsForChat } from "./calculateCredits";
 
 /**
  * Calculate credits required for a chat based on duration and character

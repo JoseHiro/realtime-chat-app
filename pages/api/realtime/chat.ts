@@ -3,15 +3,9 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { OpenAI } from "openai";
 import { saveMessage } from "../../../lib/message/messageService";
 import { PrismaClient } from "@prisma/client";
-import {
-  getAzureVoiceGender,
-  getAzureVoiceName,
-  getVoiceProvider,
-  getElevenLabsVoiceId,
-  type CharacterName,
-} from "../../../lib/voice/voiceMapping";
-import { logOpenAIEvent, logTTSEvent } from "../../../lib/cost/logUsageEvent";
-import { ApiType, Provider } from "../../../lib/cost/constants";
+import { type CharacterName } from "../../../lib/voice/voiceMapping";
+import { logOpenAIEvent } from "../../../lib/cost/logUsageEvent";
+import { ApiType } from "../../../lib/cost/constants";
 import { verifyAuth } from "../../../middleware/auth";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });

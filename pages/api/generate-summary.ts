@@ -43,7 +43,7 @@ export default async function handler(
     return res.status(401).json({ error: "Not authenticated" });
   }
 
-  const { chatId, politeness, history } = req.body;
+  const { chatId, politeness } = req.body;
 
   if (!chatId || !politeness) {
     return res.status(400).json({ error: "No data provided" });

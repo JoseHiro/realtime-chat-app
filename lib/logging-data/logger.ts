@@ -1,10 +1,7 @@
-import fs from "fs";
-import path from "path";
-
 // const dataPath = path.join(process.cwd(), "data", "token.json");
 
 // To leave token usage data
-export const logUsage = (entry: any) => {
+export const logUsage = () => {
   // const { chatId, ...rest } = entry;
 
   // if (!chatId) {

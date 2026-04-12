@@ -56,10 +56,14 @@ export default async function handler(
       },
     });
 
+    const firstItem = subscription.items.data[0];
+    const currentPeriodEnd =
+      firstItem?.current_period_end ?? subscription.cancel_at;
+
     return res.status(200).json({
       message: "Subscription will be canceled at the end of the billing period",
       cancelAt: subscription.cancel_at,
-      currentPeriodEnd: subscription.current_period_end,
+      currentPeriodEnd,
     });
   } catch (err: any) {
     console.error("Stripe cancel subscription error:", err);

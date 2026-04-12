@@ -17,7 +17,7 @@ export function StopWatch({
   history,
   setOverlayOpened,
   chatDurationMinutes,
-}: StopWatchProps): JSX.Element {
+}: StopWatchProps): React.ReactElement {
   const [timeLeft, setTimeLeft] = useState(chatDurationMinutes * 60);
   const [isActive, setIsActive] = useState(true);
   const summaryCreatedRef = useRef(false);
