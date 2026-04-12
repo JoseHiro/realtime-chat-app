@@ -153,11 +153,6 @@ model CreditTransaction {
   @@index([createdAt])
 }
 
-
-// --------------------------------------
-// 学習の階層構造
-// --------------------------------------
-
 model Chapter {
   id          String   @id @default(cuid())
   title       String
@@ -187,10 +182,6 @@ model LessonTask {
   task        Task         @relation(fields: [taskId], references: [id])
   @@id([lessonId, taskId])
 }
-
-// --------------------------------------
-// タスク（問題）本体
-// --------------------------------------
 
 model Task {
   id             String       @id @default(cuid())
@@ -222,6 +213,7 @@ enum TaskType {
 enum TaskMode {
   MIMIC
   TRANSLATE
+  JUMBLE
 }
 
 // --------------------------------------

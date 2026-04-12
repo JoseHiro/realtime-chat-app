@@ -1,9 +1,6 @@
-import React from 'react'
+import React from "react";
+import { RoadmapView } from "../component/ui/Drills";
 
-const Drills = () => {
-  return (
-    <div>drills</div>
-  )
+export default function DrillsPage() {
+  return <RoadmapView />;
 }
-
-export default Drills
