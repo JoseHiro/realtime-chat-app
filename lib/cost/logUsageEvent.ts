@@ -156,8 +156,7 @@ export async function logFailedEvent(
   chatId: number | undefined,
   provider: ProviderType,
   apiType: ApiTypeType,
-  errorCode: string,
-  errorMessage?: string
+  errorCode: string
 ): Promise<void> {
   try {
     await prisma.usageEvent.create({

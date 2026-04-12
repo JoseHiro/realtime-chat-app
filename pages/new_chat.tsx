@@ -12,14 +12,11 @@ import { ChatFooter } from "../component/ui/Chat/Footer";
 import { useBeginConversation } from "../features/new-chat";
 import { useUserData } from "../features/user-trail";
 import { toast } from "sonner";
-import { apiRequest } from "../lib/apiRequest";
 
 export const Chat = () => {
   const {
     selectedPoliteness,
     selectedLevel,
-    checkGrammarMode,
-    chatId,
     setChatId,
     chatMode,
     setChatMode,
@@ -27,10 +24,8 @@ export const Chat = () => {
     selectedTime,
     selectedTheme,
     customTheme,
-    chatEnded,
-    setChatEnded,
   } = useChatSession();
-  const { summary, setSummary, summaryFetchLoading, setSummaryFetchLoading } =
+  const { summary, setSummary, summaryFetchLoading } =
     useSummary();
 
   const [chatInfo, setChatInfo] = useState<

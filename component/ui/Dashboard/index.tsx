@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { ChatDataType } from "../../../types/types";
 import { Header } from "./Header";
-import { DashboardLeft } from "./DashboardLeft";
+import { DashboardLeft } from "./DashBoardLeft";
 import { ActionButton } from "./ActionButton";
 import { MessageSquare, Users } from "lucide-react";
 import { useRouter } from "next/router";

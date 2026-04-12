@@ -22,7 +22,8 @@ const PrivacyPolicy = () => {
                 1. Introduction
               </h2>
               <p className="text-base text-gray-600 leading-relaxed mb-4">
-                Welcome to Kaiwa Kun ("we," "our," or "us"). We are committed to
+                Welcome to Kaiwa Kun (&quot;we,&quot; &quot;our,&quot; or
+                &quot;us&quot;). We are committed to
                 protecting your privacy and ensuring the security of your
                 personal information. This Privacy Policy explains how we
                 collect, use, disclose, and safeguard your information when you
@@ -148,7 +149,8 @@ const PrivacyPolicy = () => {
               </ul>
               <p className="text-base text-gray-600 leading-relaxed mt-4">
                 To exercise these rights, please contact us using the
-                information provided in the "Contact Us" section below.
+                information provided in the &quot;Contact Us&quot; section
+                below.
               </p>
             </section>
 
@@ -166,7 +168,7 @@ const PrivacyPolicy = () => {
 
             <section>
               <h2 className="text-2xl font-bold mb-4 text-gray-900">
-                8. Children's Privacy
+                8. Children&apos;s Privacy
               </h2>
               <p className="text-base text-gray-600 leading-relaxed">
                 Our service is not intended for children under the age of 13. We
@@ -183,7 +185,8 @@ const PrivacyPolicy = () => {
               <p className="text-base text-gray-600 leading-relaxed">
                 We may update this Privacy Policy from time to time. We will
                 notify you of any material changes by posting the new Privacy
-                Policy on this page and updating the "Last updated" date. You
+                Policy on this page and updating the &quot;Last updated&quot;
+                date. You
                 are advised to review this Privacy Policy periodically for any
                 changes.
               </p>

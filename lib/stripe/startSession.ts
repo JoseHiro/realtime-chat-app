@@ -1,5 +1,4 @@
 import { loadStripe } from "@stripe/stripe-js";
-import { apiRequest } from "../apiRequest";
 
 // Initialize Stripe (you'll need your publishable key)
 const stripePromise = loadStripe(

@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useRouter } from "next/router";
-import { apiRequest } from "../../lib/apiRequest";
 import { toast } from "sonner";
 import { Shield, CheckCircle2 } from "lucide-react";
 import { RoundedButton } from "../../component/shared/button";

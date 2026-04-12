@@ -6,6 +6,7 @@ import { MyJwtPayload } from "../../types/types";
 import { wordAnalyzer } from "../../lib/chatAnalyze";
 import { logOpenAIEvent } from "../../lib/cost/logUsageEvent";
 import { ApiType } from "../../lib/cost/constants";
+import { calculateOpenAICost } from "../../lib/cost/calculateCost";
 import { deductCreditsForChat } from "../../lib/credits/creditService";
 import {
   getVoiceProvider,
@@ -43,7 +44,7 @@ export default async function handler(
     return res.status(401).json({ error: "Not authenticated" });
   }
 
-  const { chatId, politeness, history } = req.body;
+  const { chatId, politeness } = req.body;
 
   if (!chatId || !politeness) {
     return res.status(400).json({ error: "No data provided" });
@@ -300,13 +301,18 @@ export default async function handler(
 
     // Log usage for summary generation
     if (completion.usage) {
+      const summaryInput = completion.usage.prompt_tokens || 0;
+      const summaryOutput = completion.usage.completion_tokens || 0;
+      const summaryCost = calculateOpenAICost(summaryInput, summaryOutput);
+      console.log(`[Cost] Summary — input: ${summaryInput} tokens, output: ${summaryOutput} tokens, cost: $${summaryCost.toFixed(6)}`);
+
       await logOpenAIEvent({
         userId: decodedToken.userId,
         chatId: chatIdNumber,
         apiType: ApiType.SUMMARY,
         model: "gpt-4o-mini",
-        inputTokens: completion.usage.prompt_tokens || 0,
-        outputTokens: completion.usage.completion_tokens || 0,
+        inputTokens: summaryInput,
+        outputTokens: summaryOutput,
       });
     }
 
@@ -317,11 +323,21 @@ export default async function handler(
     if (jsonMatch) {
       try {
         parsed = JSON.parse(jsonMatch[0]);
-      } catch (error) {
-        console.error("[Summary] Failed to parse JSON:", error);
-        return res
-          .status(500)
-          .json({ error: "Failed to summarize text", details: error });
+      } catch {
+        // Retry with sanitized JSON (fix trailing commas, single-quoted keys, etc.)
+        try {
+          const sanitized = jsonMatch[0]
+            .replace(/,\s*([}\]])/g, "$1")          // trailing commas
+            .replace(/([{,]\s*)'([^']+)'\s*:/g, '$1"$2":'); // single-quoted keys
+          parsed = JSON.parse(sanitized);
+          console.log("[Summary] Parsed JSON after sanitization");
+        } catch (error) {
+          console.error("[Summary] Failed to parse JSON even after sanitization:", error);
+          console.error("[Summary] Raw response (first 500 chars):", raw.slice(0, 500));
+          return res
+            .status(500)
+            .json({ error: "Failed to summarize text", details: String(error) });
+        }
       }
     } else {
       console.error("[Summary] No JSON found in response");
@@ -708,13 +724,18 @@ IMPORTANT:
 
     // Log usage for conversation review generation
     if (completion.usage) {
+      const reviewInput = completion.usage.prompt_tokens || 0;
+      const reviewOutput = completion.usage.completion_tokens || 0;
+      const reviewCost = calculateOpenAICost(reviewInput, reviewOutput);
+      console.log(`[Cost] Conversation review — input: ${reviewInput} tokens, output: ${reviewOutput} tokens, cost: $${reviewCost.toFixed(6)}`);
+
       await logOpenAIEvent({
         userId,
         chatId,
         apiType: ApiType.SUMMARY,
         model: "gpt-4o-mini",
-        inputTokens: completion.usage.prompt_tokens || 0,
-        outputTokens: completion.usage.completion_tokens || 0,
+        inputTokens: reviewInput,
+        outputTokens: reviewOutput,
       });
     }
 

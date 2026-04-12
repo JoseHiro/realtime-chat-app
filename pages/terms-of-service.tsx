@@ -22,8 +22,9 @@ const TermsOfService = () => {
                 1. Acceptance of Terms
               </h2>
               <p className="text-base text-gray-600 leading-relaxed mb-4">
-                By accessing or using Kaiwa Kun ("the Service"), you agree to be
-                bound by these Terms of Service ("Terms"). If you disagree with
+                By accessing or using Kaiwa Kun (&quot;the Service&quot;), you
+                agree to be bound by these Terms of Service
+                (&quot;Terms&quot;). If you disagree with
                 any part of these terms, then you may not access the Service.
               </p>
             </section>
@@ -86,7 +87,7 @@ const TermsOfService = () => {
                   </h3>
                   <p className="text-base text-gray-600 leading-relaxed">
                     We offer a free trial period with limited features. The free
-                    trial is provided "as is" and may be modified or
+                    trial is provided &quot;as is&quot; and may be modified or
                     discontinued at any time without notice.
                   </p>
                 </div>

@@ -10,7 +10,6 @@ import {
 import { Sidebar } from "../../component/ui/Sidebar";
 import { RoundedButton } from "../../component/shared/button";
 import { apiRequest } from "../../lib/apiRequest";
-import { useRouter } from "next/router";
 import { toast } from "sonner";
 import { loadStripe } from "@stripe/stripe-js";
 import PageLayout from "../../component/ui/Settings/shared/PageLayout";
@@ -30,7 +29,6 @@ interface UserData {
 }
 
 const BillingSettings = () => {
-  const router = useRouter();
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
   const [showUnsubscribeModal, setShowUnsubscribeModal] = useState(false);

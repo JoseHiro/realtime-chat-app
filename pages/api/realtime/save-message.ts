@@ -39,7 +39,7 @@ export default async function handler(
     if (sender === "assistant" && (!reading || !english)) {
       try {
         const { reading: genReading, english: genEnglish } =
-          await addReadingAndEnglish(message, decodedToken.userId, chatId);
+          await addReadingAndEnglish(message);
         finalReading = genReading;
         finalEnglish = genEnglish;
       } catch (error) {
@@ -70,11 +70,7 @@ export default async function handler(
 }
 
 // Helper function to generate reading and english translation
-export async function addReadingAndEnglish(
-  text: string,
-  userId: string,
-  chatId: number
-) {
+export async function addReadingAndEnglish(text: string) {
   const prompt = `以下の日本語を処理してください。出力フォーマットは必ずJSONで次の形にしてください:
 {
   "reading": "ひらがなのみで表記",

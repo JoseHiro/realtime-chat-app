@@ -359,8 +359,8 @@ const HowItWorks = () => {
                     Start with Easy Level
                   </h3>
                   <p className="text-base text-gray-600">
-                    Even if you're intermediate, starting with Easy helps you
-                    get comfortable with the interface and build confidence.
+                    Even if you&apos;re intermediate, starting with Easy helps
+                    you get comfortable with the interface and build confidence.
                   </p>
                 </div>
               </li>
@@ -374,9 +374,9 @@ const HowItWorks = () => {
                     Speak Naturally
                   </h3>
                   <p className="text-base text-gray-600">
-                    Don't worry about making mistakes. The AI will understand
-                    you, and you'll get feedback to improve. Focus on
-                    communicating your thoughts naturally.
+                    Don&apos;t worry about making mistakes. The AI will
+                    understand you, and you&apos;ll get feedback to improve.
+                    Focus on communicating your thoughts naturally.
                   </p>
                 </div>
               </li>

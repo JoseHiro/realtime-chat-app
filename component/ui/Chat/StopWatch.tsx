@@ -4,6 +4,7 @@ import { apiRequest } from "../../../lib/apiRequest";
 import { useChatSession } from "../../../context/ChatSessionContext";
 import { useSummary } from "../../../context/SummaryContext";
 import { toast } from "sonner";
+import { getRealtimeTotalCost } from "../../../features/new-chat/hooks/useBeginConversation";
 
 export interface StopWatchProps {
   history: any;
@@ -17,8 +18,8 @@ export function StopWatch({
   history,
   setOverlayOpened,
   chatDurationMinutes,
-}: StopWatchProps): JSX.Element {
-  const [timeLeft, setTimeLeft] = useState(chatDurationMinutes * 60);
+}: StopWatchProps): React.ReactElement {
+  const [timeLeft, setTimeLeft] = useState(1 * 60); // TODO: revert to chatDurationMinutes * 60
   const [isActive, setIsActive] = useState(true);
   const summaryCreatedRef = useRef(false);
 
@@ -27,6 +28,7 @@ export function StopWatch({
   const { setSummary, setSummaryFetchLoading } = useSummary();
 
   const handleCreateSummary = useCallback(async () => {
+    console.log(`[Realtime Cost] Total session cost: $${getRealtimeTotalCost().toFixed(5)}`);
     setSummaryFetchLoading(true);
     try {
       const data = await apiRequest("/api/generate-summary", {
@@ -76,7 +78,7 @@ export function StopWatch({
 
   // Initialize timeLeft when chatDurationMinutes changes
   useEffect(() => {
-    setTimeLeft(60 * 60);
+    setTimeLeft(1 * 60); // TODO: revert to chatDurationMinutes * 60
   }, [chatDurationMinutes]);
 
   useEffect(() => {

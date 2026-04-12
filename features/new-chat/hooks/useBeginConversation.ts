@@ -32,6 +32,10 @@ export interface UseBeginConversationParams {
 const REALTIME_MODEL = "gpt-4o-realtime-preview";
 const REALTIME_API = "https://api.openai.com/v1/realtime";
 
+// Module-level accumulator for Realtime API cost (reset on each new conversation)
+let realtimeTotalCost = 0;
+export const getRealtimeTotalCost = () => realtimeTotalCost;
+
 function buildSessionInstructions(params: {
   selectedCharacter: string;
   selectedLevel: string;
@@ -97,6 +101,7 @@ export const useBeginConversation = (params: UseBeginConversationParams) => {
 
     if (loading) return;
     setLoading(true);
+    realtimeTotalCost = 0;
     handleRefreshPreviousData();
 
     try {
@@ -147,6 +152,21 @@ export const useBeginConversation = (params: UseBeginConversationParams) => {
             );
           }
           return;
+        }
+
+        // Accumulate Realtime API cost per response
+        if (msg.type === "response.done" && msg.response?.usage) {
+          const usage = msg.response.usage;
+          const textIn = usage.input_token_details?.text_tokens ?? 0;
+          const audioIn = usage.input_token_details?.audio_tokens ?? (usage.input_tokens ?? 0);
+          const textOut = usage.output_token_details?.text_tokens ?? 0;
+          const audioOut = usage.output_token_details?.audio_tokens ?? (usage.output_tokens ?? 0);
+          const turnCost =
+            (textIn / 1_000_000) * 5.0 +
+            (audioIn / 1_000_000) * 100.0 +
+            (textOut / 1_000_000) * 20.0 +
+            (audioOut / 1_000_000) * 200.0;
+          realtimeTotalCost += turnCost;
         }
 
         // 2. Handle the AI's response transcript
