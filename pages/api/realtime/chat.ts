@@ -6,6 +6,7 @@ import { PrismaClient } from "@prisma/client";
 import { type CharacterName } from "../../../lib/voice/voiceMapping";
 import { logOpenAIEvent } from "../../../lib/cost/logUsageEvent";
 import { ApiType } from "../../../lib/cost/constants";
+import { calculateOpenAICost } from "../../../lib/cost/calculateCost";
 import { verifyAuth } from "../../../middleware/auth";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
@@ -142,13 +143,16 @@ export default async function handler(
 
     // Log OpenAI usage
     if (chatId) {
+      const resolvedInput = inputTokens || messagesWithInstruction.length * 10;
+      const resolvedOutput = outputTokens || fullResponse.length / 4;
+
       await logOpenAIEvent({
         userId: chat.userId,
         chatId: chatId,
         apiType: ApiType.CHAT,
         model: "gpt-4o-mini",
-        inputTokens: inputTokens || messagesWithInstruction.length * 10, // Estimate if not provided
-        outputTokens: outputTokens || fullResponse.length / 4, // Estimate if not provided
+        inputTokens: resolvedInput,
+        outputTokens: resolvedOutput,
         messageCount: messages.length,
       });
     }
