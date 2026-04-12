@@ -63,9 +63,10 @@ async function generateElevenLabsAudio(text: string): Promise<Buffer> {
 }
 
 /**
- * Generate TTS audio using Azure TTS API
+ * Generate TTS audio using Azure TTS API (Japanese voice).
+ * Exported for use in scripts (e.g. generate-task-audio).
  */
-async function generateAzureAudio(text: string): Promise<Buffer> {
+export async function generateAzureAudio(text: string): Promise<Buffer> {
   // 1. Get Azure access token
   const tokenUrl = `https://${AZURE_SERVICE_REGION}.api.cognitive.microsoft.com/sts/v1.0/issuetoken`;
   const tokenResponse = await fetch(tokenUrl, {

@@ -1,0 +1,51 @@
+[VOCABULARY]
+私,わたし,I,Noun
+あなた,あなた,You,Noun
+先生,せんせい,Teacher,Noun
+学生,がくせい,Student,Noun
+会社員,かいしゃいん,Office worker,Noun
+日本人,にほんじん,Japanese person,Noun
+アメリカ人,あめりかじん,American person,Noun
+名前,なまえ,Name,Noun
+はい,はい,Yes,Expression
+いいえ,いいえ,No,Expression
+です,です,am/is/are,Auxiliary
+は,は,Topic marker,Particle
+〜,〜,placeholder (fill in a word),Symbol
+人,ひと,person,Noun
+誰,だれ,who,Question
+か,か,question marker,Particle
+の,の,possessive / of,Particle
+も,も,also/too,Particle
+と,と,and/with,Particle
+こちら,こちら,this person/this (polite),Pronoun
+あちら,あちら,that person/that (polite),Pronoun
+どちら,どちら,which (polite),Question
+本,ほん,book,Noun
+ペン,ぺん,pen,Noun
+これ,これ,this,Pronoun
+それ,それ,that,Pronoun
+あれ,あれ,that over there,Pronoun
+どれ,どれ,which,Question
+
+[TASKS]
+// Section 1: Words (4) – listen and voice input
+VOCAB,MIMIC,私,I,わたし,私:0-1
+VOCAB,MIMIC,先生,Teacher,せんせい,先生:0-2
+VOCAB,MIMIC,学生,Student,がくせい,学生:0-2
+VOCAB,MIMIC,です,am/is/are,です,です:0-2
+// Section 2: Sentence (4) – listen whole sentence and voice input
+SENTENCE,MIMIC,私は先生です,I am a teacher,わたしはせんせいです,"私:0-1,は:1-2,先生:2-4,です:4-6"
+SENTENCE,MIMIC,私は学生です,I am a student,わたしはがくせいです,"私:0-1,は:1-2,学生:2-4,です:4-6"
+SENTENCE,MIMIC,私は会社員です,I am an office worker,わたしはかいしゃいんです,"私:0-1,は:1-2,会社員:2-5,です:5-7"
+SENTENCE,MIMIC,私は日本人です,I am Japanese,わたしはにほんじんです,"私:0-1,は:1-2,日本人:2-5,です:5-7"
+// Section 3: Sentence order (4) – chips in random order, user fixes order
+SENTENCE,JUMBLE,私は先生です,I am a teacher,わたしはせんせいです,"私:0-1,は:1-2,先生:2-4,です:4-6"
+SENTENCE,JUMBLE,私は学生です,I am a student,わたしはがくせいです,"私:0-1,は:1-2,学生:2-4,です:4-6"
+SENTENCE,JUMBLE,私は会社員です,I am an office worker,わたしはかいしゃいんです,"私:0-1,は:1-2,会社員:2-5,です:5-7"
+SENTENCE,JUMBLE,私は日本人です,I am Japanese,わたしはにほんじんです,"私:0-1,は:1-2,日本人:2-5,です:5-7"
+// Section 4: Translation (4) – see English, voice input to translate
+SENTENCE,TRANSLATE,私は先生です,I am a teacher,わたしはせんせいです,"私:0-1,は:1-2,先生:2-4,です:4-6"
+SENTENCE,TRANSLATE,私は学生です,I am a student,わたしはがくせいです,"私:0-1,は:1-2,学生:2-4,です:4-6"
+SENTENCE,TRANSLATE,私は会社員です,I am an office worker,わたしはかいしゃいんです,"私:0-1,は:1-2,会社員:2-5,です:5-7"
+SENTENCE,TRANSLATE,私は日本人です,I am Japanese,わたしはにほんじんです,"私:0-1,は:1-2,日本人:2-5,です:5-7"
