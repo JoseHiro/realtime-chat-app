@@ -4,7 +4,6 @@ import {
   CheckCircle,
   TrendingUp,
   BookOpen,
-  AlertCircle,
 } from "lucide-react";
 import { SectionContainer, SectionDescription } from "./Container";
 import { SectionTitle } from "./SectionTitle";
@@ -92,55 +91,30 @@ export const PerformanceContainer = React.memo(
           </SectionContainer>
         )}
 
-        {/* Key Improvements - Notion-like design with improvement types */}
-        {improvementTypesWithCounts.length > 0 && (
-          <SectionContainer containerName="Key Improvements" icon={TrendingUp}>
-            <div className="flex flex-wrap gap-2">
-              {improvementTypesWithCounts.map(({ type }, index) => (
-                <div
-                  key={index}
-                  className="group inline-flex items-center gap-2 rounded-lg hover:border-gray-300 hover:shadow-sm transition-all cursor-default"
-                >
-                  <ImprovementTypeBadge type={type} />
+        {/* Improvements & Grammar Errors - combined */}
+        {(improvementTypesWithCounts.length > 0 || hasUserMessages) && (
+          <SectionContainer containerName="Improvements" icon={TrendingUp}>
+            <div className="space-y-3">
+              {improvementTypesWithCounts.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {improvementTypesWithCounts.map(({ type }, index) => (
+                    <ImprovementTypeBadge key={index} type={type} />
+                  ))}
                 </div>
-              ))}
+              )}
+              {hasUserMessages && hasErrors && grammarErrorTypesWithCounts.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {grammarErrorTypesWithCounts.map(({ type, count }, index) => (
+                    <div key={index} className="inline-flex items-center gap-1">
+                      <GrammarErrorBadge type={type} />
+                      {count > 1 && (
+                        <span className="text-xs text-gray-500 font-medium">{count}</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-          </SectionContainer>
-        )}
-
-        {/* Grammar Errors - Show errors or positive message if no errors */}
-        {hasUserMessages && (
-          <SectionContainer
-            containerName="Grammar Errors"
-            icon={hasErrors ? AlertCircle : CheckCircle}
-          >
-            {hasErrors && grammarErrorTypesWithCounts.length > 0 ? (
-              <div className="flex flex-wrap gap-2">
-                {grammarErrorTypesWithCounts.map(({ type, count }, index) => (
-                  <div
-                    key={index}
-                    className="group inline-flex items-center gap-2 bg-white rounded-lg border border-gray-200 hover:border-gray-300 hover:shadow-sm transition-all cursor-default"
-                  >
-                    <GrammarErrorBadge type={type} />
-                    {count > 1 && (
-                      <span className="text-xs text-gray-500 font-medium">
-                        {count}
-                      </span>
-                    )}
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="flex items-center gap-3 bg-green-50 rounded-lg p-4 border border-green-100">
-                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
-                <SectionDescription>
-                  <p className="text-sm text-gray-800 font-medium">
-                    Great job! No major grammar errors detected in your
-                    conversation.
-                  </p>
-                </SectionDescription>
-              </div>
-            )}
           </SectionContainer>
         )}
 

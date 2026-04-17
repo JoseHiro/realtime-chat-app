@@ -1,5 +1,5 @@
 import React from "react";
-import { AlertCircle, CheckCircle, TrendingUp } from "lucide-react";
+import { CheckCircle } from "lucide-react";
 import { SectionContainer, SectionDescription } from "./Container";
 import { SectionTitle, SectionSubTitle } from "./SectionTitle";
 import { Feedback } from "../../../types/types";
@@ -35,16 +35,6 @@ export const FeedbackContainer = React.memo(
           </SectionContainer>
         )}
 
-        {/* Common Mistakes */}
-        {feedback.commonMistakes && feedback.commonMistakes.length > 0 && (
-          <SectionContainer containerName="Common Mistakes" icon={AlertCircle}>
-            <div className="space-y-3">
-              {feedback.commonMistakes.map((mistake, index) => (
-                <SectionDescription key={index}>{mistake}</SectionDescription>
-              ))}
-            </div>
-          </SectionContainer>
-        )}
       </div>
     );
   }

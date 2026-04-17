@@ -1,11 +1,14 @@
 /**
- * Realtime "begin conversation" flow for the new-chat page.
+ * Gemini Live "begin conversation" flow for the new-chat page.
  * Used by: pages/new_chat.tsx
+ *
+ * OpenAI Realtime (WebRTC) version is preserved in useBeginConversation.openai.ts
  */
 
 import { useCallback, useRef, useState } from "react";
 import { toast } from "sonner";
 import { apiRequest } from "../../../lib/apiRequest";
+import { GoogleGenAI, Modality } from "@google/genai";
 
 export interface UseBeginConversationParams {
   needPayment: boolean;
@@ -29,25 +32,26 @@ export interface UseBeginConversationParams {
   selectedCharacter: string;
 }
 
-const REALTIME_MODEL = "gpt-4o-realtime-preview";
-const REALTIME_API = "https://api.openai.com/v1/realtime";
+const GEMINI_MODEL = "gemini-2.5-flash-native-audio-latest";
 
-// Module-level accumulator for Realtime API cost (reset on each new conversation)
+const INPUT_SAMPLE_RATE = 16000;
+const OUTPUT_SAMPLE_RATE = 24000;
+
+// Module-level cost accumulator (reset on each new conversation)
 let realtimeTotalCost = 0;
 export const getRealtimeTotalCost = () => realtimeTotalCost;
 
-function buildSessionInstructions(params: {
+function buildSystemInstructions(params: {
   selectedCharacter: string;
   selectedLevel: string;
   selectedPoliteness: string;
   selectedTheme: string;
 }): string {
-  const {
-    selectedCharacter,
-    selectedLevel,
-    selectedPoliteness,
-    selectedTheme,
-  } = params;
+  const { selectedCharacter, selectedLevel, selectedPoliteness, selectedTheme } = params;
+  const formality =
+    selectedPoliteness === "casual"
+      ? "話し方はカジュアルで、です・ます調は使わない。"
+      : "話し方は丁寧で、です・ます調を使う。";
   return `あなたは日本語学習者のアシスタントで、あなたの名前は${selectedCharacter}です。
 - 学習者のレベルは${selectedLevel}です。
 - 丁寧さ: ${selectedPoliteness || "polite"}
@@ -56,12 +60,42 @@ function buildSessionInstructions(params: {
 - 会話が続くようにオープンエンドの質問を入れる。
 - これまでの会話の文脈を踏まえて回答する。
 - 学習者のレベルに合わせて難易度を調整してください。
-- 文法を正しくしてください。
-- 会話を自然に続けてください。
+- ${formality}
 - 学習者が話している間は、最後までじっくり聞いてください。
-- 学習者が言葉に詰まっても、助け舟を出す前に少し待ってください。
-- 相手が確実にはっきり話し終えたと判断した時だけ、返答してください。
 - 相手がはっきり話しかけてきたときだけ返答してください。雑音や短い音には反応しないでください。`;
+}
+
+function floatTo16BitPCM(float32Array: Float32Array): ArrayBuffer {
+  const buffer = new ArrayBuffer(float32Array.length * 2);
+  const view = new DataView(buffer);
+  for (let i = 0; i < float32Array.length; i++) {
+    const s = Math.max(-1, Math.min(1, float32Array[i]));
+    view.setInt16(i * 2, s < 0 ? s * 0x8000 : s * 0x7fff, true);
+  }
+  return buffer;
+}
+
+function arrayBufferToBase64(buffer: ArrayBuffer): string {
+  const bytes = new Uint8Array(buffer);
+  let binary = "";
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}
+
+function base64ToFloat32(base64: string): Float32Array {
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  const int16 = new Int16Array(bytes.buffer);
+  const float32 = new Float32Array(int16.length);
+  for (let i = 0; i < int16.length; i++) {
+    float32[i] = int16[i] / 32768.0;
+  }
+  return float32;
 }
 
 export const useBeginConversation = (params: UseBeginConversationParams) => {
@@ -84,8 +118,13 @@ export const useBeginConversation = (params: UseBeginConversationParams) => {
   } = params;
 
   const [loading, setLoading] = useState(false);
-  const dcRef = useRef<RTCDataChannel | null>(null);
+  const [streamingMessage, setStreamingMessage] = useState("");
+  const sessionRef = useRef<any | null>(null);
   const chatIdRef = useRef<number | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const processorRef = useRef<ScriptProcessorNode | null>(null);
+  const nextAudioTimeRef = useRef(0);
+  const assistantTranscriptRef = useRef("");
 
   const handleBeginConversation = useCallback(async () => {
     if (needPayment) {
@@ -105,6 +144,7 @@ export const useBeginConversation = (params: UseBeginConversationParams) => {
     handleRefreshPreviousData();
 
     try {
+      // 1. Create chat in DB
       const startNewChat = await apiRequest("/api/chat/start-chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -117,170 +157,185 @@ export const useBeginConversation = (params: UseBeginConversationParams) => {
         }),
       });
 
-      const chatId = startNewChat?.id;
+      console.log("[start-chat] response:", startNewChat);
+      const chatId = startNewChat?.id ?? null;
       if (chatId == null) {
-        throw new Error("Failed to create chat - no chatId returned");
+        console.warn("[start-chat] No chatId returned — conversation will not be persisted");
       }
       chatIdRef.current = chatId;
       setChatId(chatId);
       setChatMode(true);
 
-      const pc = new RTCPeerConnection();
-      const dc = pc.createDataChannel("oai-events");
-      dcRef.current = dc;
+      // 2. Get Gemini API key from server (authenticated users only)
+      const sessionRes = await fetch("/api/chat/start_gemini_chat_session", {
+        method: "POST",
+      });
+      if (!sessionRes.ok) throw new Error("Failed to get Gemini session");
+      const { apiKey } = await sessionRes.json();
 
-      dc.onmessage = (event) => {
-        const msg = JSON.parse(event.data);
-
-        // After the user has spoken (voice) or sent a message (text), trigger the next AI response.
-        // This enforces turn-taking: AI only responds after the user has taken a turn.
-
-        // 1. Only trigger a manual response for TEXT messages.
-        // If it's VOICE, server_vad handles the response automatically.
-        if (
-          msg.type === "conversation.item.created" &&
-          msg.item?.role === "user"
-        ) {
-          const isText = msg.item.content?.[0]?.type === "input_text";
-
-          if (isText) {
-            dc.send(
-              JSON.stringify({
-                type: "response.create",
-                response: { modalities: ["audio", "text"] },
-              }),
-            );
-          }
-          return;
-        }
-
-        // Accumulate Realtime API cost per response
-        if (msg.type === "response.done" && msg.response?.usage) {
-          const usage = msg.response.usage;
-          const textIn = usage.input_token_details?.text_tokens ?? 0;
-          const audioIn = usage.input_token_details?.audio_tokens ?? (usage.input_tokens ?? 0);
-          const textOut = usage.output_token_details?.text_tokens ?? 0;
-          const audioOut = usage.output_token_details?.audio_tokens ?? (usage.output_tokens ?? 0);
-          const turnCost =
-            (textIn / 1_000_000) * 5.0 +
-            (audioIn / 1_000_000) * 100.0 +
-            (textOut / 1_000_000) * 20.0 +
-            (audioOut / 1_000_000) * 200.0;
-          realtimeTotalCost += turnCost;
-        }
-
-        // 2. Handle the AI's response transcript
-        if (msg.type === "response.audio_transcript.done") {
-          const fullText = msg.transcript ?? "";
-          if (!fullText) return;
-
-          // Update History
-          setHistory((prev) => [
-            ...prev,
-            { role: "assistant", content: fullText },
-          ]);
-
-          // Save to Database
-          const currentChatId = chatIdRef.current;
-          if (currentChatId != null) {
-            apiRequest("/api/realtime/save-message", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                chatId: currentChatId,
-                sender: "assistant",
-                message: fullText,
-                reading: "",
-                english: "",
-              }),
-            }).then((res: { reading?: string; english?: string }) => {
-              if (res?.reading) {
-                setHiraganaReadingList((prev) => [...prev, res.reading!]);
-              }
-              if (res?.english != null) {
-                setChatInfo((prev) => [
-                  ...prev,
-                  { audioUrl: "", english: res.english ?? "" },
-                ]);
-              }
-            });
-          }
-        }
-      };
-
-      const audioEl = document.createElement("audio");
-      audioEl.autoplay = true;
-      pc.ontrack = (event) => {
-        audioEl.srcObject = event.streams[0];
-      };
-
+      // 3. Setup microphone
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
+          channelCount: 1,
           echoCancellation: true,
           noiseSuppression: true,
           autoGainControl: true,
         },
       });
-      stream.getTracks().forEach((track) => pc.addTrack(track, stream));
 
-      const offer = await pc.createOffer();
-      await pc.setLocalDescription(offer);
+      const audioContext = new AudioContext({ sampleRate: INPUT_SAMPLE_RATE });
+      audioContextRef.current = audioContext;
+      nextAudioTimeRef.current = 0;
 
-      const tokenRes = await fetch("/api/chat/start_realtime_chat_session", {
-        method: "POST",
-      });
-      if (!tokenRes.ok) {
-        throw new Error(`Realtime session failed: ${tokenRes.status}`);
-      }
-      const session = await tokenRes.json();
-      const ephemeralKey = session.client_secret.value;
+      const source = audioContext.createMediaStreamSource(stream);
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
+      const processor = audioContext.createScriptProcessor(2048, 1, 1);
+      processorRef.current = processor;
 
-      const sdpRes = await fetch(`${REALTIME_API}?model=${REALTIME_MODEL}`, {
-        method: "POST",
-        body: offer.sdp,
-        headers: {
-          Authorization: `Bearer ${ephemeralKey}`,
-          "Content-Type": "application/sdp",
-        },
-      });
-      const answerSDP = await sdpRes.text();
-      await pc.setRemoteDescription({ type: "answer", sdp: answerSDP });
-
-      await new Promise<void>((resolve) => {
-        dc.onopen = () => {
-          console.log("接続成功");
-          dc.send(
-            JSON.stringify({
-              type: "session.update",
-              session: {
-
-                instructions: buildSessionInstructions({
+      // 4. Connect to Gemini Live via SDK
+      console.log("[Gemini Live] Connecting via SDK...");
+      const ai = new GoogleGenAI({ apiKey });
+      const session = await ai.live.connect({
+        model: GEMINI_MODEL,
+        config: {
+          responseModalities: [Modality.AUDIO],
+          outputAudioTranscription: {},
+          speechConfig: {
+            voiceConfig: {
+              prebuiltVoiceConfig: { voiceName: "Puck" },
+            },
+          },
+          systemInstruction: {
+            parts: [
+              {
+                text: buildSystemInstructions({
                   selectedCharacter,
                   selectedLevel,
                   selectedPoliteness,
-                  selectedTheme,
+                  selectedTheme: selectedTheme || customTheme,
                 }),
-                turn_detection: null,
-                // turn_detection: {
-                //   type: "server_vad",
-                //   threshold: 0.5,
-                //   prefix_padding_ms: 300,
-                //   silence_duration_ms: 2000,
-                // },
               },
-            }),
-          );
-          dc.send(
-            JSON.stringify({
-              type: "response.create",
-              response: {
-                modalities: ["audio", "text"],
-              },
-            }),
-          );
-          resolve();
-        };
+            ],
+          },
+        },
+        callbacks: {
+          onopen: () => {
+            console.log("[Gemini Live] Session opened");
+          },
+          onmessage: (msg: any) => {
+            // Model audio parts
+            const parts = msg.serverContent?.modelTurn?.parts ?? [];
+            for (const part of parts) {
+              if (
+                part.inlineData?.mimeType?.includes("audio/pcm") &&
+                part.inlineData?.data
+              ) {
+                const float32 = base64ToFloat32(part.inlineData.data);
+                const buffer = audioContext.createBuffer(
+                  1,
+                  float32.length,
+                  OUTPUT_SAMPLE_RATE,
+                );
+                buffer.copyToChannel(new Float32Array(float32), 0);
+                const bufSource = audioContext.createBufferSource();
+                bufSource.buffer = buffer;
+                bufSource.connect(audioContext.destination);
+                const startTime = Math.max(
+                  audioContext.currentTime,
+                  nextAudioTimeRef.current,
+                );
+                bufSource.start(startTime);
+                nextAudioTimeRef.current = startTime + buffer.duration;
+              }
+            }
+
+            // Output audio transcription (from outputAudioTranscription config)
+            if (msg.serverContent?.outputTranscription?.text) {
+              assistantTranscriptRef.current +=
+                msg.serverContent.outputTranscription.text;
+              setStreamingMessage(assistantTranscriptRef.current);
+            }
+
+            // User interrupted → clear audio queue and streaming text
+            if (msg.serverContent?.interrupted) {
+              nextAudioTimeRef.current = audioContext.currentTime;
+              assistantTranscriptRef.current = "";
+              setStreamingMessage("");
+            }
+
+            // Turn complete → save assistant message to DB
+            if (msg.serverContent?.turnComplete) {
+              const text = assistantTranscriptRef.current.trim();
+              assistantTranscriptRef.current = "";
+              setStreamingMessage("");
+              if (text) {
+                setHistory((prev) => [
+                  ...prev,
+                  { role: "assistant", content: text },
+                ]);
+                const currentChatId = chatIdRef.current;
+                if (currentChatId != null) {
+                  apiRequest("/api/realtime/save-message", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      chatId: currentChatId,
+                      sender: "assistant",
+                      message: text,
+                      reading: "",
+                      english: "",
+                    }),
+                  }).then((res: { reading?: string; english?: string }) => {
+                    if (res?.reading)
+                      setHiraganaReadingList((prev) => [
+                        ...prev,
+                        res.reading!,
+                      ]);
+                    if (res?.english != null)
+                      setChatInfo((prev) => [
+                        ...prev,
+                        { audioUrl: "", english: res.english ?? "" },
+                      ]);
+                  });
+                }
+              }
+            }
+
+            // Cost tracking
+            if (msg.usageMetadata) {
+              const inputTokens = msg.usageMetadata.promptTokenCount ?? 0;
+              const outputTokens = msg.usageMetadata.candidatesTokenCount ?? 0;
+              realtimeTotalCost +=
+                (inputTokens / 1_000_000) * 0.1 +
+                (outputTokens / 1_000_000) * 0.4;
+            }
+          },
+          onerror: (e: any) => {
+            console.error("[Gemini Live] Error — message:", e?.message, "type:", e?.type, e);
+            toast.error("Connection error. Please try again.", {
+              position: "top-center",
+            });
+          },
+          onclose: (e: any) => {
+            console.log("[Gemini Live] Session closed — code:", e?.code, "reason:", e?.reason, "wasClean:", e?.wasClean);
+            processorRef.current?.disconnect();
+          },
+        },
       });
+      sessionRef.current = session;
+      console.log("[Gemini Live] Session ready, starting audio stream");
+
+      // Start microphone audio streaming (session is now assigned)
+      processor.onaudioprocess = (e) => {
+        const float32 = e.inputBuffer.getChannelData(0);
+        const pcm16 = floatTo16BitPCM(float32);
+        const base64 = arrayBufferToBase64(pcm16);
+        session.sendRealtimeInput({
+          audio: { data: base64, mimeType: "audio/pcm;rate=16000" },
+        });
+      };
+      source.connect(processor);
+      processor.connect(audioContext.destination);
     } catch (error) {
       console.error("[useBeginConversation]", error);
       toast.error("Failed to start conversation. Please try again.", {
@@ -310,24 +365,16 @@ export const useBeginConversation = (params: UseBeginConversationParams) => {
 
   const sendTextMessage = useCallback(
     (text: string) => {
-      if (!dcRef.current || dcRef.current.readyState !== "open") {
+      if (!sessionRef.current) {
         toast.error("まだ接続されていません");
         return;
       }
 
-      dcRef.current.send(
-        JSON.stringify({
-          type: "conversation.item.create",
-          item: {
-            type: "message",
-            role: "user",
-            content: [{ type: "input_text", text }],
-          },
-        }),
-      );
-      // Do not send response.create here; it is sent in dc.onmessage when we
-      // receive conversation.item.added (user), so the next response is only
-      // triggered after the user turn is committed (same path for text and voice).
+      sessionRef.current.sendClientContent({
+        turns: [{ role: "user", parts: [{ text }] }],
+        turnComplete: true,
+      });
+
       setHistory((prev) => [...prev, { role: "user", content: text }]);
 
       const currentChatId = chatIdRef.current;
@@ -370,11 +417,24 @@ export const useBeginConversation = (params: UseBeginConversationParams) => {
     selectedTime,
   ]);
 
+  const stopConversation = useCallback(() => {
+    sessionRef.current?.close();
+    sessionRef.current = null;
+    processorRef.current?.disconnect();
+    processorRef.current = null;
+    if (audioContextRef.current?.state !== "closed") {
+      audioContextRef.current?.close();
+    }
+    audioContextRef.current = null;
+  }, []);
+
   return {
     handleBeginConversation,
     sendTextMessage,
     handleStartChat,
-    dcRef,
+    stopConversation,
+    sessionRef,
     loading,
+    streamingMessage,
   };
 };

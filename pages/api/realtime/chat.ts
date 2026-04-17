@@ -6,7 +6,6 @@ import { PrismaClient } from "@prisma/client";
 import { type CharacterName } from "../../../lib/voice/voiceMapping";
 import { logOpenAIEvent } from "../../../lib/cost/logUsageEvent";
 import { ApiType } from "../../../lib/cost/constants";
-import { calculateOpenAICost } from "../../../lib/cost/calculateCost";
 import { verifyAuth } from "../../../middleware/auth";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });

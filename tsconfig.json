@@ -25,6 +25,12 @@
       "@component/*": ["./component/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "lib/supabaseClient.ts"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "lib/supabaseClient.ts"
+  ],
   "exclude": ["node_modules"]
 }

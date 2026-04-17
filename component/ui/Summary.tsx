@@ -3,7 +3,6 @@ import { SummaryType, ConversationReview } from "../../types/types";
 import { SummaryNavigation } from "./Summary/SummaryNavigation";
 import { SectionHeader } from "./Summary/SectionHeader";
 import { InfoContainer } from "./Summary/InfoContainer";
-import { PerformanceContainer } from "./Summary/PerformanceContainer";
 import { ConversationReviewContainer } from "./Summary/ConversationReviewContainer";
 import { MilestoneContainer } from "./Summary/MilestoneContainer";
 import mockConversationData from "../../data/mockConversationFeedbackData.json";
@@ -68,11 +67,9 @@ export const Summary = ({
           {/* Main Content Area */}
           <div className="lg:col-span-3">
             {/* Conversation Info Tab */}
-            {activeTab === "info" && <InfoContainer meta={summary?.meta} />}
-
-            {/* Performance Tab - Overview, Strengths, Improvements, Vocabulary */}
-            {activeTab === "performance" && (
-              <PerformanceContainer
+            {activeTab === "info" && (
+              <InfoContainer
+                meta={summary?.meta}
                 analysis={summary?.analysis}
                 feedback={summary?.feedback}
                 conversation={conversationData}

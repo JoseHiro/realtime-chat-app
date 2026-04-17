@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Messages } from "../component/ui/Chat/Messages";
 import { Overlay } from "../component/overlay";
 import { Sidebar } from "../component/ui/Sidebar";
@@ -50,6 +50,8 @@ export const Chat = () => {
   //   // Ideally we would trigger the agent response here
   // }, []);
 
+  const { registerStopConversation } = useChatSession();
+
   const { needPayment, plan } = useUserData({ setPaymentOverlay });
 
   const handleRefreshPreviousData = useCallback(() => {
@@ -59,7 +61,7 @@ export const Chat = () => {
     setHiraganaReadingList([]);
   }, [setSummary]);
 
-  const { handleBeginConversation, sendTextMessage, loading } =
+  const { handleBeginConversation, sendTextMessage, stopConversation, loading, streamingMessage } =
     useBeginConversation({
       needPayment,
       plan,
@@ -77,6 +79,10 @@ export const Chat = () => {
       selectedTime: selectedTime ?? 3,
       selectedCharacter: selectedCharacter ?? "Sakura",
     });
+
+  useEffect(() => {
+    registerStopConversation(stopConversation);
+  }, [registerStopConversation, stopConversation]);
 
   return (
     <div className="relative w-full h-screen flex">
@@ -109,6 +115,7 @@ export const Chat = () => {
             hiraganaReadingList={hiraganaReadingList}
             characterName={selectedCharacter}
             MessagesTextOpenMode={MessagesTextOpenMode}
+            streamingMessage={streamingMessage}
           />
           {/* Voice Status Indicator */}
           <ChatFooter

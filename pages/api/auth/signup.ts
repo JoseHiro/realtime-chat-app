@@ -1,16 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
-import { serialize } from "cookie"; // helper for cookies
-import jwt from "jsonwebtoken";
-import type { SignOptions, Algorithm } from "jsonwebtoken";
+import { buildAccessTokenCookie } from "../../../lib/auth/setAccessTokenCookie";
 
 const prisma = new PrismaClient();
-const jwtKey = "secretChatKey";
-const jwtOptions: SignOptions = {
-  algorithm: "HS256" as Algorithm,
-  expiresIn: "7d",
-};
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -42,20 +35,14 @@ export default async function handler(
       },
     });
 
-    // Hash the user ID for storing in cookie
-    const token = jwt.sign({ userId: user.id }, jwtKey, jwtOptions);
+    let accessCookie: string;
+    try {
+      accessCookie = buildAccessTokenCookie(user.id);
+    } catch {
+      return res.status(500).json({ error: "Server configuration error" });
+    }
 
-    // Set JWT in HttpOnly cookie
-    res.setHeader(
-      "Set-Cookie",
-      serialize("access_token", token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-        maxAge: 60 * 60 * 24 * 7, // 7 days
-      })
-    );
+    res.setHeader("Set-Cookie", accessCookie);
     return res.status(201).json({ message: "successfully signed up" });
   } catch (error: any) {
     console.error(error);

@@ -288,17 +288,6 @@ export const ConversationReviewContainer = React.memo(
                                     </div>
                                   )}
 
-                                  {/* Difficulty Level */}
-                                  {improvement.level && (
-                                    <div className="pt-2 border-t border-gray-200">
-                                      <span className="text-xs text-gray-600">
-                                        Level:{" "}
-                                        <span className="font-semibold text-gray-800">
-                                          {improvement.level}
-                                        </span>
-                                      </span>
-                                    </div>
-                                  )}
                                 </div>
                               </div>
                             )
@@ -312,33 +301,6 @@ export const ConversationReviewContainer = React.memo(
           </div>
         </SectionContainer>
 
-        {/* Metadata Summary */}
-        {conversation.metadata && (
-          <SectionContainer containerName="Review Summary" icon={MessageSquare}>
-            <div className="space-y-3">
-              <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                <span className="text-sm text-gray-600">Total Messages</span>
-                <span className="text-sm font-semibold text-gray-900">
-                  {conversation.metadata.totalMessages}
-                </span>
-              </div>
-              <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                <span className="text-sm text-gray-600">Your Messages</span>
-                <span className="text-sm font-semibold text-gray-900">
-                  {conversation.metadata.userMessages}
-                </span>
-              </div>
-              <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                <span className="text-sm text-gray-600">
-                  Improvements Generated
-                </span>
-                <span className="text-sm font-semibold text-gray-900">
-                  {conversation.metadata.improvementsGenerated}
-                </span>
-              </div>
-            </div>
-          </SectionContainer>
-        )}
       </div>
     );
   }

@@ -10,6 +10,7 @@ import * as z from "zod";
 import { RoundedButton } from "../component/shared/button";
 import { Eye, EyeOff, Check, X } from "lucide-react";
 import Link from "next/link";
+import { FcGoogle } from "react-icons/fc";
 
 const signupSchema = z.object({
   email: z
@@ -130,6 +131,18 @@ const Signup = () => {
     }
   }, [plan, router]);
 
+  useEffect(() => {
+    if (!router.isReady) return;
+    const msg = router.query.message;
+    const err = router.query.error;
+    if (err && typeof msg === "string") {
+      toast.error(decodeURIComponent(msg.replace(/\+/g, " ")));
+      void router.replace({ pathname: "/signup", query: { plan } }, undefined, {
+        shallow: true,
+      });
+    }
+  }, [router.isReady, router, plan]);
+
   const onSubmit = async (data: SignupFormInputs) => {
     if (!plan) {
       toast.error("Plan is not selected");
@@ -230,6 +243,30 @@ const Signup = () => {
             <p className="text-center text-gray-600 text-sm mb-6">
               Start your Japanese learning journey today
             </p>
+
+            <button
+              type="button"
+              onClick={() => {
+                if (plan === "trial" || plan === "pro") {
+                  window.location.href = `/api/auth/google/start?plan=${plan}`;
+                } else {
+                  void router.push("/pricing");
+                }
+              }}
+              className="mb-6 flex w-full items-center justify-center gap-2 rounded-md border border-gray-300 bg-white py-3 px-4 text-sm font-medium text-gray-800 shadow-sm transition hover:bg-gray-50"
+            >
+              <FcGoogle className="h-5 w-5" />
+              Continue with Google
+            </button>
+
+            <div className="relative mb-6">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-gray-200" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-white px-2 text-gray-500">Or sign up with email</span>
+              </div>
+            </div>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               {/* Email */}
@@ -374,7 +411,7 @@ const Signup = () => {
 
               {/* Submit Button */}
               <RoundedButton
-                // type="submit"
+                type="submit"
                 loading={loading}
                 className="w-full bg-green-600 text-white py-3 px-4 rounded-md hover:bg-green-700 transition font-semibold"
               >

@@ -10,6 +10,7 @@ export const Messages = ({
   hiraganaReadingList,
   characterName,
   MessagesTextOpenMode,
+  streamingMessage,
 }: {
   chatLoading: boolean;
   history: ChatType;
@@ -17,9 +18,9 @@ export const Messages = ({
   hiraganaReadingList: string[];
   characterName?: string;
   MessagesTextOpenMode: boolean;
+  streamingMessage?: string;
 }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  // const [currentPlayingId, setCurrentPlayingId] = useState<number | null>(null);
 
   // Auto-scroll when new messages arrive
   useEffect(() => {
@@ -29,7 +30,7 @@ export const Messages = ({
         block: "end",
       });
     }
-  }, [history, chatLoading]);
+  }, [history, chatLoading, streamingMessage]);
 
   return (
     <div className="flex-1 overflow-y-auto p-4 lg:p-6 space-y-6 bg-gradient-to-b from-slate-50 to-gray-50">
@@ -164,6 +165,19 @@ export const Messages = ({
           </div>
         );
       })}
+
+      {/* Streaming assistant message (optimistic — shown while audio plays) */}
+      {streamingMessage && (
+        <div className="flex gap-4 justify-start">
+          <AssistantMessageBox
+            MessagesTextOpenMode={MessagesTextOpenMode}
+            text={streamingMessage}
+            reading=""
+            id={-1}
+            chatInfo={[]}
+          />
+        </div>
+      )}
 
       {/* Loading Message */}
       {chatLoading && <LoadingMessage characterName={characterName} />}

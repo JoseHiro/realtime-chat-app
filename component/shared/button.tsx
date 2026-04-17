@@ -7,6 +7,7 @@ type SelectModeButtonType = {
   disabled?: boolean;
   loading?: boolean;
   variant?: "green" | "gray" | "blue" | "white" | "black";
+  type?: "button" | "submit" | "reset";
 };
 
 export const SelectModeButton = ({
@@ -37,9 +38,11 @@ export const RoundedButton = ({
   onClick,
   variant = "black",
   loading,
+  type = "button",
 }: SelectModeButtonType) => {
   return (
     <button
+      type={type}
       disabled={disabled || loading}
       className={cn(
         "cursor-pointer px-6 py-2 shadow-md hover:shadow-lg flex items-center transition-all duration-300 justify-center relative",

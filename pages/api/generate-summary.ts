@@ -167,39 +167,24 @@ export default async function handler(
 
     JSONのキー:
     - title : title name based on the content (in English)
-    - level : { label: Choose exactly one JLPT level from N5, N4, N3, N2, N1 that best represents the user's Japanese ability, reason: detailed reason in English }
 
     Output Example:
     {
       "meta": {
         "title": "Chat title",
-        "level": {
-          "label": "Between N5-N1",
-          "reason": "Detailed reason explaining why this level was assigned (English)",
-        },
-        "summary": "Overall summary of the conversation in English",
       },
       "analysis": {
-        "overview": "Comprehensive performance assessment analyzing vocabulary richness, grammar variety, conversation development, sentence complexity, and linguistic elements (English, 4-6 sentences)",
+        "overview": "Concise performance assessment in 2 sentences max (English)",
       },
       "feedback": {
         "strengths": [
-          "Detailed strength with explanation, reasons, and examples from the conversation (English array - include as 1-3different strengths as genuinely observed in the conversation)"
-        ],
-        "commonMistakes": [
-          "Typical repeated errors (English array)"
+          "Short strength (1 sentence, Japanese language skill only)"
         ],
       },
       "milestone": {
-        "current": {
-          "milestone": "Current achievement level (English)",
-          "ability": "Description of current ability (English)",
-        },
         "next": {
-        "goal": "Specific next goal for improvement (English)",
-        "steps": [
-          "Actions to enhance learner's strengths (English array)"
-        ]
+          "goal": "Specific next goal for improvement (English, 1 sentence)"
+        }
       }
     }
 
@@ -210,65 +195,8 @@ export default async function handler(
     - All evaluations and explanations are in English except the Japanese learner sentences.
     - Japanese sentence corrections must preserve the indicated politeness (casual/formal).
 
-    IMPORTANT - Overview Format (analysis.overview):
-    The "overview" field should be a comprehensive, BALANCED performance assessment that evaluates the learner's linguistic and conversational performance. This is DIFFERENT from "summary" (in meta.summary), which describes what the conversation was about. The "overview" should analyze HOW the learner performed.
-
-    CRITICAL: The overview MUST be BALANCED - include BOTH strengths (what the learner did well) AND areas for improvement (what could be better). Do NOT focus only on negatives or only on positives. A balanced assessment acknowledges both what the learner is doing well and what they can improve.
-
-    The overview must evaluate the following aspects in a cohesive 4-6 sentence assessment, ensuring balance:
-    1. Vocabulary richness: How diverse and varied was the vocabulary usage? Did the learner use varied words or repeat the same terms? Did the user use advanced vocabulary? (Acknowledge both strengths and limitations)
-    2. Grammar variety: Did the learner use multiple grammatical structures or repeat the same sentence patterns/structures? (Highlight what structures were used well AND what could be expanded)
-    3. Conversation development: Did the learner actively develop the conversation (asking questions, introducing topics, elaborating) or wait passively for the assistant to lead? (Recognize active participation AND suggest ways to engage more)
-    4. Sentence complexity: What was the typical sentence length (short/simple vs longer/complex sentences)? (Note appropriate complexity where present AND opportunities for more sophisticated structures)
-    5. Linguistic elements: How was the usage of conjunctions (そして、でも、しかし、etc.) and particles (は、が、を、に、で、etc.)? (Acknowledge correct usage AND areas where usage could be enhanced)
-    6. Politeness consistency: Did the learner consistently use the selected politeness level (${politeness}) throughout the conversation? (Note consistency where present AND any inconsistencies)
-
-    Example format (BALANCED):
-    "The learner demonstrated [vocabulary assessment: acknowledge both strengths like 'used appropriate technical terms' AND areas for growth like 'could expand vocabulary range']. [Grammar variety: recognize structures used well AND suggest expansion]. In terms of conversation flow, [development: highlight active participation AND suggest further engagement techniques]. Sentences were generally [complexity: note appropriate complexity where present AND opportunities for more sophisticated structures], and the learner [conjunction/particle usage: acknowledge correct usage AND suggest enhancements]. Throughout the conversation, [politeness consistency: note consistency AND any areas for improvement]."
-
-    BALANCE REQUIREMENTS:
-    - If you mention a limitation, also mention a corresponding strength
-    - If you highlight a strength, also note an area for growth
-    - Use phrases like "while... could also..." or "demonstrated... though could enhance..." to create balance
-    - Avoid all-negative or all-positive assessments
-    - Provide specific, observable examples for both strengths and areas for improvement (e.g., "used particles like を and に correctly, though could incorporate more complex particles like によって" or "tended to use short sentences averaging 5-7 words, which were clear and appropriate, though could experiment with longer, more complex structures")
-
-    IMPORTANT - Strengths Format:
-    - CRITICAL: Strengths must focus ONLY on JAPANESE LANGUAGE SKILLS and CONVERSATION ABILITY, NOT on topic knowledge, domain expertise, or understanding of the subject matter.
-    - DO NOT evaluate: understanding of topics, critical thinking about subjects, domain knowledge, or content expertise.
-    - DO evaluate: Japanese vocabulary usage, grammar accuracy, sentence structure, conversation skills, linguistic elements (particles, conjunctions), politeness usage, question formation, dialogue development, sentence complexity, etc.
-
-    - Identify and list the learner's strengths based on what is ACTUALLY observed in the conversation. The number of strengths should reflect the learner's actual performance - do NOT force a specific number.
-    - Include as many different strengths as are genuinely present (could be 1, 2, 3, or more, depending on what the learner demonstrated).
-    - Each strength must be a detailed explanation (2-3 sentences) that includes:
-      1. What the LANGUAGE/CONVERSATION strength is (e.g., "The student demonstrated effective use of question particles" or "The student showed good conversational engagement through follow-up questions")
-      2. Why it demonstrates LANGUAGE skill - explain the reasoning behind why this is a linguistic/conversational strength (e.g., "by using appropriate question particles like か and の, which shows understanding of Japanese question formation" or "by asking follow-up questions using natural Japanese structures, which demonstrates active conversation participation")
-      3. Where it was observed - provide specific examples from the conversation showing the JAPANESE LANGUAGE usage (e.g., "For example, the student asked '日本で個人アプリを開発してそれだけ食べていけるぐらいの開発をした人はいる？' which demonstrates correct use of complex sentence structure with relative clauses and appropriate question formation")
-    - Do NOT use simple bullet points like "Engagement in conversation" or "Ability to ask questions"
-    - Instead, provide full explanatory sentences that clearly state what LANGUAGE skill, why it's a linguistic strength, and where it was observed: "The student demonstrated strong conversational engagement in Japanese by asking follow-up questions using natural sentence structures, which helped develop the dialogue naturally. For example, when discussing topics, the student actively participated by asking 'どうですか？' using appropriate question formation, showing ability to maintain conversation flow in Japanese."
-    - Always include reasons (why it's a LANGUAGE strength) and specific references to the JAPANESE LANGUAGE used in the conversation (what Japanese structures, vocabulary, or conversation techniques the student demonstrated).
-    - Focus on observable LANGUAGE behaviors and their positive impact on the Japanese conversation.
-    - Each strength should be DIFFERENT from the others - identify various aspects of the learner's JAPANESE LANGUAGE performance (e.g., conversation engagement in Japanese, grammar accuracy, vocabulary variety, particle usage, sentence complexity, politeness consistency, question formation, etc.).
-    - Quality over quantity: It's better to have fewer genuine, well-explained LANGUAGE strengths than to force multiple strengths that are not clearly demonstrated in the conversation.
-
-    Examples of CORRECT strengths (focus on language structures used in follow-up questions):
-    - "The student demonstrated effective use of complex sentence structures when asking follow-up questions by combining multiple clauses with relative clauses, as seen in '日本で個人アプリを開発してそれだけ食べていけるぐらいの開発をした人はいる？' which shows mastery of Japanese relative clause formation (連体修飾) and appropriate question particle usage (か)."
-    - "The learner showed good conversational engagement in Japanese by asking follow-up questions using natural Japanese structures like 'どうですか？', demonstrating ability to use appropriate question formation patterns and maintain dialogue flow through proper use of question particles."
-    - "The student effectively used follow-up questions to develop the conversation, demonstrating strong Japanese language skills through the use of appropriate question structures. For example, when asking 'それだけ食べていけるぐらいの開発をした人はいる？', the student correctly used the relative clause structure with ぐらい to express degree, showing mastery of complex Japanese grammar in question formation."
-    - "The learner demonstrated natural Japanese conversation flow by asking follow-up questions using appropriate sentence structures. For instance, the question '日本で個人アプリを開発して...' shows effective use of topic markers (で), verb forms (開発して), and complex relative clauses, demonstrating advanced Japanese sentence construction skills."
-
-    Key points for evaluating follow-up questions as strengths:
-    - Focus on the Japanese language structures used (particles, verb forms, sentence patterns, relative clauses, etc.)
-    - Highlight the grammatical complexity or accuracy of the question formation
-    - Note how the Japanese structures demonstrate language skill, not topic knowledge
-    - Reference specific Japanese elements: particles (か, の, は, が, を, に, で), verb forms, sentence patterns, relative clauses, etc.
-
-    Examples of INCORRECT strengths (focus on topic knowledge - DO NOT USE):
-    - "The student showed understanding of app development concepts" (this is about topic knowledge, not language)
-    - "The learner demonstrated critical thinking about the subject matter" (this is about thinking, not Japanese skills)
-    - "The student understood the importance of user feedback" (this is about domain knowledge, not language ability)
-    - "The learner actively engaged by asking relevant questions about app development" (focuses on topic relevance, not Japanese language structures)
-    - "The student showed curiosity about the subject" (focuses on interest/topic, not language skills)    `;
+    - overview: 1-2 sentences. One strength + one area to improve. Japanese language skills only (grammar, vocabulary, conversation flow). No padding.
+    - strengths: 1-2 items max. One short sentence each. Specific Japanese language skill only (e.g. particle usage, verb forms, question formation). No topic knowledge, no repetition.    `;
 
     console.log("[Summary] Starting main summary generation...");
     // Add timeout for main summary generation (60 seconds)
@@ -367,18 +295,6 @@ export default async function handler(
     parsed.meta.chatDuration = time;
     parsed.meta.createdAt = createdAt;
 
-    // Ensure level object exists with label and reason
-    if (!parsed.meta.level || typeof parsed.meta.level !== "object") {
-      parsed.meta.level = {
-        label: parsed.meta.level || "N5",
-        reason: "Level assessment not available",
-      };
-    }
-
-    // Ensure summary exists
-    if (!parsed.meta.summary) {
-      parsed.meta.summary = "No summary available.";
-    }
 
     if (parsed.analysis) {
       const verbsArray = Array.isArray(wordData.verb) ? wordData.verb : [];
@@ -410,20 +326,8 @@ export default async function handler(
       parsed.meta = {};
     }
 
-    // Validate and ensure all required meta fields exist
-    if (!parsed.meta.level || typeof parsed.meta.level !== "object") {
-      parsed.meta.level = {
-        label: typeof parsed.meta.level === "string" ? parsed.meta.level : "N5",
-        reason: "Level assessment not available",
-      };
-    }
-
     if (!parsed.meta.title) {
       parsed.meta.title = "Untitled Conversation";
-    }
-
-    if (!parsed.meta.summary) {
-      parsed.meta.summary = "No summary available.";
     }
 
     // Store analysis with conversation review included
@@ -565,12 +469,6 @@ async function generateConversationReview(
       return {
         conversationId: chatId,
         messages: formattedMessages,
-        metadata: {
-          totalMessages: formattedMessages.length,
-          userMessages: 0,
-          improvementsGenerated: 0,
-          generatedAt: new Date().toISOString(),
-        },
       };
     }
 
@@ -604,7 +502,6 @@ For each improvement, provide:
 - reading: Hiragana reading (ひらがな)
 - english: English translation
 - focus: Grammar point or improvement explanation (English, be specific)
-- level: One of: "beginner", "beginner-intermediate", "intermediate", "intermediate-advanced", "advanced"
 - type: Classification category (REQUIRED, choose ONE from the following):
   * "complete_sentence" - For incomplete sentences, fragments, or sentence structure issues
   * "particle_usage" - For particle (を, が, は, に, で, etc.) mistakes or improvements
@@ -662,7 +559,6 @@ Output format (JSON only - return ONLY user messages with improvements):
           "reading": "<hiragana reading>",
           "english": "<english translation>",
           "focus": "<grammar or vocabulary explanation in English>",
-          "level": "<difficulty level>",
           "type": "<classification category - see list above>"
         },
         {
@@ -670,7 +566,6 @@ Output format (JSON only - return ONLY user messages with improvements):
           "reading": "<hiragana>",
           "english": "<english>",
           "focus": "<grammar or vocabulary explanation>",
-          "level": "<level>",
           "type": "<classification category>"
         },
         {
@@ -678,7 +573,6 @@ Output format (JSON only - return ONLY user messages with improvements):
           "reading": "<hiragana>",
           "english": "<english>",
           "focus": "<explanation of how this responds to assistant and develops conversation with a question in English>",
-          "level": "<level>",
           "type": "conversation_expansion"
         }
       ]
@@ -835,13 +729,7 @@ IMPORTANT:
 
       return {
         conversationId: chatId,
-        messages: mergedMessages, // All messages (user + assistant) with improvements merged
-        metadata: {
-          totalMessages: mergedMessages.length,
-          userMessages: userMessages.length,
-          improvementsGenerated: improvementsCount,
-          generatedAt: new Date().toISOString(),
-        },
+        messages: mergedMessages,
       };
     } catch (error) {
       console.error(
@@ -852,12 +740,6 @@ IMPORTANT:
       return {
         conversationId: chatId,
         messages: formattedMessages,
-        metadata: {
-          totalMessages: formattedMessages.length,
-          userMessages: userMessages.length,
-          improvementsGenerated: 0,
-          generatedAt: new Date().toISOString(),
-        },
       };
     }
   } catch (error) {
@@ -873,12 +755,6 @@ IMPORTANT:
         english: msg.english || "",
         createdAt: msg.createdAt.toISOString(),
       })),
-      metadata: {
-        totalMessages: messages.length,
-        userMessages: messages.filter((m) => m.sender === "user").length,
-        improvementsGenerated: 0,
-        generatedAt: new Date().toISOString(),
-      },
     };
   }
 }
