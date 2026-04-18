@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { Messages } from "../component/ui/Chat/Messages";
 import { Overlay } from "../component/overlay";
-import { Sidebar } from "../component/ui/Sidebar";
+// import { Sidebar } from "../component/ui/Sidebar";
 import { ModeSelectScreen } from "../component/ui/ModeSelectScreen";
 import { useChatSession } from "../context/ChatSessionContext";
 import { useSummary } from "../context/SummaryContext";
@@ -87,7 +87,7 @@ export const Chat = () => {
   return (
     <div className="relative w-full h-screen flex">
       {/* サイドバー */}
-      <Sidebar />
+      {/* <Sidebar /> */}
       {!chatMode ? (
         <ModeSelectScreen
           setHistory={setHistory}
@@ -101,7 +101,7 @@ export const Chat = () => {
           handleBeginConversation={handleBeginConversation}
         />
       ) : (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-green-50 w-full flex flex-col justify-between">
+        <div className="min-h-screen bg-white dark:bg-gray-950 w-full flex flex-col justify-between">
           <ChatHeader
             title="Chat"
             chatPage={true}

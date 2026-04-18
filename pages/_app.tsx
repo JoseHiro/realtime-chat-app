@@ -5,6 +5,7 @@ import "../styles/globals.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AppProviders } from "../context/AppProviders";
 import { Toaster } from "@/components/ui/sonner";
+import { Header } from "../component/ui/Header";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -32,6 +33,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
       </Head>
       <QueryClientProvider client={queryClient}>
         <AppProviders>
+          <Header />
           <Component {...pageProps} />
           <Toaster />
         </AppProviders>

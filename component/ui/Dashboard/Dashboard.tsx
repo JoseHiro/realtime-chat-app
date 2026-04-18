@@ -33,4 +33,6 @@ export const Dashboard = ({
       <DashboardContent username={displayUsername} chatsData={chatsData} />
     </DashboardLayout>
   );
+
+
 };

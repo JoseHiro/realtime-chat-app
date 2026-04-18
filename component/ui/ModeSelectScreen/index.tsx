@@ -102,7 +102,7 @@ export const ModeSelectScreen = ({
   );
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-gray-50 to-green-50 overflow-auto w-full">
+    <div className="relative min-h-screen bg-white dark:bg-gray-950 overflow-auto w-full">
       <div className="relative min-h-screen overflow-auto w-full">
         <div className="min-h-screen px-4 overflow-auto w-full">
           <div className="max-w-4xl mx-auto py-8 ">
@@ -167,7 +167,7 @@ export const ModeSelectScreen = ({
                 className={`cursor-pointer inline-flex items-center gap-2 px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform ${
                   canProceed
                     ? "bg-green-500 hover:bg-green-600 text-white shadow-lg shadow-green-200 hover:shadow-xl hover:-translate-y-1"
-                    : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                    : "bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed"
                 }`}
               >
                 Start Conversation

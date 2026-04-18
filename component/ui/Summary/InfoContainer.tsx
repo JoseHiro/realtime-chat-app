@@ -1,6 +1,4 @@
 import React, { useMemo } from "react";
-import { BarChart3, CheckCircle, TrendingUp, BookOpen } from "lucide-react";
-import { SectionContainer, SectionDescription } from "./Container";
 import { ImprovementTypeBadge } from "./ImprovementTypeBadge";
 import { GrammarErrorBadge } from "./GrammarErrorBadge";
 import { getImprovementTypesWithCounts } from "../../../lib/improvements/getImprovementTypes";
@@ -15,11 +13,13 @@ export const InfoContainer = React.memo(
     analysis,
     feedback,
     conversation,
+    milestone,
   }: {
     meta: any;
     analysis?: any;
     feedback?: any;
     conversation?: any;
+    milestone?: any;
   }) => {
     const topStrengths = useMemo(
       () => (feedback?.strengths || []).slice(0, 2),
@@ -41,72 +41,112 @@ export const InfoContainer = React.memo(
       return hasGrammarErrors(conversation);
     }, [conversation]);
 
+    const hasImprovements =
+      improvementTypesWithCounts.length > 0 || hasErrors;
+
+    const hasVocabulary =
+      analysis?.vocabulary &&
+      (analysis.vocabulary.verbs?.length > 0 ||
+        analysis.vocabulary.adjectives?.length > 0 ||
+        analysis.vocabulary.adverbs?.length > 0 ||
+        analysis.vocabulary.conjunctions?.length > 0);
+
     return (
-      <div className="space-y-6">
+      <div className="bg-white rounded-lg border border-gray-200 divide-y divide-gray-100">
         {/* Overview */}
         {analysis?.overview && (
-          <SectionContainer containerName="Overview" icon={BarChart3}>
-            <p className="text-sm text-gray-800 leading-relaxed bg-gray-50 rounded-lg p-4">
+          <div className="px-6 py-5">
+            <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">
+              Overview
+            </p>
+            <p className="text-sm text-gray-800 leading-relaxed">
               {analysis.overview}
             </p>
-          </SectionContainer>
+          </div>
         )}
 
         {/* Strengths */}
         {topStrengths.length > 0 && (
-          <SectionContainer containerName="Strengths" icon={CheckCircle}>
-            <div className="space-y-2">
-              {topStrengths.map((strength: string, index: number) => (
-                <div
-                  key={index}
-                  className="flex items-start space-x-3 bg-green-50 rounded-lg p-3 border border-green-100"
-                >
-                  <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                  <p className="text-sm text-gray-800">{strength}</p>
-                </div>
+          <div className="px-6 py-5">
+            <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">
+              Strengths
+            </p>
+            <ul className="space-y-2">
+              {topStrengths.map((strength: string, i: number) => (
+                <li key={i} className="flex items-start gap-2.5 text-sm text-gray-800">
+                  <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-green-500 flex-shrink-0" />
+                  {strength}
+                </li>
               ))}
-            </div>
-          </SectionContainer>
+            </ul>
+          </div>
         )}
 
-        {/* Improvements & Grammar Errors */}
-        {(improvementTypesWithCounts.length > 0 || hasErrors) && (
-          <SectionContainer containerName="Improvements" icon={TrendingUp}>
-            <div className="space-y-3">
-              {improvementTypesWithCounts.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {improvementTypesWithCounts.map(({ type }: { type: string }, index: number) => (
-                    <ImprovementTypeBadge key={index} type={type} />
-                  ))}
-                </div>
+        {/* Improvements */}
+        {hasImprovements && (
+          <div className="px-6 py-5">
+            <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">
+              Improvements
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {improvementTypesWithCounts.map(
+                ({ type }: { type: string }, i: number) => (
+                  <ImprovementTypeBadge key={i} type={type} />
+                )
               )}
-              {hasErrors && grammarErrorTypesWithCounts.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {grammarErrorTypesWithCounts.map(({ type, count }: { type: string; count: number }, index: number) => (
-                    <div key={index} className="inline-flex items-center gap-1">
+              {hasErrors &&
+                grammarErrorTypesWithCounts.map(
+                  (
+                    { type, count }: { type: string; count: number },
+                    i: number
+                  ) => (
+                    <div key={i} className="inline-flex items-center gap-1">
                       <GrammarErrorBadge type={type} />
                       {count > 1 && (
-                        <span className="text-xs text-gray-500 font-medium">{count}</span>
+                        <span className="text-xs text-gray-500 font-medium">
+                          {count}
+                        </span>
                       )}
                     </div>
-                  ))}
-                </div>
-              )}
+                  )
+                )}
             </div>
-          </SectionContainer>
+          </div>
         )}
 
-        {/* Vocabulary Analysis */}
-        {analysis?.vocabulary && (
-          <SectionContainer containerName="Vocabulary" icon={BookOpen}>
-            <div className="space-y-3">
+        {/* Next Goal */}
+        {milestone?.next?.goal && (
+          <div className="px-6 py-5">
+            <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">
+              Next Goal
+            </p>
+            <div className="flex items-start gap-2.5">
+              <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-green-500 flex-shrink-0" />
+              <p className="text-sm text-gray-800 leading-relaxed">
+                {milestone.next.goal}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Vocabulary */}
+        {hasVocabulary && (
+          <div className="px-6 py-5">
+            <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-4">
+              Vocabulary
+            </p>
+            <div className="space-y-4">
               {analysis.vocabulary.verbs?.length > 0 && (
                 <div>
-                  <p className="text-xs text-gray-500 mb-1">Verbs</p>
+                  <p className="text-xs text-gray-400 mb-2">Verbs</p>
                   <div className="flex flex-wrap gap-2">
                     {analysis.vocabulary.verbs.map((item: any, i: number) => (
-                      <span key={i} className="text-xs bg-blue-50 border border-blue-200 rounded px-2 py-1 text-gray-800">
-                        {item.word} <span className="text-gray-400">{item.reading}</span>
+                      <span
+                        key={i}
+                        className="text-xs bg-blue-50 border border-blue-100 rounded px-2 py-1 text-gray-800"
+                      >
+                        {item.word}
+                        <span className="text-gray-400 ml-1">{item.reading}</span>
                       </span>
                     ))}
                   </div>
@@ -114,23 +154,33 @@ export const InfoContainer = React.memo(
               )}
               {analysis.vocabulary.adjectives?.length > 0 && (
                 <div>
-                  <p className="text-xs text-gray-500 mb-1">Adjectives</p>
+                  <p className="text-xs text-gray-400 mb-2">Adjectives</p>
                   <div className="flex flex-wrap gap-2">
-                    {analysis.vocabulary.adjectives.map((item: any, i: number) => (
-                      <span key={i} className="text-xs bg-purple-50 border border-purple-200 rounded px-2 py-1 text-gray-800">
-                        {item.word} <span className="text-gray-400">{item.reading}</span>
-                      </span>
-                    ))}
+                    {analysis.vocabulary.adjectives.map(
+                      (item: any, i: number) => (
+                        <span
+                          key={i}
+                          className="text-xs bg-purple-50 border border-purple-100 rounded px-2 py-1 text-gray-800"
+                        >
+                          {item.word}
+                          <span className="text-gray-400 ml-1">{item.reading}</span>
+                        </span>
+                      )
+                    )}
                   </div>
                 </div>
               )}
               {analysis.vocabulary.adverbs?.length > 0 && (
                 <div>
-                  <p className="text-xs text-gray-500 mb-1">Adverbs</p>
+                  <p className="text-xs text-gray-400 mb-2">Adverbs</p>
                   <div className="flex flex-wrap gap-2">
                     {analysis.vocabulary.adverbs.map((item: any, i: number) => (
-                      <span key={i} className="text-xs bg-orange-50 border border-orange-200 rounded px-2 py-1 text-gray-800">
-                        {item.word} <span className="text-gray-400">{item.reading}</span>
+                      <span
+                        key={i}
+                        className="text-xs bg-orange-50 border border-orange-100 rounded px-2 py-1 text-gray-800"
+                      >
+                        {item.word}
+                        <span className="text-gray-400 ml-1">{item.reading}</span>
                       </span>
                     ))}
                   </div>
@@ -138,18 +188,24 @@ export const InfoContainer = React.memo(
               )}
               {analysis.vocabulary.conjunctions?.length > 0 && (
                 <div>
-                  <p className="text-xs text-gray-500 mb-1">Conjunctions</p>
+                  <p className="text-xs text-gray-400 mb-2">Conjunctions</p>
                   <div className="flex flex-wrap gap-2">
-                    {analysis.vocabulary.conjunctions.map((item: any, i: number) => (
-                      <span key={i} className="text-xs bg-green-50 border border-green-200 rounded px-2 py-1 text-gray-800">
-                        {item.word} <span className="text-gray-400">{item.reading}</span>
-                      </span>
-                    ))}
+                    {analysis.vocabulary.conjunctions.map(
+                      (item: any, i: number) => (
+                        <span
+                          key={i}
+                          className="text-xs bg-green-50 border border-green-100 rounded px-2 py-1 text-gray-800"
+                        >
+                          {item.word}
+                          <span className="text-gray-400 ml-1">{item.reading}</span>
+                        </span>
+                      )
+                    )}
                   </div>
                 </div>
               )}
             </div>
-          </SectionContainer>
+          </div>
         )}
       </div>
     );

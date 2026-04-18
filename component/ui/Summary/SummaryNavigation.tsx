@@ -1,10 +1,9 @@
 import React, { useCallback } from "react";
-import { MessageCircle, TrendingUp, MessageSquare } from "lucide-react";
+import { MessageCircle, MessageSquare } from "lucide-react";
 
 const tabs = [
   { id: "info", label: "Conversation Info", icon: MessageCircle },
-  { id: "conversation", label: "Refined Responses", icon: MessageSquare },
-  { id: "milestone", label: "Growth Path", icon: TrendingUp },
+  { id: "conversation", label: "Conversation Review", icon: MessageSquare },
 ];
 
 export const SummaryNavigation = React.memo(
@@ -23,35 +22,27 @@ export const SummaryNavigation = React.memo(
     );
 
     return (
-      <div className="lg:col-span-1">
-        <div className="bg-white rounded-lg border border-gray-200 p-2 sticky top-6">
-          <nav className="space-y-1">
-            {tabs.map((tab) => {
-              const Icon = tab.icon;
-              const isActive = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    handleTabClick(tab.id);
-                  }}
-                  className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-colors ${
-                    isActive
-                      ? "bg-gray-900 text-white"
-                      : "text-gray-700 hover:bg-gray-50"
-                  }`}
-                >
-                  <Icon className="w-5 h-5" />
-                  <span className="text-sm font-medium">{tab.label}</span>
-                </button>
-              );
-            })}
-          </nav>
-        </div>
-      </div>
+      <nav className="flex items-center gap-0.5">
+        {tabs.map(({ id, label, icon: Icon }) => {
+          const active = activeTab === id;
+          const base = `flex items-center gap-1.5 rounded-md transition-colors ${
+            active
+              ? "bg-gray-100 text-gray-900 font-medium"
+              : "text-gray-500 hover:text-gray-900 hover:bg-gray-50"
+          }`;
+          return (
+            <button
+              key={id}
+              type="button"
+              onClick={() => handleTabClick(id)}
+              className={`${base} px-3 py-1.5 text-sm`}
+            >
+              <Icon size={14} />
+              {label}
+            </button>
+          );
+        })}
+      </nav>
     );
   }
 );

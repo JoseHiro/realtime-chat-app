@@ -7,7 +7,7 @@ import {
   X,
   CheckCircle2,
 } from "lucide-react";
-import { Sidebar } from "../../component/ui/Sidebar";
+// import { Sidebar } from "../../component/ui/Sidebar";
 import { RoundedButton } from "../../component/shared/button";
 import { apiRequest } from "../../lib/apiRequest";
 import { toast } from "sonner";
@@ -127,7 +127,7 @@ const BillingSettings = () => {
   if (loading) {
     return (
       <div className="relative w-full h-screen flex">
-        <Sidebar />
+        {/* <Sidebar /> */}
         <div className="min-h-screen bg-gradient-to-br pt-5 from-gray-50 to-green-50 overflow-auto w-full flex items-center justify-center">
           <Loader2 className="w-8 h-8 animate-spin text-green-600" />
         </div>
@@ -138,7 +138,7 @@ const BillingSettings = () => {
   if (!userData) {
     return (
       <div className="relative w-full h-screen flex">
-        <Sidebar />
+        {/* <Sidebar /> */}
         <div className="min-h-screen bg-gradient-to-br pt-5 from-gray-50 to-green-50 overflow-auto w-full flex items-center justify-center">
           <p className="text-gray-600">Failed to load user data</p>
         </div>

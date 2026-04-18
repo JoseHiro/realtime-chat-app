@@ -20,22 +20,22 @@ export const SectionHeader = ({ meta }: { meta: any }) => {
           {meta?.title || "Untitled Conversation"}
         </h1>
       </div>
-      <div className="flex items-center gap-3 text-sm text-gray-500 shrink-0">
+      <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-wider text-gray-400 shrink-0">
         {meta?.selectedTopic && (
           <span className="flex items-center gap-1">
-            <Tag className="w-3.5 h-3.5" />
+            <Tag className="w-3 h-3" />
             {meta.selectedTopic.charAt(0).toUpperCase() + meta.selectedTopic.slice(1)}
           </span>
         )}
         {date && (
           <span className="flex items-center gap-1">
-            <Calendar className="w-3.5 h-3.5" />
+            <Calendar className="w-3 h-3" />
             {date}
           </span>
         )}
         {meta?.chatDuration && (
           <span className="flex items-center gap-1">
-            <Clock className="w-3.5 h-3.5" />
+            <Clock className="w-3 h-3" />
             {meta.chatDuration} min
           </span>
         )}

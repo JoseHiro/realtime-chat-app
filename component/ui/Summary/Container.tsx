@@ -1,18 +1,15 @@
 export const SectionContainer = ({
   children,
   containerName,
-  icon: Icon,
 }: {
   children: React.ReactNode;
   containerName: string;
-  icon?: React.ElementType;
 }) => {
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-6">
-      <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
-        {Icon && <Icon className="w-5 h-5 mr-2 text-gray-600" />}
+      <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-6">
         {containerName}
-      </h2>
+      </p>
       {children}
     </div>
   );

@@ -82,10 +82,7 @@ export const ConversationReviewContainer = React.memo(
 
     return (
       <div className="space-y-6">
-        <SectionContainer
-          containerName="Conversation Review"
-          icon={MessageSquare}
-        >
+        <SectionContainer containerName="Conversation Review">
           <div className="space-y-6">
             {conversation.messages?.map((message: ConversationMessage) => (
               <div key={message.id} className="space-y-3">

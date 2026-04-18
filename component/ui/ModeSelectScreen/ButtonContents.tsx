@@ -16,12 +16,12 @@ export const ButtonContents = React.memo(
           className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${color} opacity-10 group-hover:opacity-20 transition-opacity duration-300 pointer-events-none`}
         ></div>
         <div className="relative z-10">
-          <h3 className="text-sm font-semibold text-gray-900 mb-0.5">
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-0.5">
             {label}
           </h3>
-          <p className="text-gray-600 text-xs">{description}</p>
+          <p className="text-gray-600 dark:text-gray-400 text-xs">{description}</p>
           {example && (
-            <p className="text-xs text-gray-500 italic mt-0.5">{example}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-500 italic mt-0.5">{example}</p>
           )}
         </div>
         {selected && (

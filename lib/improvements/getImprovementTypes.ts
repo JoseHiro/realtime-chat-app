@@ -52,21 +52,8 @@ export function getImprovementTypeLabel(type: ImprovementType): string {
 /**
  * Gets a color class for an improvement type badge
  */
-export function getImprovementTypeColor(type: ImprovementType): string {
-  const colors: Record<ImprovementType, string> = {
-    complete_sentence: "bg-gray-100 text-gray-700 border-gray-300",
-    particle_usage: "bg-blue-100 text-blue-700 border-blue-300",
-    listing_and_conjunctions: "bg-purple-100 text-purple-700 border-purple-300",
-    politeness_and_register: "bg-pink-100 text-pink-700 border-pink-300",
-    opinion_expression: "bg-orange-100 text-orange-700 border-orange-300",
-    conversation_expansion: "bg-green-100 text-green-700 border-green-300",
-    verb_forms: "bg-yellow-100 text-yellow-700 border-yellow-300",
-    conditional_expressions: "bg-indigo-100 text-indigo-700 border-indigo-300",
-    honorifics: "bg-red-100 text-red-700 border-red-300",
-    vocabulary_choice: "bg-teal-100 text-teal-700 border-teal-300",
-    sentence_structure: "bg-slate-100 text-slate-700 border-slate-300",
-  };
-  return colors[type] || "bg-gray-100 text-gray-700 border-gray-300";
+export function getImprovementTypeColor(_type: ImprovementType): string {
+  return "bg-gray-100 text-gray-700 border-gray-200";
 }
 
 /**
