@@ -1,12 +1,11 @@
 import React from "react";
-import { BarChart3, BookOpen } from "lucide-react";
 import { SectionContainer, SectionDescription } from "./Container";
 import { SectionTitle, SectionSubTitle } from "./SectionTitle";
 
 export const AnalysisContainer = React.memo(({ analysis }: { analysis: any }) => {
   return (
     <div className="space-y-6">
-      <SectionContainer containerName="Performance Metrics" icon={BarChart3}>
+      <SectionContainer containerName="Performance Metrics">
         <div className="space-y-6">
           <SectionTitle title="Overall Assessment" />
           <div className="bg-gray-50 rounded-lg p-4">
@@ -39,7 +38,7 @@ export const AnalysisContainer = React.memo(({ analysis }: { analysis: any }) =>
         </div>
       </SectionContainer>
 
-      <SectionContainer containerName="Vocabulary Analysis" icon={BookOpen}>
+      <SectionContainer containerName="Vocabulary Analysis">
         <div className="space-y-4">
           {analysis.vocabulary.verbs.length > 0 && (
             <div>

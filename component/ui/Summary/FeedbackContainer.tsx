@@ -10,7 +10,7 @@ export const FeedbackContainer = React.memo(
       <div className="space-y-6">
         {/* Strengths */}
         {feedback.strengths && feedback.strengths.length > 0 && (
-          <SectionContainer containerName="Strengths" icon={CheckCircle}>
+          <SectionContainer containerName="Strengths">
             <div className="space-y-3">
               {feedback.strengths.map((strength, index) => (
                 <SectionDescription key={index}>{strength}</SectionDescription>
@@ -23,7 +23,7 @@ export const FeedbackContainer = React.memo(
         {feedback.improvements && feedback.improvements.length > 0 && (
           <SectionContainer
             containerName="Areas for Improvement"
-            icon={TrendingUp}
+           
           >
             <div className="space-y-3">
               {feedback.improvements.map((improvement, index) => (

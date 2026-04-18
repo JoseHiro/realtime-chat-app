@@ -144,6 +144,7 @@ export function getGrammarErrorTypeLabel(type: GrammarErrorType): string {
 /**
  * Gets a color class for a grammar error type badge
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function getGrammarErrorTypeColor(_type: GrammarErrorType): string {
   return "bg-gray-100 text-gray-700 border-gray-200";
 }

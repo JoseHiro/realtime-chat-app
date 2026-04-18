@@ -61,7 +61,7 @@ export const PerformanceContainer = React.memo(
       <div className="space-y-6">
         {/* Overview */}
         {analysis.overview && (
-          <SectionContainer containerName="Overview" icon={BarChart3}>
+          <SectionContainer containerName="Overview">
             <div className="bg-gray-50 rounded-lg p-4">
               <SectionDescription>
                 <p className="text-sm text-gray-800 leading-relaxed">
@@ -74,7 +74,7 @@ export const PerformanceContainer = React.memo(
 
         {/* Strengths */}
         {topStrengths.length > 0 && (
-          <SectionContainer containerName="Strengths" icon={CheckCircle}>
+          <SectionContainer containerName="Strengths">
             <div className="space-y-3">
               {topStrengths.map((strength, index) => (
                 <div
@@ -93,7 +93,7 @@ export const PerformanceContainer = React.memo(
 
         {/* Improvements & Grammar Errors - combined */}
         {(improvementTypesWithCounts.length > 0 || hasUserMessages) && (
-          <SectionContainer containerName="Improvements" icon={TrendingUp}>
+          <SectionContainer containerName="Improvements">
             <div className="space-y-3">
               {improvementTypesWithCounts.length > 0 && (
                 <div className="flex flex-wrap gap-2">
@@ -119,7 +119,7 @@ export const PerformanceContainer = React.memo(
         )}
 
         {/* Vocabulary Analysis */}
-        <SectionContainer containerName="Vocabulary Analysis" icon={BookOpen}>
+        <SectionContainer containerName="Vocabulary Analysis">
           <div className="space-y-4">
             {analysis.vocabulary.verbs.length > 0 && (
               <div>

@@ -91,7 +91,7 @@ export const InfoContainer = React.memo(
             <div className="flex flex-wrap gap-2">
               {improvementTypesWithCounts.map(
                 ({ type }: { type: string }, i: number) => (
-                  <ImprovementTypeBadge key={i} type={type} />
+                  <ImprovementTypeBadge key={i} type={type as any} />
                 )
               )}
               {hasErrors &&
@@ -101,7 +101,7 @@ export const InfoContainer = React.memo(
                     i: number
                   ) => (
                     <div key={i} className="inline-flex items-center gap-1">
-                      <GrammarErrorBadge type={type} />
+                      <GrammarErrorBadge type={type as any} />
                       {count > 1 && (
                         <span className="text-xs text-gray-500 font-medium">
                           {count}

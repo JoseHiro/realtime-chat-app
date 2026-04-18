@@ -52,6 +52,7 @@ export function getImprovementTypeLabel(type: ImprovementType): string {
 /**
  * Gets a color class for an improvement type badge
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function getImprovementTypeColor(_type: ImprovementType): string {
   return "bg-gray-100 text-gray-700 border-gray-200";
 }

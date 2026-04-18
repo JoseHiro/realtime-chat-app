@@ -722,7 +722,7 @@ IMPORTANT:
       });
 
       // Calculate metadata
-      const improvementsCount = Object.values(improvementsByMessageId).reduce(
+      const _improvementsCount = Object.values(improvementsByMessageId).reduce(
         (sum, improvements) => sum + (improvements?.length || 0),
         0
       );
