@@ -1,7 +1,6 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Messages } from "../component/ui/Chat/Messages";
 import { Overlay } from "../component/overlay";
-import { Sidebar } from "../component/ui/Sidebar";
 import { ModeSelectScreen } from "../component/ui/ModeSelectScreen";
 import { useChatSession } from "../context/ChatSessionContext";
 import { useSummary } from "../context/SummaryContext";
@@ -50,6 +49,8 @@ export const Chat = () => {
   //   // Ideally we would trigger the agent response here
   // }, []);
 
+  const { registerStopConversation } = useChatSession();
+
   const { needPayment, plan } = useUserData({ setPaymentOverlay });
 
   const handleRefreshPreviousData = useCallback(() => {
@@ -59,7 +60,7 @@ export const Chat = () => {
     setHiraganaReadingList([]);
   }, [setSummary]);
 
-  const { handleBeginConversation, sendTextMessage, loading } =
+  const { handleBeginConversation, sendTextMessage, stopConversation, loading, streamingMessage } =
     useBeginConversation({
       needPayment,
       plan,
@@ -78,10 +79,12 @@ export const Chat = () => {
       selectedCharacter: selectedCharacter ?? "Sakura",
     });
 
+  useEffect(() => {
+    registerStopConversation(stopConversation);
+  }, [registerStopConversation, stopConversation]);
+
   return (
     <div className="relative w-full h-screen flex">
-      {/* サイドバー */}
-      <Sidebar />
       {!chatMode ? (
         <ModeSelectScreen
           setHistory={setHistory}
@@ -95,7 +98,7 @@ export const Chat = () => {
           handleBeginConversation={handleBeginConversation}
         />
       ) : (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-green-50 w-full flex flex-col justify-between">
+        <div className="min-h-screen bg-white dark:bg-gray-950 w-full flex flex-col justify-between">
           <ChatHeader
             title="Chat"
             chatPage={true}
@@ -109,6 +112,7 @@ export const Chat = () => {
             hiraganaReadingList={hiraganaReadingList}
             characterName={selectedCharacter}
             MessagesTextOpenMode={MessagesTextOpenMode}
+            streamingMessage={streamingMessage}
           />
           {/* Voice Status Indicator */}
           <ChatFooter

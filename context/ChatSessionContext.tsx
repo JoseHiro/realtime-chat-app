@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useCallback, useContext, useRef, useState } from "react";
 
 export type CharacterName = "Sakura" | "Ken" | "Chica" | "Haruki" | "Aiko" | "Ryo";
 
@@ -23,6 +23,8 @@ export interface ChatSessionContextType {
   setSelectedTime: React.Dispatch<React.SetStateAction<number>>;
   selectedCharacter: CharacterName;
   setSelectedCharacter: React.Dispatch<React.SetStateAction<CharacterName>>;
+  stopConversation: () => void;
+  registerStopConversation: (fn: () => void) => void;
 }
 
 const defaultState: ChatSessionContextType = {
@@ -46,6 +48,8 @@ const defaultState: ChatSessionContextType = {
   setSelectedTime: () => {},
   selectedCharacter: "Sakura",
   setSelectedCharacter: () => {},
+  stopConversation: () => {},
+  registerStopConversation: () => {},
 };
 
 const ChatSessionContext = createContext<ChatSessionContextType>(defaultState);
@@ -61,6 +65,14 @@ export const ChatSessionProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [chatEnded, setChatEnded] = useState(false);
   const [selectedTime, setSelectedTime] = useState(3);
   const [selectedCharacter, setSelectedCharacter] = useState<CharacterName>("Sakura");
+
+  const stopConversationRef = useRef<() => void>(() => {});
+  const registerStopConversation = useCallback((fn: () => void) => {
+    stopConversationRef.current = fn;
+  }, []);
+  const stopConversation = useCallback(() => {
+    stopConversationRef.current();
+  }, []);
 
   const value: ChatSessionContextType = {
     selectedLevel,
@@ -83,6 +95,8 @@ export const ChatSessionProvider: React.FC<{ children: React.ReactNode }> = ({ c
     setSelectedTime,
     selectedCharacter,
     setSelectedCharacter,
+    stopConversation,
+    registerStopConversation,
   };
 
   return (

@@ -34,22 +34,20 @@ export const ThemeSelection = ({
 }: ThemeSelectionProps) => {
   return (
     <div className="max-w-5xl mx-auto py-8">
-      {/* Header */}
       <div className="flex justify-between items-center gap-2">
         <div className="mb-4">
-          <h2 className="text-lg font-medium text-gray-900 mb-1">
+          <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-1">
             Conversation Theme
           </h2>
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-gray-500 dark:text-gray-400">
             Choose a topic for your conversation
           </p>
         </div>
-        <div className="bg-gray-100 rounded-full p-2">
-          <IoIosColorPalette className="w-6 h-6 text-gray-700" />
+        <div className="bg-gray-100 dark:bg-gray-800 rounded-full p-2">
+          <IoIosColorPalette className="w-6 h-6 text-gray-700 dark:text-gray-300" />
         </div>
       </div>
 
-      {/* Theme Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {themes.map((theme) => {
           const IconComponent = iconMap[theme.icon];
@@ -72,29 +70,26 @@ export const ThemeSelection = ({
               className={`relative rounded-lg overflow-hidden border transition-all ${
                 isLocked
                   ? "opacity-50 cursor-not-allowed"
-                  : "cursor-pointer hover:border-gray-300"
+                  : "cursor-pointer hover:border-gray-300 dark:hover:border-gray-600"
               } ${
                 isSelected
-                  ? "border-gray-900 bg-gray-50"
-                  : "border-gray-200 bg-white"
+                  ? "border-gray-900 dark:border-gray-300 bg-gray-50 dark:bg-gray-800"
+                  : "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900"
               }`}
             >
-              {/* Image */}
-              <div className="relative h-40 overflow-hidden bg-gray-100">
+              <div className="relative h-40 overflow-hidden bg-gray-100 dark:bg-gray-800">
                 <img
                   src={theme.imgURL}
                   alt={theme.label}
                   className="w-full h-full object-cover"
                 />
-
-                {/* Locked Overlay */}
                 {isLocked && (
-                  <div className="absolute inset-0 bg-white/90 backdrop-blur-sm flex items-center justify-center">
+                  <div className="absolute inset-0 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm flex items-center justify-center">
                     <div className="text-center">
-                      <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-gray-900 text-white mb-2">
+                      <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 mb-2">
                         <Lock className="w-5 h-5" />
                       </div>
-                      <p className="text-xs font-medium text-gray-900 mb-2">
+                      <p className="text-xs font-medium text-gray-900 dark:text-gray-100 mb-2">
                         Pro Only
                       </p>
                       <button
@@ -102,7 +97,7 @@ export const ThemeSelection = ({
                           e.stopPropagation();
                           setPaymentOverlay(true);
                         }}
-                        className="px-3 py-1.5 bg-gray-900 hover:bg-gray-800 text-white text-xs font-medium rounded transition-colors"
+                        className="px-3 py-1.5 bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 text-xs font-medium rounded transition-colors"
                       >
                         Upgrade
                       </button>
@@ -111,23 +106,22 @@ export const ThemeSelection = ({
                 )}
               </div>
 
-              {/* Content */}
               <div className="p-4">
                 <div className="flex items-center gap-2 mb-2">
                   <div
                     className={`w-8 h-8 rounded-md flex items-center justify-center transition-colors ${
                       isSelected
-                        ? "bg-gray-900 text-white"
-                        : "bg-gray-100 text-gray-600"
+                        ? "bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900"
+                        : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400"
                     }`}
                   >
                     <IconComponent className="w-4 h-4" />
                   </div>
-                  <h3 className="text-sm font-medium text-gray-900">
+                  <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">
                     {theme.label}
                   </h3>
                 </div>
-                <p className="text-xs text-gray-600 leading-relaxed">
+                <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
                   {theme.description}
                 </p>
               </div>
@@ -140,29 +134,26 @@ export const ThemeSelection = ({
           className={`relative rounded-lg overflow-hidden border transition-all ${
             !isProUser
               ? "opacity-50 cursor-not-allowed"
-              : "cursor-pointer hover:border-gray-300"
+              : "cursor-pointer hover:border-gray-300 dark:hover:border-gray-600"
           } ${
             customTheme.trim()
-              ? "border-gray-900 bg-gray-50"
-              : "border-gray-200 bg-white"
+              ? "border-gray-900 dark:border-gray-300 bg-gray-50 dark:bg-gray-800"
+              : "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900"
           }`}
         >
-          {/* Custom Background */}
-          <div className="relative h-40 bg-gradient-to-br from-gray-800 via-gray-700 to-gray-900">
+          <div className="relative h-40 bg-gradient-to-br from-gray-800 via-gray-700 to-gray-900 dark:from-gray-700 dark:via-gray-600 dark:to-gray-800">
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center">
                 <Edit3 className="w-6 h-6 text-white" />
               </div>
             </div>
-
-            {/* Locked Overlay */}
             {!isProUser && (
-              <div className="absolute inset-0 bg-white/90 backdrop-blur-sm flex items-center justify-center">
+              <div className="absolute inset-0 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm flex items-center justify-center">
                 <div className="text-center">
-                  <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-gray-900 text-white mb-2">
+                  <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 mb-2">
                     <Lock className="w-5 h-5" />
                   </div>
-                  <p className="text-xs font-medium text-gray-900 mb-2">
+                  <p className="text-xs font-medium text-gray-900 dark:text-gray-100 mb-2">
                     Pro Only
                   </p>
                   <button
@@ -170,7 +161,7 @@ export const ThemeSelection = ({
                       e.stopPropagation();
                       setPaymentOverlay(true);
                     }}
-                    className="px-3 py-1.5 bg-gray-900 hover:bg-gray-800 text-white text-xs font-medium rounded transition-colors"
+                    className="px-3 py-1.5 bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 text-xs font-medium rounded transition-colors"
                   >
                     Upgrade
                   </button>
@@ -179,24 +170,23 @@ export const ThemeSelection = ({
             )}
           </div>
 
-          {/* Content */}
           <div className="p-4">
             <div className="flex items-center gap-2 mb-2">
               <div
                 className={`w-8 h-8 rounded-md flex items-center justify-center transition-colors ${
                   customTheme.trim()
-                    ? "bg-gray-900 text-white"
-                    : "bg-gray-100 text-gray-600"
+                    ? "bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900"
+                    : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400"
                 }`}
               >
                 <Plus className="w-4 h-4" />
               </div>
-              <h3 className="text-sm font-medium text-gray-900">
+              <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">
                 Custom Theme
               </h3>
             </div>
 
-            <p className="text-xs text-gray-600 leading-relaxed mb-3">
+            <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed mb-3">
               Create your own conversation topic
             </p>
 
@@ -210,9 +200,7 @@ export const ThemeSelection = ({
                   setPaymentOverlay(true);
                   toast.info(
                     "Custom themes are available in Pro plan. Upgrade to unlock!",
-                    {
-                      position: "top-center",
-                    }
+                    { position: "top-center" }
                   );
                   return;
                 }
@@ -225,9 +213,7 @@ export const ThemeSelection = ({
                   setPaymentOverlay(true);
                   toast.info(
                     "Custom themes are available in Pro plan. Upgrade to unlock!",
-                    {
-                      position: "top-center",
-                    }
+                    { position: "top-center" }
                   );
                   return;
                 }
@@ -236,9 +222,9 @@ export const ThemeSelection = ({
               disabled={!isProUser}
               className={`w-full px-3 py-2 rounded-md border text-sm transition-colors ${
                 !isProUser
-                  ? "border-gray-200 bg-gray-50 cursor-not-allowed text-gray-400"
-                  : "border-gray-200 focus:border-gray-900 focus:outline-none bg-white text-gray-900"
-              } placeholder-gray-400`}
+                  ? "border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 cursor-not-allowed text-gray-400 dark:text-gray-600"
+                  : "border-gray-200 dark:border-gray-700 focus:border-gray-900 dark:focus:border-gray-300 focus:outline-none bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+              } placeholder-gray-400 dark:placeholder-gray-600`}
             />
           </div>
         </div>

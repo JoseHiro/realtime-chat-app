@@ -1,7 +1,7 @@
 import React from "react";
 import { useRouter } from "next/router";
 import { useQuery } from "@tanstack/react-query";
-import { Sidebar } from "../../component/ui/Sidebar";
+// import { Sidebar } from "../../component/ui/Sidebar";
 
 import {
   AssistantMessageBox,
@@ -50,7 +50,7 @@ const ChatPage = () => {
 
   return (
     <div className="relative w-full h-screen flex">
-      <Sidebar />
+      {/* <Sidebar /> */}
 
       <div className="flex-1 min-h-screen flex flex-col bg-gray-50 overflow-hidden">
         {/* Header */}

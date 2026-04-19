@@ -33,6 +33,10 @@ export default async function handler(
       return res.status(403).json({ error: "Access denied. Admin only." });
     }
 
+    if (!user.password) {
+      return res.status(401).json({ error: "Invalid email or password" });
+    }
+
     const isValid = await bcrypt.compare(password, user.password);
     if (!isValid) {
       return res.status(401).json({ error: "Invalid email or password" });

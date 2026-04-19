@@ -3,6 +3,26 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Falling sakura petals */
+@keyframes sakura-fall-track {
+  0% { transform: translateY(-12vh); opacity: 0; }
+  4% { opacity: 1; }
+  96% { opacity: 0.85; }
+  100% { transform: translateY(112vh); opacity: 0; }
+}
+@keyframes sakura-fall-sway {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(var(--sakura-sway-px, 28px)); }
+}
+.sakura-fall-track {
+  animation: sakura-fall-track linear infinite;
+  will-change: transform;
+}
+.sakura-fall-sway {
+  animation: sakura-fall-sway ease-in-out infinite alternate;
+  will-change: transform;
+}
+
 :root {
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);

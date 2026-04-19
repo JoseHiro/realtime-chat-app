@@ -1,11 +1,12 @@
 // pages/signin.tsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 import { AuthHeader } from "../component/ui/LandingPage/LandingHeader";
 import { toast } from "sonner";
 import { RoundedButton } from "../component/shared/button";
 import { Eye, EyeOff } from "lucide-react";
+import { FcGoogle } from "react-icons/fc";
 
 type LoginFormInputs = {
   email: string;
@@ -17,6 +18,17 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    if (!router.isReady) return;
+    const msg = router.query.message;
+    const err = router.query.error;
+    if (err && typeof msg === "string") {
+      toast.error(decodeURIComponent(msg.replace(/\+/g, " ")));
+      void router.replace("/login", undefined, { shallow: true });
+    }
+  }, [router.isReady, router]);
+
   const {
     register,
     handleSubmit,
@@ -46,7 +58,7 @@ const Login = () => {
       toast.success("Successfully logged in!", {
         position: "top-center",
       });
-      router.push("/new_chat");
+      router.push("/dashboard");
     } catch (error: any) {
       console.error("Login error:", error);
     } finally {
@@ -66,6 +78,26 @@ const Login = () => {
           <h1 className="text-2xl font-bold mb-6 text-black text-center">
             Login
           </h1>
+
+          <button
+            type="button"
+            onClick={() => {
+              window.location.href = "/api/auth/google/start?mode=login";
+            }}
+            className="mb-6 flex w-full items-center justify-center gap-2 rounded-md border border-gray-300 bg-white py-3 px-4 text-sm font-medium text-gray-800 shadow-sm transition hover:bg-gray-50"
+          >
+            <FcGoogle className="h-5 w-5" />
+            Continue with Google
+          </button>
+
+          <div className="relative mb-6">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-gray-200" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-white px-2 text-gray-500">Or use email</span>
+            </div>
+          </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             {/* Email */}
@@ -124,7 +156,7 @@ const Login = () => {
 
             {/* Submit */}
             <RoundedButton
-              // type="submit"
+              type="submit"
               loading={loading}
               className="w-full cursor-pointer bg-black text-white py-2 px-4 rounded-md hover:bg-gray-800 transition"
             >

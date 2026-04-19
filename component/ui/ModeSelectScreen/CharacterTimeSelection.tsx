@@ -27,11 +27,8 @@ export const CharacterTimeSelection = ({
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const getCharacterImage = (characterName: CharacterName) => {
-    // First try to get from voice mapping config
     const imageUrl = getCharacterImageUrl(characterName);
     if (imageUrl) return imageUrl;
-
-    // Fallback to default images based on character name
     if (characterName === "Sakura") return "/img/female.jpg";
     if (characterName === "Ken") return "/img/man.jpg";
     return characterName.includes("Chica") || characterName === "Aiko"
@@ -40,19 +37,15 @@ export const CharacterTimeSelection = ({
   };
 
   const getRandomAudioPath = (characterName: CharacterName): string => {
-    const randomIndex = Math.floor(Math.random() * 3) + 1; // 1, 2, or 3
+    const randomIndex = Math.floor(Math.random() * 3) + 1;
     const characterLower = characterName.toLowerCase();
     return `/audio/characters/${characterLower}_${randomIndex}.mp3`;
   };
 
-  const handlePlayAudio = (
-    characterName: CharacterName,
-    e: React.MouseEvent
-  ) => {
+  const handlePlayAudio = (characterName: CharacterName, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
-    // If the same character is playing, pause it
     if (playingCharacter === characterName && audioRef.current) {
       audioRef.current.pause();
       audioRef.current = null;
@@ -60,336 +53,197 @@ export const CharacterTimeSelection = ({
       return;
     }
 
-    // Stop any currently playing audio
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current = null;
     }
 
-    // Play the new audio
     const audioPath = getRandomAudioPath(characterName);
     const audio = new Audio(audioPath);
     audioRef.current = audio;
     setPlayingCharacter(characterName);
 
-    audio.play().catch((error) => {
-      console.error("Error playing audio:", error);
+    audio.play().catch(() => {
       setPlayingCharacter(null);
       audioRef.current = null;
     });
 
-    // Reset state when audio ends
     audio.onended = () => {
       setPlayingCharacter(null);
       audioRef.current = null;
     };
 
-    // Handle errors
     audio.onerror = () => {
-      console.error("Error loading audio:", audioPath);
       setPlayingCharacter(null);
       audioRef.current = null;
     };
   };
 
   const azureCharacters = characters.filter((c) => c.voiceProvider === "azure");
-  const elevenlabsCharacters = characters.filter(
-    (c) => c.voiceProvider === "elevenlabs"
-  );
+  const elevenlabsCharacters = characters.filter((c) => c.voiceProvider === "elevenlabs");
+
+  const CharacterRow = ({ character }: { character: ReturnType<typeof getAllCharacters>[0] }) => {
+    const isCharacterSelected = selectedCharacter === character.characterName;
+    return (
+      <div
+        className={`group border rounded-lg transition-all ${
+          isCharacterSelected
+            ? "border-gray-900 dark:border-gray-300 bg-gray-50 dark:bg-gray-800"
+            : "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:border-gray-300 dark:hover:border-gray-600"
+        }`}
+      >
+        <div className="flex items-center gap-6 p-4">
+          <div className="flex items-center gap-3 min-w-[200px]">
+            <div
+              className="flex items-center gap-3 flex-1 cursor-pointer"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setSelectedCharacter(character.characterName);
+              }}
+            >
+              <div
+                className={`relative w-12 h-12 rounded-md overflow-hidden flex-shrink-0 ${
+                  isCharacterSelected ? "ring-2 ring-gray-900 dark:ring-gray-300 ring-offset-2 dark:ring-offset-gray-900" : ""
+                }`}
+              >
+                <Image
+                  src={getCharacterImage(character.characterName)}
+                  alt={character.characterName}
+                  fill
+                  className="object-cover"
+                />
+                {"voiceProvider" in character && character.voiceProvider === "elevenlabs" && (
+                  <div className="absolute top-1 left-1 bg-gray-900 text-white text-[9px] font-medium px-1.5 py-0.5 rounded">
+                    PRO
+                  </div>
+                )}
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                  {character.characterName}
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  {character.description}
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={(e) => handlePlayAudio(character.characterName, e)}
+              className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+              aria-label={`Play ${character.characterName} voice sample`}
+            >
+              {playingCharacter === character.characterName ? (
+                <Pause className="w-4 h-4 text-gray-700 dark:text-gray-300" />
+              ) : (
+                <Play className="w-4 h-4 text-gray-700 dark:text-gray-300" />
+              )}
+            </button>
+          </div>
+
+          <div className="flex-1 flex items-center gap-2">
+            {timeOptions.map((time) => {
+              const isTimeSelected = isCharacterSelected && selectedTime === time;
+              const credits = calculateCreditsForCharacter(time, character.characterName);
+              const isAvailable = time !== 10;
+
+              return (
+                <button
+                  key={time}
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (isAvailable) {
+                      setSelectedCharacter(character.characterName);
+                      setSelectedTime(time);
+                    }
+                  }}
+                  disabled={!isAvailable}
+                  className={`flex-1 px-4 py-3 rounded-md border transition-all ${
+                    isTimeSelected
+                      ? "border-gray-900 dark:border-gray-300 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900"
+                      : "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 hover:border-gray-300 dark:hover:border-gray-600"
+                  } ${!isAvailable ? "opacity-40 cursor-not-allowed" : "cursor-pointer"}`}
+                >
+                  <div className="text-center">
+                    <div className="text-sm font-medium mb-0.5">{time} min</div>
+                    <div className="text-xs opacity-70">{credits} credits</div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="max-w-5xl mx-auto py-4">
-      {/* Header */}
       <div className="flex justify-between items-center gap-2">
         <div className="mb-4">
-          <h2 className="text-lg font-medium text-gray-900 mb-1">
+          <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-1">
             Select Voice & Duration
           </h2>
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-gray-500 dark:text-gray-400">
             Choose a character and session length
           </p>
         </div>
-        <div className="bg-gray-100 rounded-full p-2">
-          <AudioWaveform className="w-6 h-6 text-gray-700" />
+        <div className="bg-gray-100 dark:bg-gray-800 rounded-full p-2">
+          <AudioWaveform className="w-6 h-6 text-gray-700 dark:text-gray-300" />
         </div>
       </div>
 
-      {/* Standard Voice Section */}
+      {/* Standard */}
       <div className="mb-12">
         <div className="flex items-center gap-2 mb-4">
-          <h3 className="text-xs font-medium text-gray-400 uppercase tracking-wider">
+          <h3 className="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider">
             Standard
           </h3>
-          <div className="flex-1 h-px bg-gray-200"></div>
+          <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
         </div>
-
         <div className="space-y-3">
-          {azureCharacters.map((character) => {
-            const isCharacterSelected =
-              selectedCharacter === character.characterName;
-
-            return (
-              <div
-                key={character.characterName}
-                className={`group border rounded-lg transition-all ${
-                  isCharacterSelected
-                    ? "border-gray-900 bg-gray-50"
-                    : "border-gray-200 bg-white hover:border-gray-300"
-                }`}
-              >
-                <div className="flex items-center gap-6 p-4">
-                  {/* Character Info */}
-                  <div className="flex items-center gap-3 min-w-[200px]">
-                    <div
-                      className="flex items-center gap-3 flex-1 cursor-pointer"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setSelectedCharacter(character.characterName);
-                      }}
-                    >
-                      <div
-                        className={`relative w-12 h-12 rounded-md overflow-hidden flex-shrink-0 ${
-                          isCharacterSelected
-                            ? "ring-2 ring-gray-900 ring-offset-2"
-                            : ""
-                        }`}
-                      >
-                        <Image
-                          src={getCharacterImage(character.characterName)}
-                          alt={character.characterName}
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">
-                          {character.characterName}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {character.description}
-                        </p>
-                      </div>
-                    </div>
-                    {/* Play Button */}
-                    <button
-                      type="button"
-                      onClick={(e) =>
-                        handlePlayAudio(character.characterName, e)
-                      }
-                      className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
-                      aria-label={`Play ${character.characterName} voice sample`}
-                    >
-                      {playingCharacter === character.characterName ? (
-                        <Pause className="w-4 h-4 text-gray-700" />
-                      ) : (
-                        <Play className="w-4 h-4 text-gray-700" />
-                      )}
-                    </button>
-                  </div>
-
-                  {/* Time Options */}
-                  <div className="flex-1 flex items-center gap-2">
-                    {timeOptions.map((time) => {
-                      const isTimeSelected =
-                        isCharacterSelected && selectedTime === time;
-                      const credits = calculateCreditsForCharacter(
-                        time,
-                        character.characterName
-                      );
-                      const isAvailable = time !== 10;
-
-                      return (
-                        <button
-                          key={time}
-                          type="button"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            if (isAvailable) {
-                              setSelectedCharacter(character.characterName);
-                              setSelectedTime(time);
-                            }
-                          }}
-                          disabled={!isAvailable}
-                          className={`flex-1 px-4 py-3 rounded-md border transition-all ${
-                            isTimeSelected
-                              ? "border-gray-900 bg-gray-900 text-white"
-                              : "border-gray-200 bg-white text-gray-900 hover:border-gray-300"
-                          } ${
-                            !isAvailable
-                              ? "opacity-40 cursor-not-allowed"
-                              : "cursor-pointer"
-                          }`}
-                        >
-                          <div className="text-center">
-                            <div className="text-sm font-medium mb-0.5">
-                              {time} min
-                            </div>
-                            <div className="text-xs opacity-70">
-                              {credits} credits
-                            </div>
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+          {azureCharacters.map((character) => (
+            <CharacterRow key={character.characterName} character={character} />
+          ))}
         </div>
       </div>
 
-      {/* Premium Voice Section */}
+      {/* Premium */}
       <div className="mb-8">
         <div className="flex items-center gap-2 mb-4">
-          <h3 className="text-xs font-medium text-gray-400 uppercase tracking-wider">
+          <h3 className="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider">
             Premium
           </h3>
-          <div className="flex items-center gap-1.5 px-2 py-0.5 bg-gray-100 rounded-full">
-            <Sparkles className="w-3 h-3 text-gray-600" />
-            <span className="text-[10px] font-medium text-gray-600 uppercase tracking-wide">
+          <div className="flex items-center gap-1.5 px-2 py-0.5 bg-gray-100 dark:bg-gray-800 rounded-full">
+            <Sparkles className="w-3 h-3 text-gray-600 dark:text-gray-400" />
+            <span className="text-[10px] font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide">
               Enhanced Quality
             </span>
           </div>
-          <div className="flex-1 h-px bg-gray-200"></div>
+          <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
         </div>
-
         <div className="space-y-3">
-          {elevenlabsCharacters.map((character) => {
-            const isCharacterSelected =
-              selectedCharacter === character.characterName;
-
-            return (
-              <div
-                key={character.characterName}
-                className={`group border rounded-lg transition-all ${
-                  isCharacterSelected
-                    ? "border-gray-900 bg-gray-50"
-                    : "border-gray-200 bg-white hover:border-gray-300"
-                }`}
-              >
-                <div className="flex items-center gap-6 p-4">
-                  {/* Character Info */}
-                  <div className="flex items-center gap-3 min-w-[200px]">
-                    <div
-                      className="flex items-center gap-3 flex-1 cursor-pointer"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setSelectedCharacter(character.characterName);
-                      }}
-                    >
-                      <div
-                        className={`relative w-12 h-12 rounded-md overflow-hidden flex-shrink-0 ${
-                          isCharacterSelected
-                            ? "ring-2 ring-gray-900 ring-offset-2"
-                            : ""
-                        }`}
-                      >
-                        <Image
-                          src={getCharacterImage(character.characterName)}
-                          alt={character.characterName}
-                          fill
-                          className="object-cover"
-                        />
-                        <div className="absolute top-1 left-1 bg-gray-900 text-white text-[9px] font-medium px-1.5 py-0.5 rounded">
-                          PRO
-                        </div>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">
-                          {character.characterName}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {character.description}
-                        </p>
-                      </div>
-                    </div>
-                    {/* Play Button */}
-                    <button
-                      type="button"
-                      onClick={(e) =>
-                        handlePlayAudio(character.characterName, e)
-                      }
-                      className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
-                      aria-label={`Play ${character.characterName} voice sample`}
-                    >
-                      {playingCharacter === character.characterName ? (
-                        <Pause className="w-4 h-4 text-gray-700" />
-                      ) : (
-                        <Play className="w-4 h-4 text-gray-700" />
-                      )}
-                    </button>
-                  </div>
-
-                  {/* Time Options */}
-                  <div className="flex-1 flex items-center gap-2">
-                    {timeOptions.map((time) => {
-                      const isTimeSelected =
-                        isCharacterSelected && selectedTime === time;
-                      const credits = calculateCreditsForCharacter(
-                        time,
-                        character.characterName
-                      );
-                      const isAvailable = time !== 10;
-
-                      return (
-                        <button
-                          key={time}
-                          type="button"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            if (isAvailable) {
-                              setSelectedCharacter(character.characterName);
-                              setSelectedTime(time);
-                            }
-                          }}
-                          disabled={!isAvailable}
-                          className={`flex-1 px-4 py-3 rounded-md border transition-all ${
-                            isTimeSelected
-                              ? "border-gray-900 bg-gray-900 text-white"
-                              : "border-gray-200 bg-white text-gray-900 hover:border-gray-300"
-                          } ${
-                            !isAvailable
-                              ? "opacity-40 cursor-not-allowed"
-                              : "cursor-pointer"
-                          }`}
-                        >
-                          <div className="text-center">
-                            <div className="text-sm font-medium mb-0.5">
-                              {time} min
-                            </div>
-                            <div className="text-xs opacity-70">
-                              {credits} credits
-                            </div>
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+          {elevenlabsCharacters.map((character) => (
+            <CharacterRow key={character.characterName} character={character} />
+          ))}
         </div>
       </div>
 
       {/* Selection Summary */}
       {selectedCharacter && selectedTime && (
-        <div className="mt-8 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+        <div className="mt-8 p-4 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-2 h-2 bg-gray-900 rounded-full"></div>
-              <span className="text-sm text-gray-600">
+              <div className="w-2 h-2 bg-gray-900 dark:bg-gray-300 rounded-full" />
+              <span className="text-sm text-gray-600 dark:text-gray-400">
                 {selectedCharacter} · {selectedTime} minutes
               </span>
             </div>
-            <span className="text-sm font-medium text-gray-900">
-              {calculateCreditsForCharacter(selectedTime, selectedCharacter)}{" "}
-              credits
+            <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+              {calculateCreditsForCharacter(selectedTime, selectedCharacter)} credits
             </span>
           </div>
         </div>

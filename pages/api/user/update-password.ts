@@ -27,12 +27,10 @@ export default async function handler(
   try {
     const { currentPassword, newPassword } = req.body;
 
-    if (!currentPassword || !newPassword) {
-      return res.status(400).json({ error: "Current password and new password are required" });
-    }
-
-    if (newPassword.length < 6) {
-      return res.status(400).json({ error: "New password must be at least 6 characters" });
+    if (!newPassword || newPassword.length < 6) {
+      return res
+        .status(400)
+        .json({ error: "New password must be at least 6 characters" });
     }
 
     // Get user with password
@@ -47,13 +45,18 @@ export default async function handler(
       return res.status(404).json({ error: "User not found" });
     }
 
-    // Verify current password
-    const isValid = await bcrypt.compare(currentPassword, user.password);
-    if (!isValid) {
-      return res.status(401).json({ error: "Current password is incorrect" });
+    if (user.password) {
+      if (!currentPassword) {
+        return res
+          .status(400)
+          .json({ error: "Current password is required" });
+      }
+      const isValid = await bcrypt.compare(currentPassword, user.password);
+      if (!isValid) {
+        return res.status(401).json({ error: "Current password is incorrect" });
+      }
     }
 
-    // Hash new password
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
     await prisma.user.update({

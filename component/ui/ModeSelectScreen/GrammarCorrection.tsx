@@ -25,15 +25,15 @@ export const GrammarCorrection = ({
       {/* Header */}
       <div className="flex items-center justify-between gap-2 mb-4">
         <div>
-          <h2 className="text-lg font-medium text-gray-900 mb-1">
+          <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-1">
             Grammar Correction
           </h2>
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-gray-500 dark:text-gray-400">
             Choose whether to receive grammar feedback
           </p>
         </div>
-        <div className="bg-gray-100 rounded-full p-2">
-          <MdAutoFixHigh className="w-6 h-6 text-gray-700" />
+        <div className="bg-gray-100 dark:bg-gray-800 rounded-full p-2">
+          <MdAutoFixHigh className="w-6 h-6 text-gray-700 dark:text-gray-300" />
         </div>
       </div>
 
@@ -57,11 +57,11 @@ export const GrammarCorrection = ({
               className={`relative p-5 rounded-lg border transition-all ${
                 isLocked
                   ? "opacity-50 cursor-not-allowed"
-                  : "cursor-pointer hover:border-gray-300"
+                  : "cursor-pointer hover:border-gray-300 dark:hover:border-gray-600"
               } ${
                 isSelected
-                  ? "border-gray-900 bg-gray-50"
-                  : "border-gray-200 bg-white"
+                  ? "border-gray-900 dark:border-gray-300 bg-gray-50 dark:bg-gray-800"
+                  : "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900"
               }`}
             >
               {/* Lock Badge */}
@@ -79,8 +79,8 @@ export const GrammarCorrection = ({
                 <div
                   className={`w-10 h-10 rounded-md flex items-center justify-center transition-colors ${
                     isSelected
-                      ? "bg-gray-900 text-white"
-                      : "bg-gray-100 text-gray-600"
+                      ? "bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900"
+                      : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400"
                   }`}
                 >
                   <IconComponent className="w-5 h-5" />
@@ -98,7 +98,7 @@ export const GrammarCorrection = ({
                 {isLocked && (
                   <div className="flex items-center gap-1.5 pt-1">
                     <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
-                    <span className="text-xs text-gray-500 font-medium">
+                    <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">
                       Pro Feature
                     </span>
                   </div>

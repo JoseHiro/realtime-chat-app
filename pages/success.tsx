@@ -50,7 +50,7 @@ const PaymentSuccess = () => {
   const handleStartNow = () => {
     if (payment?.subscriptionStatus === "active") {
       setIsRedirecting(true);
-      router.push("/new_chat");
+      router.push("/chat");
     }
   };
 

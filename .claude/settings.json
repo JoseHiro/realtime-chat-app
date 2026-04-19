@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch(domain:ai.google.dev)",
+      "Read(//Users/joseysekine/Documents/programming_projects/tangokun/app/**)",
+      "Read(//Users/joseysekine/Documents/programming_projects/tangokun/components/**)",
+      "Read(//Users/joseysekine/Documents/programming_projects/tangokun/lib/**)",
+      "Read(//Users/joseysekine/Documents/programming_projects/tangokun/features/practice/**)",
+      "Read(//Users/joseysekine/Documents/programming_projects/tangokun/**)",
+      "Bash(npx prisma:*)"
+    ]
+  }
+}

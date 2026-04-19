@@ -23,7 +23,7 @@ export function StopWatch({
   const [isActive, setIsActive] = useState(true);
   const summaryCreatedRef = useRef(false);
 
-  const { selectedPoliteness, chatId, setChatEnded, setChatId } =
+  const { selectedPoliteness, chatId, setChatEnded, setChatId, stopConversation } =
     useChatSession();
   const { setSummary, setSummaryFetchLoading } = useSummary();
 
@@ -86,31 +86,23 @@ export function StopWatch({
 
     if (isActive && timeLeft > 0) {
       interval = setInterval(() => {
-        setTimeLeft((prev) => {
-          if (prev == 1) {
-            setIsActive(false);
-            // 時間切れ時の処理（自動で会話終了）
-            if (!summaryCreatedRef.current) {
-              summaryCreatedRef.current = true;
-              // Set chatEnded immediately so input is blocked even if modal is closed
-              setChatEnded(true);
-              setOverlayOpened(true);
-              handleCreateSummary();
-            }
-
-            return 0;
-          }
-          return prev - 1;
-        });
+        setTimeLeft((prev) => prev - 1);
       }, 1000);
-    } else if (!isActive) {
-      if (interval) clearInterval(interval);
+    } else if (isActive && timeLeft === 0) {
+      setIsActive(false);
+      if (!summaryCreatedRef.current) {
+        summaryCreatedRef.current = true;
+        stopConversation();
+        setChatEnded(true);
+        setOverlayOpened(true);
+        handleCreateSummary();
+      }
     }
 
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [isActive, timeLeft, handleCreateSummary, setOverlayOpened, setChatEnded]);
+  }, [isActive, timeLeft, handleCreateSummary, setOverlayOpened, setChatEnded, stopConversation]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);

@@ -144,16 +144,7 @@ export function getGrammarErrorTypeLabel(type: GrammarErrorType): string {
 /**
  * Gets a color class for a grammar error type badge
  */
-export function getGrammarErrorTypeColor(type: GrammarErrorType): string {
-  const colors: Record<GrammarErrorType, string> = {
-    particle_error: "bg-red-100 text-red-700 border-red-300",
-    verb_conjugation: "bg-orange-100 text-orange-700 border-orange-300",
-    missing_marker: "bg-amber-100 text-amber-700 border-amber-300",
-    word_order: "bg-yellow-100 text-yellow-700 border-yellow-300",
-    sentence_structure: "bg-lime-100 text-lime-700 border-lime-300",
-    politeness_mismatch: "bg-pink-100 text-pink-700 border-pink-300",
-    tense_error: "bg-purple-100 text-purple-700 border-purple-300",
-    form_error: "bg-rose-100 text-rose-700 border-rose-300",
-  };
-  return colors[type] || "bg-gray-100 text-gray-700 border-gray-300";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function getGrammarErrorTypeColor(_type: GrammarErrorType): string {
+  return "bg-gray-100 text-gray-700 border-gray-200";
 }

@@ -5,6 +5,7 @@ import "../styles/globals.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AppProviders } from "../context/AppProviders";
 import { Toaster } from "@/components/ui/sonner";
+import { Header } from "../component/ui/Header";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -14,11 +15,13 @@ const inter = Inter({
 const playfair = Playfair_Display({
   subsets: ["latin"],
   variable: "--font-display",
+  preload: false,
 });
 
 const quicksand = Quicksand({
   subsets: ["latin"],
   variable: "--font-quicksand",
+  preload: false,
 });
 
 const queryClient = new QueryClient();
@@ -32,6 +35,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
       </Head>
       <QueryClientProvider client={queryClient}>
         <AppProviders>
+          <Header />
           <Component {...pageProps} />
           <Toaster />
         </AppProviders>

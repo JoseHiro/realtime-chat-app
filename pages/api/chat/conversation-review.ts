@@ -118,12 +118,6 @@ async function generateConversationReview(
       return {
         conversationId: chatId,
         messages: formattedMessages,
-        metadata: {
-          totalMessages: formattedMessages.length,
-          userMessages: 0,
-          improvementsGenerated: 0,
-          generatedAt: new Date().toISOString(),
-        },
       };
     }
 
@@ -146,7 +140,6 @@ For each improvement, provide:
 - reading: Hiragana reading (ひらがな)
 - english: English translation
 - focus: Grammar point or improvement explanation (English, be specific)
-- level: One of: "beginner", "beginner-intermediate", "intermediate", "intermediate-advanced", "advanced"
 - type: Classification category (REQUIRED, choose ONE from the following):
   * "complete_sentence" - For incomplete sentences, fragments, or sentence structure issues
   * "particle_usage" - For particle (を, が, は, に, で, etc.) mistakes or improvements
@@ -214,7 +207,6 @@ Output format (JSON only):
           "reading": "<hiragana reading>",
           "english": "<english translation>",
           "focus": "<grammar or vocabulary explanation in English>",
-          "level": "<difficulty level>",
           "type": "<classification category - see list above>"
         },
         {
@@ -222,7 +214,6 @@ Output format (JSON only):
           "reading": "<hiragana>",
           "english": "<english>",
           "focus": "<grammar or vocabulary explanation>",
-          "level": "<level>",
           "type": "<classification category>"
         },
         {
@@ -230,7 +221,6 @@ Output format (JSON only):
           "reading": "<hiragana>",
           "english": "<english>",
           "focus": "<explanation of how this responds to assistant and develops conversation with a question in English>",
-          "level": "<level>",
           "type": "conversation_expansion"
         }
       ]
@@ -345,13 +335,7 @@ IMPORTANT:
 
       const result = {
         conversationId: chatId,
-        messages: mergedMessages, // All messages (user + assistant) with improvements merged
-        metadata: {
-          totalMessages: mergedMessages.length,
-          userMessages: userMessages.length,
-          improvementsGenerated: improvementsCount,
-          generatedAt: new Date().toISOString(),
-        },
+        messages: mergedMessages,
       };
 
       return result;
