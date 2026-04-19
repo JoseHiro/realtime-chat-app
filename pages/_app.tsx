@@ -15,11 +15,13 @@ const inter = Inter({
 const playfair = Playfair_Display({
   subsets: ["latin"],
   variable: "--font-display",
+  preload: false,
 });
 
 const quicksand = Quicksand({
   subsets: ["latin"],
   variable: "--font-quicksand",
+  preload: false,
 });
 
 const queryClient = new QueryClient();

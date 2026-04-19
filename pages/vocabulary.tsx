@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { Plus, Trash2, FolderOpen } from "lucide-react";
+import { useRouter } from "next/router";
+import { Plus, Trash2, FolderOpen, Pencil, Check, X } from "lucide-react";
 
 interface Word {
   id: string;
@@ -14,6 +15,7 @@ interface Deck {
 }
 
 export default function VocabularyPage() {
+  const router = useRouter();
   const [words, setWords] = useState<Word[]>([]);
   const [decks, setDecks] = useState<Deck[]>([]);
   const [loading, setLoading] = useState(true);
@@ -28,6 +30,10 @@ export default function VocabularyPage() {
   const [showNewDeck, setShowNewDeck] = useState(false);
   const [creatingDeck, setCreatingDeck] = useState(false);
 
+  const [editingDeckId, setEditingDeckId] = useState<string | null>(null);
+  const [editWordIds, setEditWordIds] = useState<Set<string>>(new Set());
+  const [saving, setSaving] = useState(false);
+
   useEffect(() => {
     Promise.all([
       fetch("/api/practice/vocab").then((r) => r.json()),
@@ -38,6 +44,15 @@ export default function VocabularyPage() {
       setLoading(false);
     });
   }, []);
+
+  useEffect(() => {
+    if (!router.isReady || loading) return;
+    const add = router.query.add;
+    if (add === "1" || add === "true") {
+      setShowAddForm(true);
+      void router.replace("/vocabulary", undefined, { shallow: true });
+    }
+  }, [router, loading]);
 
   async function addWord() {
     if (!jp.trim() || !en.trim()) return;
@@ -94,6 +109,41 @@ export default function VocabularyPage() {
       body: JSON.stringify({ id }),
     });
     setDecks((prev) => prev.filter((d) => d.id !== id));
+  }
+
+  function startEditDeck(deck: Deck) {
+    setEditingDeckId(deck.id);
+    setEditWordIds(new Set(deck.wordIds));
+  }
+
+  function cancelEditDeck() {
+    setEditingDeckId(null);
+    setEditWordIds(new Set());
+  }
+
+  async function saveDeck(deckId: string) {
+    setSaving(true);
+    const wordIds = Array.from(editWordIds);
+    const res = await fetch("/api/practice/decks", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: deckId, wordIds }),
+    });
+    if (res.ok) {
+      setDecks((prev) =>
+        prev.map((d) => (d.id === deckId ? { ...d, wordIds } : d))
+      );
+      cancelEditDeck();
+    }
+    setSaving(false);
+  }
+
+  function toggleEditWord(id: string) {
+    setEditWordIds((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
   }
 
   if (loading) {
@@ -192,14 +242,16 @@ export default function VocabularyPage() {
         {/* Decks section */}
         <div>
           <div className="flex items-center justify-between mb-3">
-            <p className="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider">Decks</p>
-            <button
-              onClick={() => setShowNewDeck(true)}
-              className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              New deck
-            </button>
+            <p className="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider">Deck</p>
+            {decks.length === 0 && (
+              <button
+                onClick={() => setShowNewDeck(true)}
+                className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                New deck
+              </button>
+            )}
           </div>
 
           {/* New deck form */}
@@ -261,20 +313,76 @@ export default function VocabularyPage() {
           {decks.length > 0 ? (
             <div className="rounded-xl border border-gray-100 dark:border-gray-800 divide-y divide-gray-100 dark:divide-gray-800">
               {decks.map((deck) => (
-                <div key={deck.id} className="flex items-center justify-between px-4 py-3 group">
-                  <div className="flex items-center gap-3">
-                    <FolderOpen className="w-4 h-4 text-gray-400 dark:text-gray-600" />
-                    <span className="text-sm font-medium text-gray-800 dark:text-gray-200">{deck.name}</span>
-                    <span className="text-xs text-gray-400 dark:text-gray-500">
-                      {deck.wordIds.length} word{deck.wordIds.length !== 1 ? "s" : ""}
-                    </span>
+                <div key={deck.id}>
+                  {/* Deck row */}
+                  <div className="flex items-center justify-between px-4 py-3 group">
+                    <div className="flex items-center gap-3">
+                      <FolderOpen className="w-4 h-4 text-gray-400 dark:text-gray-600" />
+                      <span className="text-sm font-medium text-gray-800 dark:text-gray-200">{deck.name}</span>
+                      <span className="text-xs text-gray-400 dark:text-gray-500">
+                        {deck.wordIds.length} word{deck.wordIds.length !== 1 ? "s" : ""}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button
+                        onClick={() => editingDeckId === deck.id ? cancelEditDeck() : startEditDeck(deck)}
+                        className="p-1.5 rounded-md text-gray-400 dark:text-gray-600 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                      >
+                        <Pencil className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => deleteDeck(deck.id)}
+                        className="p-1.5 rounded-md text-gray-400 dark:text-gray-600 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </div>
-                  <button
-                    onClick={() => deleteDeck(deck.id)}
-                    className="opacity-0 group-hover:opacity-100 p-1.5 rounded-md text-gray-400 dark:text-gray-600 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
+
+                  {/* Edit panel */}
+                  {editingDeckId === deck.id && (
+                    <div className="px-4 pb-4 bg-gray-50 dark:bg-gray-900">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-2 pt-2">Select words in this deck</p>
+                      {words.length === 0 ? (
+                        <p className="text-xs text-gray-400">No words yet.</p>
+                      ) : (
+                        <div className="max-h-48 overflow-y-auto rounded-lg border border-gray-200 dark:border-gray-700 divide-y divide-gray-100 dark:divide-gray-800 mb-3">
+                          {words.map((word) => (
+                            <label
+                              key={word.id}
+                              className="flex items-center gap-3 px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                            >
+                              <input
+                                type="checkbox"
+                                checked={editWordIds.has(word.id)}
+                                onChange={() => toggleEditWord(word.id)}
+                                className="accent-green-600 rounded"
+                              />
+                              <span className="text-sm text-gray-800 dark:text-gray-200">{word.jp}</span>
+                              <span className="text-xs text-gray-400 dark:text-gray-500">{word.en}</span>
+                            </label>
+                          ))}
+                        </div>
+                      )}
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => saveDeck(deck.id)}
+                          disabled={saving}
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-black dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 disabled:opacity-40 transition-colors"
+                        >
+                          <Check className="w-3.5 h-3.5" />
+                          {saving ? "Saving…" : "Save"}
+                        </button>
+                        <button
+                          onClick={cancelEditDeck}
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

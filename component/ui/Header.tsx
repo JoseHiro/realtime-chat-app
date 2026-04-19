@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { LayoutDashboard, MessageCircle, Dumbbell, Library, Settings, LogOut, Sun, Moon } from "lucide-react";
+import { LayoutDashboard, MessageCircle, Dumbbell, Library, History, Settings, LogOut, Sun, Moon } from "lucide-react";
 import { useUser } from "../../context/UserContext";
 import { useTheme } from "../../context/ThemeContext";
 import { apiRequest } from "../../lib/apiRequest";
@@ -18,8 +18,9 @@ type NavLink = {
 
 const NAV_LINKS: NavLink[] = [
   { href: "/dashboard",  label: "Dashboard",  Icon: LayoutDashboard },
-  { href: "/new_chat",   label: "New Chat",   Icon: MessageCircle },
-  { href: "/drills",     label: "Practice",   Icon: Dumbbell },
+  { href: "/chat",   label: "Chat",       Icon: MessageCircle },
+  { href: "/chats",  label: "History",    Icon: History },
+  { href: "/flashcards", label: "Flashcards", Icon: Dumbbell },
   { href: "/vocabulary", label: "Vocabulary", Icon: Library },
 ];
 
@@ -53,7 +54,7 @@ export const Header = () => {
 
           <nav className="flex items-center gap-0.5">
             {NAV_LINKS.map(({ href, label, Icon }) => {
-              const active = router.pathname === href;
+              const active = router.pathname === href || router.pathname.startsWith(href + "/");
               const base = `flex items-center gap-1.5 rounded-md transition-colors ${
                 active
                   ? "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-medium"

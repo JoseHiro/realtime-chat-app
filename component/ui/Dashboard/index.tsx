@@ -1,7 +1,15 @@
 import React, { useMemo } from "react";
+import Image from "next/image";
+import Link from "next/link";
 import { ChatDataType } from "../../../types/types";
-import { MessageSquare, BookOpen, Clock, ArrowRight, Library } from "lucide-react";
-import { useRouter } from "next/router";
+import {
+  MessageSquare,
+  BookOpen,
+  Clock,
+  ArrowRight,
+  Plus,
+} from "lucide-react";
+import { StreakCalendar } from "./StreakCalendar";
 
 type ExtendedChatDataType = ChatDataType & {
   time?: number;
@@ -17,12 +25,12 @@ interface FeatureCardProps {
   icon: React.ReactNode;
   title: string;
   description: string;
-  onClick: () => void;
+  href: string;
 }
 
-const FeatureCard = ({ icon, title, description, onClick }: FeatureCardProps) => (
-  <button
-    onClick={onClick}
+const FeatureCard = ({ icon, title, description, href }: FeatureCardProps) => (
+  <Link
+    href={href}
     className="group flex flex-col gap-4 p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl text-left hover:border-gray-400 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all"
   >
     <div className="flex items-center justify-between">
@@ -35,15 +43,13 @@ const FeatureCard = ({ icon, title, description, onClick }: FeatureCardProps) =>
       <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-1">{title}</h3>
       <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">{description}</p>
     </div>
-  </button>
+  </Link>
 );
 
 export const DashboardContent = ({
   username,
   chatsData,
 }: DashboardContentProps) => {
-  const router = useRouter();
-
   const stats = useMemo(() => {
     if (!chatsData?.chats) return { totalChats: 0, chatsThisWeek: 0 };
     const chats = chatsData.chats;
@@ -65,15 +71,41 @@ export const DashboardContent = ({
   return (
     <div className="max-w-2xl mx-auto py-12 px-4">
       {/* Header */}
-      <div className="mb-10">
-        <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-          {greeting}, {username}.
-        </h1>
-        <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
-          {stats.chatsThisWeek > 0
-            ? `${stats.chatsThisWeek} session${stats.chatsThisWeek > 1 ? "s" : ""} this week`
-            : "No sessions this week yet. Let's get started."}
-        </p>
+      <div className="mb-10 flex items-center justify-between gap-4">
+        <div className="space-y-1 min-w-0 flex-1">
+          <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+            {greeting}, {username}.
+          </h1>
+          <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
+            {stats.chatsThisWeek > 0
+              ? `${stats.chatsThisWeek} session${stats.chatsThisWeek > 1 ? "s" : ""} this week`
+              : "No sessions this week yet. Let's get started."}
+          </p>
+        </div>
+        <div className="shrink-0 w-28 h-28 sm:w-36 sm:h-36 relative">
+          <Image
+            src="/img/sakura.webp"
+            alt=""
+            fill
+            className="object-contain"
+            sizes="(max-width: 640px) 112px, 144px"
+            priority
+          />
+        </div>
+      </div>
+
+      <div className="mb-8">
+        <StreakCalendar chats={chatsData?.chats} />
+      </div>
+
+      <div className="mb-8">
+        <Link
+          href="/vocabulary?add=1"
+          className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 dark:border-gray-700 px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 hover:border-gray-400 dark:hover:border-gray-500 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+        >
+          <Plus className="w-3.5 h-3.5" />
+          Add word
+        </Link>
       </div>
 
       {/* Main features */}
@@ -83,22 +115,16 @@ export const DashboardContent = ({
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <FeatureCard
-            icon={<MessageSquare className="w-5 h-5 text-gray-700" />}
+            icon={<MessageSquare className="w-5 h-5 text-gray-700 dark:text-gray-300" />}
             title="Chat Practice"
             description="Practice natural Japanese conversation with an AI partner. Choose your level and topic."
-            onClick={() => router.push("/new_chat")}
+            href="/chat"
           />
           <FeatureCard
-            icon={<BookOpen className="w-5 h-5 text-gray-700" />}
+            icon={<BookOpen className="w-5 h-5 text-gray-700 dark:text-gray-300" />}
             title="AI Flashcard"
             description="Review vocabulary and grammar with spaced repetition. Build lasting memory."
-            onClick={() => router.push("/drills")}
-          />
-          <FeatureCard
-            icon={<Library className="w-5 h-5 text-gray-700" />}
-            title="Vocabulary"
-            description="Add and manage your personal word list. Organize words into decks for practice."
-            onClick={() => router.push("/vocabulary")}
+            href="/flashcards"
           />
         </div>
       </div>

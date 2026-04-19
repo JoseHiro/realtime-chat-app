@@ -161,7 +161,7 @@ export function PracticingPhase({
                     return (
                       <button
                         key={i}
-                        onClick={() => !currentJudge && setActiveHintWord(isActive ? null : seg.annotation!)}
+                        onClick={() => setActiveHintWord(isActive ? null : seg.annotation!)}
                         className={`underline underline-offset-4 decoration-dotted text-gray-900 dark:text-gray-100 cursor-pointer ${
                           seg.isTarget ? "decoration-violet-400" : "decoration-gray-400 dark:decoration-gray-600"
                         }`}
@@ -181,7 +181,7 @@ export function PracticingPhase({
                 </button>
               )}
             </div>
-            {activeHintWord && !currentJudge && (
+            {activeHintWord && (
               <div className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-violet-50 dark:bg-violet-900/30 border border-violet-200 dark:border-violet-700">
                 <span className="text-xs text-violet-500">💡</span>
                 <span className="text-sm font-medium text-violet-700 dark:text-violet-300">{activeHintWord.word}</span>

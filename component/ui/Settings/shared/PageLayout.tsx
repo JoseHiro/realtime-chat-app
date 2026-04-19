@@ -1,5 +1,4 @@
 import React from "react";
-import { Sidebar } from "../../Sidebar";
 
 const PageLayout = ({
   children,
@@ -9,8 +8,7 @@ const PageLayout = ({
   title: string;
 }) => {
   return (
-    <div className="relative w-full h-screen flex">
-      <Sidebar />
+    <div className="relative w-full min-h-screen">
       <div className="bg-gray-50 min-h-screen pt-5 overflow-auto w-full">
         <div className="max-w-3xl mx-auto px-4 pb-8">
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">

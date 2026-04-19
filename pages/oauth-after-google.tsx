@@ -16,7 +16,7 @@ export default function OauthAfterGoogle() {
       void startStripeSession();
       return;
     }
-    router.replace("/new_chat");
+    router.replace("/chat");
   }, [router, plan]);
 
   return (

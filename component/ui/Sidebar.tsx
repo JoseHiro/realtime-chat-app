@@ -95,7 +95,7 @@ export const Sidebar = () => {
     setChatMode(false);
     setChatEnded(false);
     setChatId(null);
-    router.push("/new_chat");
+    router.push("/chat");
   }, [chatId, setChatMode, setChatEnded, setChatId, router]);
 
   const handleSetMuted = useCallback(() => {

@@ -1,6 +1,6 @@
 /**
  * Gemini Live "begin conversation" flow for the new-chat page.
- * Used by: pages/new_chat.tsx
+ * Used by: pages/chat.tsx
  *
  * OpenAI Realtime (WebRTC) version is preserved in useBeginConversation.openai.ts
  */
@@ -336,6 +336,12 @@ export const useBeginConversation = (params: UseBeginConversationParams) => {
       };
       source.connect(processor);
       processor.connect(audioContext.destination);
+
+      // Trigger AI to speak first
+      session.sendClientContent({
+        turns: [{ role: "user", parts: [{ text: "会話を始めてください。まず挨拶してください。" }] }],
+        turnComplete: true,
+      });
     } catch (error) {
       console.error("[useBeginConversation]", error);
       toast.error("Failed to start conversation. Please try again.", {

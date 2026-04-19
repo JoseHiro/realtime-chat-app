@@ -1,6 +1,6 @@
 /**
  * Realtime "begin conversation" flow for the new-chat page.
- * Used by: pages/new_chat.tsx
+ * Used by: pages/chat.tsx
  */
 
 import { useCallback, useRef, useState } from "react";

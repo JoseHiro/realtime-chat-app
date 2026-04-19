@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { User, Lock, Save, Loader2, ArrowLeft } from "lucide-react";
-// import { Sidebar } from "../../component/ui/Sidebar";
 import { RoundedButton } from "../../component/shared/button";
 import { apiRequest } from "../../lib/apiRequest";
 import { useRouter } from "next/router";
@@ -138,22 +137,16 @@ const AccountSettings = () => {
 
   if (loading) {
     return (
-      <div className="relative w-full h-screen flex">
-        {/* <Sidebar /> */}
-        <div className="min-h-screen bg-gradient-to-br pt-5 from-gray-50 to-green-50 overflow-auto w-full flex items-center justify-center">
-          <Loader2 className="w-8 h-8 animate-spin text-green-600" />
-        </div>
+      <div className="relative w-full min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-green-50 pt-5">
+        <Loader2 className="w-8 h-8 animate-spin text-green-600" />
       </div>
     );
   }
 
   if (!userData) {
     return (
-      <div className="relative w-full h-screen flex">
-        {/* <Sidebar /> */}
-        <div className="min-h-screen bg-gradient-to-br pt-5 from-gray-50 to-green-50 overflow-auto w-full flex items-center justify-center">
-          <p className="text-gray-600">Failed to load user data</p>
-        </div>
+      <div className="relative w-full min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-green-50 pt-5">
+        <p className="text-gray-600">Failed to load user data</p>
       </div>
     );
   }

@@ -1,7 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { Messages } from "../component/ui/Chat/Messages";
 import { Overlay } from "../component/overlay";
-// import { Sidebar } from "../component/ui/Sidebar";
 import { ModeSelectScreen } from "../component/ui/ModeSelectScreen";
 import { useChatSession } from "../context/ChatSessionContext";
 import { useSummary } from "../context/SummaryContext";
@@ -86,8 +85,6 @@ export const Chat = () => {
 
   return (
     <div className="relative w-full h-screen flex">
-      {/* サイドバー */}
-      {/* <Sidebar /> */}
       {!chatMode ? (
         <ModeSelectScreen
           setHistory={setHistory}

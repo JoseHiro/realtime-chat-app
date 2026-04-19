@@ -2,6 +2,7 @@ import React from "react";
 import { Loader2 } from "lucide-react";
 import { DashboardLayout } from "./DashboardLayout";
 import { DashboardContent } from "./index";
+import { SakuraFall } from "../../SakuraFall";
 
 interface DashboardProps {
   username: string;
@@ -30,6 +31,7 @@ export const Dashboard = ({
 
   return (
     <DashboardLayout>
+      <SakuraFall />
       <DashboardContent username={displayUsername} chatsData={chatsData} />
     </DashboardLayout>
   );

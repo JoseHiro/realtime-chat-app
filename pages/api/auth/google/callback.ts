@@ -191,7 +191,7 @@ export default async function handler(
       }
 
       res.setHeader("Set-Cookie", [buildAccessTokenCookie(user.id), ...appendCookies]);
-      return res.redirect(302, `${baseUrl}/new_chat`);
+      return res.redirect(302, `${baseUrl}/dashboard`);
     }
 
     // Signup flow (plan required)
@@ -219,7 +219,7 @@ export default async function handler(
       if (plan === "pro") {
         return res.redirect(302, `${baseUrl}/oauth-after-google?plan=pro`);
       }
-      return res.redirect(302, `${baseUrl}/new_chat`);
+      return res.redirect(302, `${baseUrl}/dashboard`);
     }
 
     const byEmail = await prisma.user.findUnique({ where: { email } });
@@ -239,7 +239,7 @@ export default async function handler(
       if (plan === "pro") {
         return res.redirect(302, `${baseUrl}/oauth-after-google?plan=pro`);
       }
-      return res.redirect(302, `${baseUrl}/new_chat`);
+      return res.redirect(302, `${baseUrl}/dashboard`);
     }
 
     user = await prisma.user.create({
@@ -261,7 +261,7 @@ export default async function handler(
     if (plan === "pro") {
       return res.redirect(302, `${baseUrl}/oauth-after-google?plan=pro`);
     }
-    return res.redirect(302, `${baseUrl}/new_chat`);
+    return res.redirect(302, `${baseUrl}/dashboard`);
   } catch (e) {
     console.error("Google callback DB error:", e);
     res.setHeader("Set-Cookie", appendCookies);

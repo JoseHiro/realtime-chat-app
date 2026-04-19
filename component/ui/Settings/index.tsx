@@ -9,7 +9,6 @@ import {
   CreditCard,
   Loader2,
 } from "lucide-react";
-import { Sidebar } from "../Sidebar";
 import { RoundedButton } from "../../shared/button";
 import { apiRequest } from "../../../lib/apiRequest";
 import { useRouter } from "next/router";
@@ -87,11 +86,8 @@ export const SettingsContent = () => {
 
   if (loading) {
     return (
-      <div className="relative w-full h-screen flex">
-        <Sidebar />
-        <div className="min-h-screen bg-gray-50 pt-5 overflow-auto w-full flex items-center justify-center">
-          <Loader2 className="w-8 h-8 animate-spin text-green-600" />
-        </div>
+      <div className="relative w-full min-h-screen flex items-center justify-center bg-gray-50">
+        <Loader2 className="w-8 h-8 animate-spin text-green-600" />
       </div>
     );
   }
