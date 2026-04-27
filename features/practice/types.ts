@@ -2,6 +2,8 @@
 
 export type MasteryState = "new" | "learning" | "familiar" | "strong" | "mastered";
 
+export type Difficulty = "easy" | "medium" | "hard";
+
 export type Direction = "jp-to-en" | "en-to-jp";
 
 export type VocabWord = {

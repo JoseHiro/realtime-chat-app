@@ -1,6 +1,6 @@
 import React, { createContext, useCallback, useContext, useRef, useState } from "react";
-
-export type CharacterName = "Sakura" | "Ken" | "Chica" | "Haruki" | "Aiko" | "Ryo";
+import type { CharacterName } from "../lib/voice/voiceMapping";
+export type { CharacterName };
 
 export interface ChatSessionContextType {
   selectedLevel: string;

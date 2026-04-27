@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { ProgressBar } from "./ProgressBar";
 import type { SessionQuestion, SupportingWord } from "../../features/practice/types";
 import type { QuestionResult, InputMode } from "../../hooks/practice/usePractice";
@@ -26,7 +26,6 @@ interface PracticingPhaseProps {
   isEnToJp: boolean;
   isLastQuestion: boolean;
   onNext: () => void;
-  handleJudge: (ans: string) => void;
   handleTextSubmit: (e: React.SyntheticEvent) => void;
   handleRecordStart: () => void;
   handleRecordEnd: () => void;
@@ -39,22 +38,33 @@ export function PracticingPhase({
   showHint, setShowHint, showSentence, setShowSentence, activeHintWord, setActiveHintWord,
   onShowSessionInfo, isEnToJp, isLastQuestion,
   onNext,
-  handleJudge, handleTextSubmit, handleRecordStart, handleRecordEnd,
+  handleTextSubmit, handleRecordStart, handleRecordEnd,
 }: PracticingPhaseProps) {
   const currentQ = currentQuestion;
   const currentAudio = audioUrls.get(currentQ.id) ?? null;
   const promptText = isEnToJp ? currentQ.translation : currentQ.sentence;
 
+  const handleRecordStartRef = useRef(handleRecordStart);
+  handleRecordStartRef.current = handleRecordStart;
+  const handleRecordEndRef = useRef(handleRecordEnd);
+  handleRecordEndRef.current = handleRecordEnd;
+  const isRecordingRef = useRef(isRecording);
+  isRecordingRef.current = isRecording;
+
   useEffect(() => {
     if (inputMode !== "voice" || currentJudge) return;
+    let holding = false;
     function onKeyDown(e: KeyboardEvent) {
-      if (e.key !== "Enter" || e.repeat) return;
+      if (e.key !== " " || e.repeat || e.isComposing) return;
+      const t = e.target as Element | null;
+      if (t?.tagName === "INPUT" || t?.tagName === "TEXTAREA" || t?.tagName === "SELECT") return;
       e.preventDefault();
-      handleRecordStart();
+      if (!holding) { holding = true; handleRecordStartRef.current(); }
     }
     function onKeyUp(e: KeyboardEvent) {
-      if (e.key !== "Enter") return;
-      handleRecordEnd();
+      if (e.key !== " " || !holding) return;
+      holding = false;
+      handleRecordEndRef.current();
     }
     document.addEventListener("keydown", onKeyDown);
     document.addEventListener("keyup", onKeyUp);
@@ -112,7 +122,7 @@ export function PracticingPhase({
       <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm p-5">
         {currentAudio ? (
           <div className="mb-4">
-            <audio controls src={currentAudio} className="w-full h-8" />
+            <audio controls controlsList="nodownload" tabIndex={-1} src={currentAudio} className="w-full h-8" />
           </div>
         ) : (
           <div className="flex items-center gap-3 h-10 mb-4">
@@ -181,22 +191,13 @@ export function PracticingPhase({
                 </button>
               )}
             </div>
-            {activeHintWord && (
-              <div className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-violet-50 dark:bg-violet-900/30 border border-violet-200 dark:border-violet-700">
-                <span className="text-xs text-violet-500">💡</span>
-                <span className="text-sm font-medium text-violet-700 dark:text-violet-300">{activeHintWord.word}</span>
-                <span className="text-xs text-violet-500 dark:text-violet-400">{activeHintWord.reading}</span>
-                <span className="text-xs text-violet-400">—</span>
-                <span className="text-sm text-violet-600 dark:text-violet-300">{activeHintWord.meaning}</span>
-              </div>
-            )}
             {!isEnToJp &&
               (showHint ? (
-                <div className="flex items-center gap-2 mt-1">
+                <div className="flex flex-col gap-1 mt-1">
                   <p className="text-sm text-gray-400 dark:text-gray-500 leading-relaxed">{currentQ.furigana}</p>
                   <button
                     onClick={() => setShowHint(false)}
-                    className="text-xs text-gray-300 dark:text-gray-600 hover:text-gray-500 dark:hover:text-gray-400 transition-colors shrink-0"
+                    className="text-xs text-gray-300 dark:text-gray-600 hover:text-gray-500 dark:hover:text-gray-400 transition-colors self-start"
                   >
                     Hide reading
                   </button>
@@ -209,6 +210,17 @@ export function PracticingPhase({
                   Show reading
                 </button>
               ))}
+            {activeHintWord && (
+              <div className="mt-2">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-violet-50 dark:bg-violet-900/30 border border-violet-200 dark:border-violet-700">
+                  <span className="text-xs text-violet-500">💡</span>
+                  <span className="text-sm font-medium text-violet-700 dark:text-violet-300">{activeHintWord.word}</span>
+                  <span className="text-xs text-violet-500 dark:text-violet-400">{activeHintWord.reading}</span>
+                  <span className="text-xs text-violet-400">—</span>
+                  <span className="text-sm text-violet-600 dark:text-violet-300">{activeHintWord.meaning}</span>
+                </div>
+              </div>
+            )}
           </div>
         ) : (
           <button
@@ -288,7 +300,7 @@ export function PracticingPhase({
                     Listening…
                   </span>
                 ) : (
-                  "Hold to speak (or press Enter)"
+                  "Hold to speak, or hold Space"
                 )}
               </p>
               <button

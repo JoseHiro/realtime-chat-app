@@ -12,6 +12,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   const isEnToJp = direction === "en-to-jp";
+
+  // jp-to-en: reject answers containing Japanese characters
+  if (!isEnToJp && /[぀-ゟ゠-ヿ一-鿿]/.test(userAnswer)) {
+    return res.status(200).json({
+      correct: false,
+      feedback: "Please answer in English.",
+      correctTranslation: expectedTranslation ?? "",
+    });
+  }
+
+  // en-to-jp: reject answers that contain no Japanese characters
+  if (isEnToJp && !/[぀-ゟ゠-ヿ一-鿿]/.test(userAnswer)) {
+    return res.status(200).json({
+      correct: false,
+      feedback: "Please answer in Japanese.",
+      correctTranslation: sentence ?? "",
+    });
+  }
+
   let systemPrompt: string;
   let userContent: string;
 

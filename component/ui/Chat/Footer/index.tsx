@@ -11,6 +11,8 @@ interface ChatFooterProps {
   hiraganaReading: boolean;
   setHiraganaReading: (enabled: boolean) => void;
   sendTextMessage?: (message: string) => void;
+  micLevel?: number;
+  isReconnecting?: boolean;
 }
 
 export const ChatFooter = ({
@@ -21,6 +23,8 @@ export const ChatFooter = ({
   hiraganaReading,
   setHiraganaReading,
   sendTextMessage,
+  micLevel,
+  isReconnecting,
 }: ChatFooterProps) => {
   const [settingsOpen, setSettingOpen] = useState(false);
 
@@ -35,7 +39,7 @@ export const ChatFooter = ({
           {textInputMode ? (
             <InputArea sendTextMessage={sendTextMessage} />
           ) : (
-            <VoiceStatus />
+            <VoiceStatus micLevel={micLevel} isReconnecting={isReconnecting} />
           )}
         </div>
       </div>

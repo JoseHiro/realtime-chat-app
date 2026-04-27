@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import type { MasteryState, WordProgressSummary } from "../../features/practice/types";
+import type { MasteryState, WordProgressSummary, Difficulty } from "../../features/practice/types";
 
 export type Direction = "jp-to-en" | "en-to-jp";
 export type VocabWord = { id: string; jp: string; en: string };
@@ -30,6 +30,7 @@ function groupBy<T>(arr: T[], key: (item: T) => string): Record<string, T[]> {
 
 export function useSetupData() {
   const [direction, setDirection] = useState<Direction>("jp-to-en");
+  const [difficulty, setDifficulty] = useState<Difficulty>("medium");
   const [allVocab, setAllVocab] = useState<VocabWord[]>([]);
   const [selectedVocabIds, setSelectedVocabIds] = useState<Set<string>>(new Set());
   const [vocabLoading, setVocabLoading] = useState(true);
@@ -72,6 +73,12 @@ export function useSetupData() {
       .catch(() => {})
       .finally(() => setProgressLoading(false));
   }, []);
+
+  // Auto-select the single deck when decks finish loading
+  useEffect(() => {
+    if (decksLoading || decks.length === 0) return;
+    setSelectedDeckId(decks[0].id);
+  }, [decksLoading, decks]);
 
   useEffect(() => {
     if (!selectedDeckId || !allVocab.length) return;
@@ -148,6 +155,7 @@ export function useSetupData() {
 
   return {
     direction, setDirection,
+    difficulty, setDifficulty,
     allVocab, selectedVocabIds, vocabLoading,
     decks, decksLoading, selectedDeckId, setSelectedDeckId,
     allGrammar, selectedGrammarIds, grammarLoading,

@@ -3,13 +3,7 @@
  */
 
 export type VoiceGender = "male" | "female";
-export type CharacterName =
-  | "Sakura"
-  | "Ken"
-  | "Chica"
-  | "Haruki"
-  | "Aiko"
-  | "Ryo";
+export type CharacterName = "Sakura" | "Ken" | "Haruki";
 
 interface VoiceConfig {
   characterName: CharacterName;
@@ -28,8 +22,8 @@ const VOICE_MAP: Record<CharacterName, VoiceConfig> = {
     characterName: "Sakura",
     azureVoiceName: "ja-JP-NanamiNeural",
     azureVoiceGender: "Female",
-    voiceProvider: "realtime", // Using Realtime API now
-    realtimeVoice: "shimmer", // Soft, warm voice matching her friendly nature
+    voiceProvider: "realtime",
+    realtimeVoice: "Aoede",
     description: "Natural, warm, and friendly",
     gender: "female",
   },
@@ -37,54 +31,20 @@ const VOICE_MAP: Record<CharacterName, VoiceConfig> = {
     characterName: "Ken",
     azureVoiceName: "ja-JP-KeitaNeural",
     azureVoiceGender: "Male",
-    voiceProvider: "realtime", // Using Realtime API now
-    realtimeVoice: "echo", // Clear, professional voice matching his confident style
+    voiceProvider: "realtime",
+    realtimeVoice: "Fenrir",
     description: "Clear, confident, and professional",
     gender: "male",
   },
-  Chica: {
-    characterName: "Chica",
-    azureVoiceName: "ja-JP-NanamiNeural", // Fallback, but uses ElevenLabs
-    azureVoiceGender: "Female",
-    voiceProvider: "realtime", // Using Realtime API now
-    realtimeVoice: "coral", // Bright, energetic voice matching her cheerful personality
-    elevenLabsVoiceId: "JTlYtJrcTzPC71hMLOxo", // Keep for reference
-    description: "Energetic and cheerful with premium sound",
-    gender: "female",
-    imageUrl: "/img/chica.jpg",
-  },
   Haruki: {
     characterName: "Haruki",
-    azureVoiceName: "ja-JP-KeitaNeural", // Fallback, but uses ElevenLabs
+    azureVoiceName: "ja-JP-KeitaNeural",
     azureVoiceGender: "Male",
-    voiceProvider: "realtime", // Using Realtime API now
-    realtimeVoice: "sage", // Calm, thoughtful voice matching his warm style
-    elevenLabsVoiceId: "hBWDuZMNs32sP5dKzMuc", // Keep for reference
-    description: "Warm and expressive with premium sound",
+    voiceProvider: "realtime",
+    realtimeVoice: "Charon",
+    description: "Warm and expressive",
     gender: "male",
     imageUrl: "/img/haruki.jpg",
-  },
-  Aiko: {
-    characterName: "Aiko",
-    azureVoiceName: "ja-JP-AoiNeural", // Different Azure fallback voice to distinguish from Sakura
-    azureVoiceGender: "Female",
-    voiceProvider: "realtime", // Using Realtime API now
-    realtimeVoice: "verse", // Expressive, dynamic voice matching her gentle nature
-    elevenLabsVoiceId: "WQz3clzUdMqvBf0jswZQ", // Keep for reference
-    description: "Gentle and soothing with premium sound",
-    gender: "female",
-    imageUrl: "/img/Aiko.jpg",
-  },
-  Ryo: {
-    characterName: "Ryo",
-    azureVoiceName: "ja-JP-KeitaNeural", // Fallback, but uses ElevenLabs
-    azureVoiceGender: "Male",
-    voiceProvider: "realtime", // Using Realtime API now
-    realtimeVoice: "ash", // Deep, resonant voice matching his dynamic style
-    elevenLabsVoiceId: "8QgNyYugQ07X0LFdMABE", // Keep for reference
-    description: "Dynamic and engaging with premium sound",
-    gender: "male",
-    imageUrl: "/img/Ryo.jpg",
   },
 };
 
@@ -151,7 +111,7 @@ export function getVoiceProvider(
  */
 export function getRealtimeVoice(characterName: CharacterName): string {
   const config = VOICE_MAP[characterName];
-  return config?.realtimeVoice || "alloy"; // Default to alloy if not specified
+  return config?.realtimeVoice || "Aoede";
 }
 
 /**

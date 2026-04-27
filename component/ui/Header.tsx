@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { LayoutDashboard, MessageCircle, Dumbbell, Library, History, Settings, LogOut, Sun, Moon } from "lucide-react";
+import { LayoutDashboard, MessageCircle, Dumbbell, Settings, LogOut, Sun, Moon } from "lucide-react";
 import { useUser } from "../../context/UserContext";
 import { useTheme } from "../../context/ThemeContext";
 import { apiRequest } from "../../lib/apiRequest";
@@ -18,10 +18,8 @@ type NavLink = {
 
 const NAV_LINKS: NavLink[] = [
   { href: "/dashboard",  label: "Dashboard",  Icon: LayoutDashboard },
-  { href: "/chat",   label: "Chat",       Icon: MessageCircle },
-  { href: "/chats",  label: "History",    Icon: History },
+  { href: "/chat",       label: "Chat",       Icon: MessageCircle },
   { href: "/flashcards", label: "Flashcards", Icon: Dumbbell },
-  { href: "/vocabulary", label: "Vocabulary", Icon: Library },
 ];
 
 // Pages where the header should not be shown

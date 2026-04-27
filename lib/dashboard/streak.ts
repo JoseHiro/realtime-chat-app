@@ -35,6 +35,29 @@ export function computeStreak(active: Set<string>, now = new Date()): number {
   return count;
 }
 
+/**
+ * Calendar keys (YYYY-MM-DD) that belong to the current streak from `now`
+ * backward, using the same anchor rule as {@link computeStreak}.
+ * Empty when there is no ongoing streak.
+ */
+export function buildCurrentStreakDayKeys(
+  active: Set<string>,
+  now = new Date(),
+): Set<string> {
+  const keys = new Set<string>();
+  const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const d = new Date(start);
+  if (!active.has(formatLocalDateKey(d))) {
+    d.setDate(d.getDate() - 1);
+    if (!active.has(formatLocalDateKey(d))) return keys;
+  }
+  while (active.has(formatLocalDateKey(d))) {
+    keys.add(formatLocalDateKey(d));
+    d.setDate(d.getDate() - 1);
+  }
+  return keys;
+}
+
 export type DayCell = {
   date: Date;
   weekdayShort: string;

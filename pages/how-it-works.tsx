@@ -29,11 +29,11 @@ const HowItWorks = () => {
       number: 1,
       title: "Sign Up & Get Started",
       description:
-        "Create your free account and start with 2 free conversation sessions to try out all features.",
+        "Create your free account and start with 3 free conversation sessions to try out all features.",
       icon: UserPlus,
       details: [
         "Quick signup with email",
-        "2 free trial conversations",
+        "3 free trial conversations",
         "No credit card required",
         "Access to all difficulty levels",
       ],
@@ -247,7 +247,7 @@ const HowItWorks = () => {
               Free Trial Limitations
             </h2>
             <p className="text-base text-gray-600 mb-6">
-              The free trial includes 2 conversation sessions with access to
+              The free trial includes 3 conversation sessions with access to
               core features. Some features are available only with a Pro
               subscription:
             </p>
@@ -256,9 +256,9 @@ const HowItWorks = () => {
                 <div className="w-1.5 h-1.5 bg-gray-900 rounded-full mt-2 flex-shrink-0" />
                 <span className="text-base text-gray-600">
                   <strong className="text-gray-900">
-                    Limited to 2 conversations
+                    Limited to 3 conversations
                   </strong>{" "}
-                  - Free trial allows 2 complete conversation sessions
+                  - Free trial allows 3 complete conversation sessions
                 </span>
               </li>
               <li className="flex items-start gap-3">

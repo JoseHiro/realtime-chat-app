@@ -36,6 +36,9 @@ model User {
   // Credit system fields
   creditsRemaining  Int       @default(0)
   lastCreditResetAt DateTime?
+
+  practiceWords     PracticeWord[]
+  practiceWordDecks PracticeWordDeck[]
 }
 
 model Chat {
@@ -237,6 +240,60 @@ model Vocabulary {
 // --------------------------------------
 // 中間テーブル
 // --------------------------------------
+
+model Grammar {
+  id          String   @id @default(cuid())
+  pattern     String
+  meaning     String
+  example     String?
+  translation String?
+  jlptLevel   String?
+  source      String?
+  createdAt   DateTime @default(now())
+}
+
+model PracticeWord {
+  id        String   @id @default(cuid())
+  jp        String
+  en        String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model PracticeWordDeck {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  wordIds   Json
+  createdAt DateTime @default(now())
+}
+
+model PracticeWordProgress {
+  id                  String    @id @default(cuid())
+  userId              String
+  wordId              String
+  lifetimeAttempts    Int       @default(0)
+  lifetimeCorrect     Int       @default(0)
+  recentSessionScores Json      @default("[]")
+  lastSessionScore    Float?
+  lastSeen            DateTime?
+  createdAt           DateTime  @default(now())
+
+  @@unique([userId, wordId])
+}
+
+model PracticeLog {
+  id        String   @id @default(cuid())
+  userId    String
+  correct   Boolean
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
 
 model TaskVocabulary {
   taskId       String

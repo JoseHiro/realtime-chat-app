@@ -26,21 +26,14 @@ export const VoiceSelection = ({
 
     // Fallback to default images based on character name
     if (characterName === "Sakura") return "/img/female.jpg";
-    if (characterName === "Ken") return "/img/man.jpg";
-    // For new characters, use placeholder or default image
-    return characterName.includes("Chica") || characterName.includes("Aiko")
-      ? "/img/female.jpg"
-      : "/img/man.jpg";
+    return "/img/man.jpg";
   };
 
   const getCharacterColorClass = (characterName: CharacterName) => {
     const colorMap: Record<CharacterName, string> = {
       Sakura: "bg-pink-500",
       Ken: "bg-blue-500",
-      Chica: "bg-purple-500",
       Haruki: "bg-indigo-500",
-      Aiko: "bg-rose-500",
-      Ryo: "bg-cyan-500",
     };
     return colorMap[characterName] || "bg-gray-500";
   };

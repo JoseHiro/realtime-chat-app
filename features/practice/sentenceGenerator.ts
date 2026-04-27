@@ -1,5 +1,5 @@
 import OpenAI from "openai";
-import type { VocabWord, GrammarPattern, SupportingWord } from "./types";
+import type { VocabWord, GrammarPattern, SupportingWord, Difficulty } from "./types";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 
@@ -30,10 +30,31 @@ function pick<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
+const DIFFICULTY_RULES: Record<Difficulty, string[]> = {
+  easy: [
+    "- 短い文（5〜8語程度）にすること。",
+    "- JLPT N5レベルの基本的な語彙のみ使うこと。",
+    "- 「〜です」「〜ます」などシンプルな文末表現のみ使うこと。",
+    "- 複雑な文構造（複文・従属節）は避けること。",
+  ],
+  medium: [
+    "- 中程度の長さの文（8〜14語程度）にすること。",
+    "- JLPT N4〜N3レベルの語彙を使ってよい。",
+    "- 複文や接続表現（〜から・〜ので・〜て）を適度に使ってよい。",
+  ],
+  hard: [
+    "- やや長い・複雑な文（15語以上を目安）にすること。",
+    "- JLPT N2〜N1レベルの難易度の高い語彙・表現を積極的に使うこと。",
+    "- 複雑な文構造（複文・条件節・引用節など）を使うこと。",
+    "- 丁寧語・敬語・書き言葉的表現など、文体的バリエーションを持たせること。",
+  ],
+};
+
 export async function generateSentence(
   word: VocabWord,
   grammar: GrammarPattern | null,
   knownWords: VocabWord[] = [],
+  difficulty: Difficulty = "medium",
 ): Promise<GeneratedSentence> {
   const scenario = pick(SCENARIOS);
   const subject = pick(SUBJECTS);
@@ -41,13 +62,12 @@ export async function generateSentence(
   const systemPrompt = [
     "あなたは日本語教師です。学習者のために、バリエーション豊かな練習文を一文作成してください。",
     "ルール：",
-    "- 初級〜中級レベルの自然な日本語にすること。",
     "- 指定された単語を必ず文中に使うこと。",
     "- シナリオと主語は参考にするが、不自然な日本語になる場合は調整してよい。",
     "- 文法的に自然な文にすること。例えば「私は〜ましょう」のように主語と文末表現が合わない組み合わせは避けること。",
     "- ましょう・てください・ませんかなど、勧誘・依頼・提案の表現を使う場合は、主語を省略するか複数形にすること。",
     "- 最もよく使われる典型的な文は避け、文脈に合った自然な使い方をすること。",
-    "- 指定単語以外に使う語彙は、「既知単語リスト」に含まれる単語か、JLPT N5レベルの極めて基本的な単語のみに限定すること。",
+    ...DIFFICULTY_RULES[difficulty],
     grammar
       ? `- 文法パターン「${grammar.pattern}（${grammar.meaning}）」を文中で明確に使うこと。`
       : "",

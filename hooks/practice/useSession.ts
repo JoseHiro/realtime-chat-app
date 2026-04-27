@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import type { SessionQuestion } from "../../features/practice/types";
+import type { SessionQuestion, Difficulty } from "../../features/practice/types";
 
 export type Phase = "setup" | "loading" | "practicing" | "finished";
 export type LoadingStep = "questions" | "audio";
@@ -9,6 +9,7 @@ interface StartArgs {
   direction: Direction;
   selectedVocabIds: Set<string>;
   selectedGrammarIds: Set<string>;
+  difficulty: Difficulty;
 }
 
 export function useSession() {
@@ -38,7 +39,7 @@ export function useSession() {
     setError("");
   }
 
-  async function startSession({ direction, selectedVocabIds, selectedGrammarIds }: StartArgs): Promise<SessionQuestion[] | null> {
+  async function startSession({ direction, selectedVocabIds, selectedGrammarIds, difficulty }: StartArgs): Promise<SessionQuestion[] | null> {
     if (selectedVocabIds.size === 0) {
       setError("Select at least one vocabulary word.");
       return null;
@@ -56,6 +57,7 @@ export function useSession() {
         wordIds: Array.from(selectedVocabIds),
         grammarIds: Array.from(selectedGrammarIds),
         direction,
+        difficulty,
       }),
     });
 

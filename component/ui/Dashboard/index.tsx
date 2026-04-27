@@ -8,17 +8,21 @@ import {
   Clock,
   ArrowRight,
   Plus,
+  Zap,
 } from "lucide-react";
 import { StreakCalendar } from "./StreakCalendar";
 
 type ExtendedChatDataType = ChatDataType & {
   time?: number;
   analysis?: any;
+  characterName?: string;
+  title?: string;
 };
 
 interface DashboardContentProps {
   username: string;
   chatsData?: { chats?: ExtendedChatDataType[] };
+  practiceActivity?: { createdAt: string }[];
 }
 
 interface FeatureCardProps {
@@ -49,6 +53,7 @@ const FeatureCard = ({ icon, title, description, href }: FeatureCardProps) => (
 export const DashboardContent = ({
   username,
   chatsData,
+  practiceActivity,
 }: DashboardContentProps) => {
   const stats = useMemo(() => {
     if (!chatsData?.chats) return { totalChats: 0, chatsThisWeek: 0 };
@@ -95,17 +100,30 @@ export const DashboardContent = ({
       </div>
 
       <div className="mb-8">
-        <StreakCalendar chats={chatsData?.chats} />
+        <StreakCalendar activities={practiceActivity} />
       </div>
 
+      {/* Quick actions */}
       <div className="mb-8">
-        <Link
-          href="/vocabulary?add=1"
-          className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 dark:border-gray-700 px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 hover:border-gray-400 dark:hover:border-gray-500 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
-        >
-          <Plus className="w-3.5 h-3.5" />
-          Add word
-        </Link>
+        <p className="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">
+          Quick actions
+        </p>
+        <div className="flex gap-2">
+          <Link
+            href="/chat"
+            className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-sm font-medium hover:bg-gray-700 dark:hover:bg-gray-300 transition-colors"
+          >
+            <Zap className="w-4 h-4" />
+            Start conversation
+          </Link>
+          <Link
+            href="/flashcards?tab=vocabulary&add=1"
+            className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-sm font-medium hover:border-gray-400 dark:hover:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            Add word
+          </Link>
+        </div>
       </div>
 
       {/* Main features */}
@@ -128,6 +146,40 @@ export const DashboardContent = ({
           />
         </div>
       </div>
+
+      {/* Recent chats */}
+      {chatsData?.chats && chatsData.chats.length > 0 && (
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+              Recent chats
+            </p>
+            <Link href="/chats" className="text-xs text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
+              See all
+            </Link>
+          </div>
+          <div className="rounded-xl border border-gray-100 dark:border-gray-800 divide-y divide-gray-100 dark:divide-gray-800">
+            {chatsData.chats.slice(0, 3).map((chat) => (
+              <Link
+                key={chat.id}
+                href={`/chats/${chat.id}`}
+                className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors group"
+              >
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm text-gray-800 dark:text-gray-200 truncate">
+                    {chat.title || chat.theme || "Untitled chat"}
+                  </p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+                    {new Date(chat.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                    {chat.characterName && <span className="ml-2">· {chat.characterName}</span>}
+                  </p>
+                </div>
+                <ArrowRight className="w-3.5 h-3.5 text-gray-300 dark:text-gray-600 group-hover:text-gray-500 dark:group-hover:text-gray-400 ml-3 shrink-0 transition-colors" />
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Divider */}
       <div className="border-t border-gray-100 dark:border-gray-800 mb-8" />
