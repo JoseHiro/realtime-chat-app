@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { RoundedButton } from "../component/shared/button";
 import { LandingHeader } from "../component/ui/LandingPage/LandingHeader";
@@ -83,6 +83,12 @@ const faqs: FAQType[] = [
 
 const Pricing = () => {
   const router = useRouter();
+  const [cardsVisible, setCardsVisible] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setCardsVisible(true), 100);
+    return () => clearTimeout(t);
+  }, []);
 
   const FAQItem = ({ faq }: { faq: FAQType }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -164,15 +170,16 @@ const Pricing = () => {
           <div className="grid lg:grid-cols-3 gap-6 items-stretch">
 
             {/* Free Trial */}
-            <div className="flex flex-col rounded-2xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
-              <div className="bg-gray-50 px-7 pt-8 pb-6 border-b border-gray-200">
+            <div
+              style={{ transitionDelay: "0ms" }}
+              className={`flex flex-col rounded-2xl border border-gray-200 bg-white shadow-md hover:shadow-lg overflow-hidden transition-all duration-700 ease-out ${cardsVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
+            >
+              <div className="flex flex-col flex-1 px-7 pt-8 pb-6">
                 <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">Free Trial</p>
                 <div className="flex items-baseline gap-1 mb-1">
                   <span className="text-4xl font-bold text-gray-900">$0</span>
                 </div>
-                <p className="text-sm text-gray-500">No credit card required</p>
-              </div>
-              <div className="flex flex-col flex-1 px-7 py-6">
+                <p className="text-sm text-gray-500 mb-5">No credit card required</p>
                 <p className="text-gray-500 text-sm mb-5">
                   Get a feel for real AI Japanese conversation with 3 complete sessions.
                 </p>
@@ -194,19 +201,20 @@ const Pricing = () => {
             </div>
 
             {/* Pro — highlighted */}
-            <div className="flex flex-col rounded-2xl overflow-hidden shadow-xl ring-2 ring-green-500 relative">
-              <div className="bg-gradient-to-br from-green-700 to-green-500 px-7 pt-8 pb-6 relative">
-                <span className="absolute top-4 right-4 bg-white/20 backdrop-blur-sm text-white text-xs font-semibold px-3 py-1 rounded-full">
+            <div
+              style={{ transitionDelay: "150ms" }}
+              className={`flex flex-col rounded-2xl border-2 border-green-500 bg-white shadow-lg hover:shadow-xl overflow-hidden relative transition-all duration-700 ease-out ${cardsVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
+            >
+              <div className="flex flex-col flex-1 px-7 pt-8 pb-6 relative">
+                <span className="absolute top-5 right-5 bg-green-50 text-green-600 text-xs font-semibold px-3 py-1 rounded-full">
                   Most Popular
                 </span>
-                <p className="text-xs font-semibold uppercase tracking-widest text-green-200 mb-3">Pro</p>
+                <p className="text-xs font-semibold uppercase tracking-widest text-green-500 mb-3">Pro</p>
                 <div className="flex items-baseline gap-1 mb-1">
-                  <span className="text-4xl font-bold text-white">$15</span>
-                  <span className="text-green-200 text-sm">/month</span>
+                  <span className="text-4xl font-bold text-gray-900">$15</span>
+                  <span className="text-gray-400 text-sm">/month</span>
                 </div>
-                <p className="text-sm text-green-100">Cancel anytime</p>
-              </div>
-              <div className="flex flex-col flex-1 px-7 py-6 bg-white">
+                <p className="text-sm text-gray-500 mb-5">Cancel anytime</p>
                 <p className="text-gray-500 text-sm mb-4">
                   Everything in Free Trial, plus:
                 </p>
@@ -228,37 +236,25 @@ const Pricing = () => {
             </div>
 
             {/* Premium — Coming Soon */}
-            <div className="flex flex-col rounded-2xl overflow-hidden border border-gray-200 shadow-sm opacity-80">
-              <div className="bg-gradient-to-br from-gray-800 to-gray-600 px-7 pt-8 pb-6 relative">
-                <span className="absolute top-4 right-4 bg-white/10 text-gray-300 text-xs font-semibold px-3 py-1 rounded-full border border-white/20">
+            <div
+              style={{ transitionDelay: "300ms" }}
+              className={`flex flex-col rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden transition-all duration-700 ease-out ${cardsVisible ? "opacity-60 translate-y-0" : "opacity-0 translate-y-10"}`}
+            >
+              <div className="flex flex-col flex-1 px-7 pt-8 pb-6 relative">
+                <span className="absolute top-5 right-5 bg-gray-100 text-gray-400 text-xs font-semibold px-3 py-1 rounded-full border border-gray-200">
                   Coming Soon
                 </span>
                 <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">Premium</p>
                 <div className="flex items-baseline gap-1 mb-1">
-                  <span className="text-4xl font-bold text-white">TBD</span>
+                  <span className="text-4xl font-bold text-gray-400">TBD</span>
                 </div>
-                <p className="text-sm text-gray-400">Advanced features</p>
-              </div>
-              <div className="flex flex-col flex-1 px-7 py-6 bg-white">
-                <p className="text-gray-400 text-sm mb-4">
-                  Everything in Pro, plus:
+                <p className="text-sm text-gray-400 mb-5">Advanced features</p>
+                <p className="text-gray-400 text-sm mb-6 leading-relaxed flex-1">
+                  We&apos;re still figuring out exactly what Premium will look like — but it&apos;ll go beyond Pro in ways we&apos;re excited to share soon.
                 </p>
-                <ul className="space-y-2.5 mb-8 flex-1">
-                  {[
-                    "Business Japanese scenarios",
-                    "Job interview preparation",
-                    "Realistic situation role plays",
-                    "Anki Deck flashcard export",
-                    "Pronunciation practice",
-                    "Advanced grammar explanations",
-                    "Multiple AI voices",
-                  ].map((feature, idx) => (
-                    <li key={idx} className="flex items-start text-sm text-gray-400">
-                      <CheckIcon dim />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
+                <p className="text-xs text-gray-300 italic mb-8">
+                  Stay tuned. Something&apos;s coming.
+                </p>
                 <button
                   disabled
                   className="w-full py-3 font-semibold rounded-xl border-2 border-gray-200 text-gray-400 cursor-not-allowed bg-gray-50"
@@ -318,22 +314,22 @@ const Pricing = () => {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-gradient-to-r from-green-600 to-green-400 text-white">
+      <section className="py-20 bg-gray-50 border-y border-gray-200">
         <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
-          <h2 className="text-4xl font-bold mb-6">Ready to Start Speaking Japanese?</h2>
-          <p className="text-xl mb-8 text-green-100">
+          <h2 className="text-4xl font-bold mb-6 text-gray-900">Ready to Start Speaking Japanese?</h2>
+          <p className="text-xl mb-8 text-gray-600">
             Try 3 conversations for free, then continue your journey for just $15/month.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <RoundedButton
               onClick={() => router.push("/signup?plan=trial")}
-              className="bg-white text-green-600 px-8 py-4 text-lg font-semibold hover:bg-gray-50 hover:scale-105 hover:shadow-xl shadow-lg transition-all duration-200"
+              className="bg-green-600 text-white px-8 py-4 text-lg font-semibold hover:bg-green-700 hover:scale-105 hover:shadow-xl shadow-lg transition-all duration-200"
             >
               Start Free Trial
             </RoundedButton>
             <RoundedButton
               onClick={() => router.push("/chat")}
-              className="border-2 border-white text-white hover:bg-white hover:text-green-600 px-8 py-4 text-lg font-semibold hover:scale-105 transition-all duration-200"
+              className="border-2 border-green-600 text-green-700 hover:bg-green-600 hover:text-white px-8 py-4 text-lg font-semibold hover:scale-105 transition-all duration-200"
             >
               Try Demo
             </RoundedButton>

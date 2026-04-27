@@ -47,7 +47,7 @@ export const LandingHeader = () => {
             </Link>
             <RoundedButton
               onClick={() => router.push("/login")}
-              variant="green"
+              variant="black"
             >
               Start Learning
             </RoundedButton>

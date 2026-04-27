@@ -1,17 +1,15 @@
 import React from "react";
 import Link from "next/link";
+import { AppName } from "../AppName";
 
 export const LandingFooter = () => {
   return (
-    <footer className="bg-gray-900 text-white py-16">
+    <footer className="bg-black text-white py-16">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="grid md:grid-cols-3 gap-8">
           <div className="md:col-span-2">
-            <div className="flex items-center space-x-2 mb-6">
-              <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-green-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">日</span>
-              </div>
-              <span className="text-xl font-bold">Kaiwa Kun</span>
+            <div className="mb-6">
+              <AppName />
             </div>
             <p className="text-gray-400 mb-6 max-w-md">
               The most natural way to learn Japanese through AI-powered

@@ -30,9 +30,9 @@ const HERO_CHAT_MESSAGES: ChatMessage[] = [
 const HERO_BADGE_LABEL = "AI-Powered Japanese Learning";
 
 const HERO_FEATURES = [
-  "3-5 min sessions",
-  "Speaking Skills Feedback",
-  "Custom themes",
+  "Dynamic flashcards",
+  "AI voice conversations",
+  "Conversation feedback",
 ] as const;
 
 const DECORATIVE_KANJI = [
@@ -103,23 +103,20 @@ export function HeroSection() {
           </div>
 
           <h1 className="text-5xl lg:text-6xl font-bold leading-tight mb-6">
-            Master{" "}
-            <span className="bg-gradient-to-r from-green-500 to-green-600 bg-clip-text text-transparent">
-              Japanese
-            </span>
+            No Japanese speaker around?
             <br />
-            Through Real
-            <br />
+            You&apos;re{" "}
             <span className="relative">
-              Conversations
+              <span className="bg-gradient-to-r from-green-500 to-green-600 bg-clip-text text-transparent">
+                not alone.
+              </span>
               <div className="absolute -bottom-2 left-0 w-full h-1 bg-gradient-to-r from-green-400 to-green-600 rounded-full" />
             </span>
           </h1>
 
           <p className="text-md text-gray-400 mb-8 leading-relaxed">
-            Practice Japanese naturally with AI-powered conversations. Get instant grammar
-            feedback, choose your difficulty level, and improve your skills in just 3-5 minutes a
-            day.
+            Learn vocabulary through dynamic flashcards that generate real sentences.
+            Real conversations with an AI — talk, get feedback, get better.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 mb-12 md:mb-16 justify-center lg:justify-start">
