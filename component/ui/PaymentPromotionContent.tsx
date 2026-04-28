@@ -13,7 +13,7 @@ export const PaymentPromotionContent = ({
     {
       title: "Trial Limit Reached",
       messageFirst: "You've used all ",
-      messageSecond: "2 free conversations",
+      messageSecond: "3 free conversations",
     },
     {
       title: "Subscription Inactive",

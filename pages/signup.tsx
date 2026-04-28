@@ -87,9 +87,9 @@ const Signup = () => {
     trial: {
       name: "Free Trial",
       price: "Free",
-      description: "2 free conversations",
+      description: "3 free conversations",
       features: [
-        "2 conversation sessions",
+        "3 conversation sessions",
         "Grammar feedback",
         "Conversation skill feedback",
         "All difficulty levels",

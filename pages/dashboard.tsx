@@ -25,11 +25,21 @@ const Dashboard = () => {
     },
   });
 
+  const { data: activityData } = useQuery({
+    queryKey: ["practiceActivity"],
+    queryFn: async () => {
+      const data = await apiRequest("/api/practice/activity");
+      if (!data) throw new Error("Failed to fetch activity");
+      return data as { dates: { createdAt: string }[] };
+    },
+  });
+
   return (
     <DashboardComponent
       username={username || ""}
       userData={userData}
       chatsData={chatsData}
+      practiceActivity={activityData?.dates}
       isLoading={userLoading || chatsLoading}
     />
   );

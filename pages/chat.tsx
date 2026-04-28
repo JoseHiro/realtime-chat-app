@@ -60,7 +60,7 @@ export const Chat = () => {
     setHiraganaReadingList([]);
   }, [setSummary]);
 
-  const { handleBeginConversation, sendTextMessage, stopConversation, loading, streamingMessage } =
+  const { handleBeginConversation, sendTextMessage, stopConversation, loading, streamingMessage, micLevel, isReconnecting } =
     useBeginConversation({
       needPayment,
       plan,
@@ -123,6 +123,8 @@ export const Chat = () => {
             hiraganaReading={hiraganaReading}
             setHiraganaReading={setHiraganaReading}
             sendTextMessage={sendTextMessage}
+            micLevel={micLevel}
+            isReconnecting={isReconnecting}
           />
         </div>
       )}

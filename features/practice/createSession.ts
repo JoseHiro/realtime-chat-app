@@ -3,13 +3,14 @@ import { getUserVocabulary } from "./vocabularyService";
 import { getGrammarPatterns } from "./grammarService";
 import { buildQuestionSlots } from "./generateQuestions";
 import { generateSentence } from "./sentenceGenerator";
-import type { Direction, SessionQuestion, SessionResponse } from "./types";
+import type { Direction, Difficulty, SessionQuestion, SessionResponse } from "./types";
 
 type CreateSessionParams = {
   userId: string;
   wordIds: string[];
   grammarIds: string[];
   direction: Direction;
+  difficulty: Difficulty;
 };
 
 export async function createSession({
@@ -17,6 +18,7 @@ export async function createSession({
   wordIds,
   grammarIds,
   direction,
+  difficulty,
 }: CreateSessionParams): Promise<SessionResponse> {
   const [words, grammarPatterns] = await Promise.all([
     getUserVocabulary(userId, wordIds),
@@ -33,7 +35,7 @@ export async function createSession({
     slots.map(({ word, grammar }) => {
       const otherWords = words.filter((w) => w.id !== word.id);
       const sample = otherWords.sort(() => Math.random() - 0.5).slice(0, 10);
-      return generateSentence(word, grammar, sample);
+      return generateSentence(word, grammar, sample, difficulty);
     }),
   );
 

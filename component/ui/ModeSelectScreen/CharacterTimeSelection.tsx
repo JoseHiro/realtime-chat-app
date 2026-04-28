@@ -30,10 +30,7 @@ export const CharacterTimeSelection = ({
     const imageUrl = getCharacterImageUrl(characterName);
     if (imageUrl) return imageUrl;
     if (characterName === "Sakura") return "/img/female.jpg";
-    if (characterName === "Ken") return "/img/man.jpg";
-    return characterName.includes("Chica") || characterName === "Aiko"
-      ? "/img/female.jpg"
-      : "/img/man.jpg";
+    return "/img/man.jpg";
   };
 
   const getRandomAudioPath = (characterName: CharacterName): string => {

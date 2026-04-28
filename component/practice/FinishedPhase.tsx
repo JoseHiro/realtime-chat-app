@@ -1,3 +1,4 @@
+import { useState, useEffect, useMemo } from "react";
 import { ProgressBar } from "./ProgressBar";
 import type { SessionQuestion, MasteryState, WordProgressSummary } from "../../features/practice/types";
 import type { QuestionResult } from "../../hooks/practice/usePractice";
@@ -23,37 +24,52 @@ interface FinishedPhaseProps {
   progressMap: Record<string, WordProgressSummary>;
   updatedProgressMap: Record<string, WordProgressSummary> | null;
   todayCount: number | null;
-  onPracticeAgain: () => void;
-  onPracticeMistakes: (wrongWordIds: string[]) => void;
-  onBackToSetup: () => void;
+  onTryAgain: () => void;
+  onFinish: () => void;
 }
+
+type LevelUpPhase = "before" | "spinning" | "after";
 
 export function FinishedPhase({
   session, results, retryCounts, progressMap, updatedProgressMap, todayCount,
-  onPracticeAgain, onPracticeMistakes, onBackToSetup,
+  onTryAgain, onFinish,
 }: FinishedPhaseProps) {
+  const [levelUpPhase, setLevelUpPhase] = useState<LevelUpPhase>("before");
+
   const totalCorrect = results.filter((r) => r?.correct).length;
   const pct = Math.round((totalCorrect / Math.max(session.length, 1)) * 100);
   const streakComplete = todayCount !== null ? todayCount >= STREAK_MIN : null;
   const streakRemaining = todayCount !== null ? Math.max(0, STREAK_MIN - todayCount) : STREAK_MIN - session.length;
 
-  const seenWordIds = new Set<string>();
-  const uniqueWords: SessionQuestion["wordUsed"][] = [];
-  for (const q of session) {
-    if (!seenWordIds.has(q.wordUsed.id)) {
-      seenWordIds.add(q.wordUsed.id);
-      uniqueWords.push(q.wordUsed);
+  const uniqueWords = useMemo(() => {
+    const seen = new Set<string>();
+    const list: SessionQuestion["wordUsed"][] = [];
+    for (const q of session) {
+      if (!seen.has(q.wordUsed.id)) { seen.add(q.wordUsed.id); list.push(q.wordUsed); }
     }
-  }
+    return list;
+  }, [session]);
 
-  const wrongWordIds = uniqueWords
-    .filter((word) => {
-      const wordResults = session
-        .map((q, i) => q.wordUsed.id === word.id ? results[i] : null)
-        .filter(Boolean) as QuestionResult[];
-      return !(wordResults[wordResults.length - 1]?.correct ?? true);
-    })
-    .map((w) => w.id);
+  const leveledUpIds = useMemo(() => {
+    if (!updatedProgressMap) return new Set<string>();
+    return new Set(
+      uniqueWords
+        .filter((w) => {
+          const before = progressMap[w.id]?.mastery ?? "new";
+          const after = updatedProgressMap[w.id]?.mastery;
+          return after && after !== before;
+        })
+        .map((w) => w.id),
+    );
+  }, [updatedProgressMap, uniqueWords, progressMap]);
+
+  useEffect(() => {
+    if (leveledUpIds.size === 0) return;
+    setLevelUpPhase("before");
+    const t1 = setTimeout(() => setLevelUpPhase("spinning"), 600);
+    const t2 = setTimeout(() => setLevelUpPhase("after"), 1400);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
+  }, [leveledUpIds]);
 
   return (
     <div className="space-y-8">
@@ -135,6 +151,7 @@ export function FinishedPhase({
             const retries = retryCounts.get(word.id) ?? 0;
             const beforeMastery = progressMap[word.id]?.mastery ?? "new";
             const afterMastery = updatedProgressMap?.[word.id]?.mastery ?? null;
+            const didLevelUp = leveledUpIds.has(word.id);
             const masteryChanged = afterMastery && afterMastery !== beforeMastery;
 
             const wordResults = session
@@ -154,7 +171,33 @@ export function FinishedPhase({
                   )}
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                  {masteryChanged ? (
+                  {didLevelUp && masteryChanged ? (
+                    <div className="flex items-center gap-1">
+                      {levelUpPhase === "before" && (
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${masteryColors[beforeMastery]}`}>
+                          {masteryLabel[beforeMastery]}
+                        </span>
+                      )}
+                      {levelUpPhase === "spinning" && (
+                        <>
+                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${masteryColors[beforeMastery]}`}>
+                            {masteryLabel[beforeMastery]}
+                          </span>
+                          <span className="text-xs text-gray-400 dark:text-gray-500">→</span>
+                          <span className="inline-block animate-spin text-base leading-none">🌀</span>
+                          <span className="text-xs text-gray-400 dark:text-gray-500">→</span>
+                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium opacity-40 ${masteryColors[afterMastery]}`}>
+                            {masteryLabel[afterMastery]}
+                          </span>
+                        </>
+                      )}
+                      {levelUpPhase === "after" && (
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium animate-bounce ${masteryColors[afterMastery]}`}>
+                          {masteryLabel[afterMastery]} ⬆
+                        </span>
+                      )}
+                    </div>
+                  ) : masteryChanged ? (
                     <div className="flex items-center gap-1">
                       <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${masteryColors[beforeMastery]}`}>
                         {masteryLabel[beforeMastery]}
@@ -188,24 +231,16 @@ export function FinishedPhase({
 
       <div className="flex flex-wrap gap-3">
         <button
-          onClick={onPracticeAgain}
+          onClick={onTryAgain}
           className="px-5 py-2.5 rounded-lg text-sm font-medium bg-black dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors"
         >
-          Practice again
+          Try again
         </button>
-        {wrongWordIds.length > 0 && (
-          <button
-            onClick={() => onPracticeMistakes(wrongWordIds)}
-            className="px-5 py-2.5 rounded-lg text-sm font-medium bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-          >
-            Practice mistakes ({wrongWordIds.length} {wrongWordIds.length === 1 ? "word" : "words"})
-          </button>
-        )}
         <button
-          onClick={onBackToSetup}
+          onClick={onFinish}
           className="px-5 py-2.5 rounded-lg text-sm font-medium bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
         >
-          Back to setup
+          Finish
         </button>
       </div>
     </div>

@@ -25,9 +25,9 @@ export const AssistantMessageBox = ({
   const { isMuted } = useUIPreferences();
   const [currentPlayingId, setCurrentPlayingId] = useState<number | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [displayEnglishSentence, setDisplayEnglishSentence] = useState<
-    null | number
-  >(null);
+  const [displayEnglishSentence, setDisplayEnglishSentence] = useState<null | number>(null);
+  const [playbackRate, setPlaybackRate] = useState(1);
+
 
   // const { isMuted } = useUIPreferences();
   // Create audioList from chatInfo if available
@@ -46,6 +46,7 @@ export const AssistantMessageBox = ({
     const audio = new Audio(chatInfo[id - 1].audioUrl);
     audioRef.current = audio;
     audio.muted = false;
+    audio.playbackRate = playbackRate;
     audio.play();
     setCurrentPlayingId(id);
 
@@ -53,6 +54,11 @@ export const AssistantMessageBox = ({
       setCurrentPlayingId(null);
       audioRef.current = null;
     };
+  };
+
+  const handleSpeedChange = (rate: number) => {
+    setPlaybackRate(rate);
+    if (audioRef.current) audioRef.current.playbackRate = rate;
   };
 
   const stopAudio = () => {
@@ -115,20 +121,56 @@ export const AssistantMessageBox = ({
                   {reading}
                 </p>
 
-                {((chatInfo && chatInfo[id]?.english !== "") ||
-                  english !== null) && (
-                  <button
-                    onClick={() => handleDisplayEnglishSentence(id)}
-                    className={`p-1.5 rounded-md transition-all hover:bg-gray-100 ${
-                      displayEnglishSentence === id
-                        ? "bg-green-50 text-green-600"
-                        : "text-gray-400"
-                    }`}
-                    title="Show translation"
-                  >
-                    <Languages className="w-4 h-4" />
-                  </button>
-                )}
+                <div className="flex items-center gap-1">
+                  {chatInfo?.[id]?.audioUrl && (
+                    <>
+                      <button
+                        onClick={() => {
+                          if (currentPlayingId === id + 1) {
+                            stopAudio();
+                          } else {
+                            playAudio(id + 1);
+                          }
+                        }}
+                        className={`p-1.5 rounded-md transition-all hover:bg-gray-100 ${
+                          currentPlayingId === id + 1
+                            ? "bg-gray-100 text-gray-700"
+                            : "text-gray-400"
+                        }`}
+                        title="Replay audio"
+                      >
+                        {currentPlayingId === id + 1 ? (
+                          <Pause className="w-4 h-4" />
+                        ) : (
+                          <Play className="w-4 h-4" />
+                        )}
+                      </button>
+                      <button
+                        onClick={() => handleSpeedChange(playbackRate === 1 ? 0.75 : 1)}
+                        className={`p-1.5 rounded-md transition-all hover:bg-gray-100 text-base leading-none ${
+                          playbackRate === 0.75 ? "bg-gray-200" : "opacity-30"
+                        }`}
+                        title={playbackRate === 0.75 ? "普通に戻す" : "ゆっくり再生"}
+                      >
+                        🐢
+                      </button>
+                    </>
+                  )}
+                  {((chatInfo && chatInfo[id]?.english !== "") ||
+                    english !== null) && (
+                    <button
+                      onClick={() => handleDisplayEnglishSentence(id)}
+                      className={`p-1.5 rounded-md transition-all hover:bg-gray-100 ${
+                        displayEnglishSentence === id
+                          ? "bg-green-50 text-green-600"
+                          : "text-gray-400"
+                      }`}
+                      title="Show translation"
+                    >
+                      <Languages className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
               </div>
 
               {displayEnglishSentence === id && (

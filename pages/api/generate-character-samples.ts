@@ -134,11 +134,13 @@ export default async function handler(
 
             const accessToken = await tokenResponse.text();
 
-            // Create SSML with appropriate style based on character
-            const style = character.characterName === "Chica" ? "cheerful"
-              : character.characterName === "Ryo" ? "energetic"
-              : character.characterName === "Aiko" ? "gentle"
-              : "friendly";
+            // Create SSML with appropriate style based on current character set
+            const style =
+              character.characterName === "Sakura"
+                ? "cheerful"
+                : character.characterName === "Ken"
+                  ? "friendly"
+                  : "gentle"; // Haruki
 
             const ssml = `
               <speak version='1.0' xml:lang='ja-JP' xmlns:mstts="http://www.w3.org/2001/mstts">

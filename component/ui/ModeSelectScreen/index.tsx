@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useRef } from "react";
+import React, { useMemo, useState, useRef, useEffect } from "react";
 import { ChevronRight, Play, Pause, Lock, Edit3 } from "lucide-react";
 import Image from "next/image";
 import { toast } from "sonner";
@@ -12,6 +12,8 @@ import themes from "../../../data/themes.json";
 import { getAllCharacters, getCharacterImageUrl } from "../../../lib/voice/voiceMapping";
 import type { CharacterName } from "../../../lib/voice/voiceMapping";
 import { calculateCreditsForCharacter } from "../../../lib/credits/characterCredits";
+import { GuideModal } from "../../practice/GuideModal";
+import type { GuideStep } from "../../practice/GuideModal";
 
 function chip(selected: boolean, extra?: string) {
   return [
@@ -59,10 +61,59 @@ export const ModeSelectScreen = ({
 
   const [playingCharacter, setPlayingCharacter] = useState<CharacterName | null>(null);
   const [showCustomTheme, setShowCustomTheme] = useState(false);
+  const [showGuide, setShowGuide] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
+  useEffect(() => {
+    if (localStorage.getItem("chat_guide_dismissed") !== "1") {
+      setShowGuide(true);
+    }
+  }, []);
+
+  function closeGuide() {
+    localStorage.setItem("chat_guide_dismissed", "1");
+    setShowGuide(false);
+  }
+
+  const chatGuideSteps: GuideStep[] = [
+    {
+      title: "Welcome to Chat",
+      body: <p>Practice real Japanese conversations with an AI character. Set up your session below and start speaking in seconds.</p>,
+    },
+    {
+      title: "Level",
+      body: <p>Choose your current Japanese level. This controls the vocabulary and sentence complexity the AI uses during conversation.</p>,
+      targetId: "chat-guide-level",
+    },
+    {
+      title: "Speaking style",
+      body: (
+        <>
+          <p><strong className="text-gray-700 dark:text-gray-300">Casual</strong> — everyday speech, like talking to a friend.</p>
+          <p className="mt-1"><strong className="text-gray-700 dark:text-gray-300">Polite</strong> — standard formal Japanese (〜ます・〜です).</p>
+          <p className="mt-1"><strong className="text-gray-700 dark:text-gray-300">Keigo</strong> — honorific business Japanese.</p>
+        </>
+      ),
+      targetId: "chat-guide-style",
+    },
+    {
+      title: "Theme",
+      body: <p>Pick a conversation topic. The AI will steer the dialogue around that theme. Pro users can enter a custom topic.</p>,
+      targetId: "chat-guide-theme",
+    },
+    {
+      title: "Voice & Duration",
+      body: <p>Choose your AI conversation partner. Press the play button to hear a voice sample. Each session is 3 minutes.</p>,
+      targetId: "chat-guide-voice",
+    },
+    {
+      title: "Grammar correction",
+      body: <p>When turned on, the AI will flag grammar mistakes during the conversation and offer corrections. Available on Pro plan.</p>,
+      targetId: "chat-guide-grammar",
+    },
+  ];
+
   const characters = getAllCharacters();
-  const timeOptions = [3, 5, 10];
 
   const canProceed = useMemo(
     () => Boolean(selectedLevel && (selectedTheme || customTheme.trim()) && selectedPoliteness),
@@ -97,26 +148,36 @@ export const ModeSelectScreen = ({
   function getCharacterImage(name: CharacterName): string {
     const url = getCharacterImageUrl(name);
     if (url) return url;
-    return (name === "Sakura" || name.includes("Chica") || name === "Aiko") ? "/img/female.jpg" : "/img/man.jpg";
+    return name === "Sakura" ? "/img/female.jpg" : "/img/man.jpg";
   }
 
   return (
     <div className="relative min-h-screen bg-white dark:bg-gray-950 overflow-auto w-full">
+      {showGuide && <GuideModal steps={chatGuideSteps} onClose={closeGuide} />}
       <div className="max-w-2xl mx-auto px-4 py-10">
 
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Chat setup</h1>
-          {showCredits && (
-            <span className="text-xs font-medium text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700 px-3 py-1 rounded-full">
-              {creditsRemaining} credits
-            </span>
-          )}
+          <div className="flex items-center gap-2">
+            {showCredits && (
+              <span className="text-xs font-medium text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700 px-3 py-1 rounded-full">
+                {creditsRemaining} credits
+              </span>
+            )}
+            <button
+              onClick={() => setShowGuide(true)}
+              title="How to use"
+              className="w-7 h-7 rounded-full flex items-center justify-center border border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:border-gray-400 dark:hover:border-gray-500 transition-colors text-xs font-medium"
+            >
+              ?
+            </button>
+          </div>
         </div>
 
         <div className="space-y-7">
           {/* Level */}
-          <div>
+          <div id="chat-guide-level">
             <p className="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Level</p>
             <div className="flex flex-wrap gap-2">
               {levels.map((l) => (
@@ -129,7 +190,7 @@ export const ModeSelectScreen = ({
           </div>
 
           {/* Speaking Style */}
-          <div>
+          <div id="chat-guide-style">
             <p className="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Speaking style</p>
             <div className="flex flex-wrap gap-2">
               {politenesses.map((p) => (
@@ -141,7 +202,7 @@ export const ModeSelectScreen = ({
           </div>
 
           {/* Theme */}
-          <div>
+          <div id="chat-guide-theme">
             <p className="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Theme</p>
             <div className="flex flex-wrap gap-2">
               {themes.map((t) => {
@@ -199,7 +260,7 @@ export const ModeSelectScreen = ({
           </div>
 
           {/* Character + Time */}
-          <div>
+          <div id="chat-guide-voice">
             <p className="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Voice &amp; Duration</p>
             <div className="rounded-xl border border-gray-100 dark:border-gray-800 divide-y divide-gray-100 dark:divide-gray-800">
               {characters.map((character) => {
@@ -237,33 +298,10 @@ export const ModeSelectScreen = ({
                       }
                     </button>
 
-                    {/* Time options */}
-                    <div className="flex gap-1 shrink-0">
-                      {timeOptions.map((t) => {
-                        const isTimeSelected = isSelected && selectedTime === t;
-                        const disabled = t === 10;
-                        return (
-                          <button
-                            key={t}
-                            type="button"
-                            disabled={disabled}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              if (!disabled) { setSelectedCharacter(character.characterName); setSelectedTime(t); }
-                            }}
-                            className={[
-                              "px-2.5 py-1 rounded-md border text-xs font-medium transition-all",
-                              isTimeSelected
-                                ? "border-gray-900 dark:border-gray-200 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900"
-                                : "border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-gray-400 dark:hover:border-gray-500",
-                              disabled ? "opacity-30 cursor-not-allowed" : "cursor-pointer",
-                            ].join(" ")}
-                          >
-                            {t}m
-                          </button>
-                        );
-                      })}
-                    </div>
+                    {/* Duration badge (fixed 3 min) */}
+                    <span className="shrink-0 px-2.5 py-1 rounded-md border border-gray-200 dark:border-gray-700 text-xs font-medium text-gray-600 dark:text-gray-400">
+                      3m
+                    </span>
                   </div>
                 );
               })}
@@ -271,7 +309,7 @@ export const ModeSelectScreen = ({
           </div>
 
           {/* Grammar Correction */}
-          <div>
+          <div id="chat-guide-grammar">
             <p className="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Grammar correction</p>
             <div className="flex gap-2">
               <button

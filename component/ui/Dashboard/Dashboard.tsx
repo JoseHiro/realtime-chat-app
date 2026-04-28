@@ -8,6 +8,7 @@ interface DashboardProps {
   username: string;
   userData?: any;
   chatsData?: any;
+  practiceActivity?: { createdAt: string }[];
   isLoading: boolean;
 }
 
@@ -15,6 +16,7 @@ export const Dashboard = ({
   username,
   userData,
   chatsData,
+  practiceActivity,
   isLoading,
 }: DashboardProps) => {
   if (isLoading) {
@@ -32,7 +34,7 @@ export const Dashboard = ({
   return (
     <DashboardLayout>
       <SakuraFall />
-      <DashboardContent username={displayUsername} chatsData={chatsData} />
+      <DashboardContent username={displayUsername} chatsData={chatsData} practiceActivity={practiceActivity} />
     </DashboardLayout>
   );
 

@@ -51,7 +51,7 @@ export default async function handler(
     //   const now = new Date();
     //   if (user.trialEndsAt && now > user.trialEndsAt) {
     //     trialStatus = "ended";
-    //   } else if ((user.trialUsedChats ?? 0) >= 2) {
+    //   } else if ((user.trialUsedChats ?? 0) >= 3) {
     //     trialStatus = "ended";
     //   } else {
     //     trialStatus = "active";

@@ -7,7 +7,6 @@ type HeaderProps = {
 };
 
 export const Header = ({
-  username,
   subscriptionPlan,
   creditsRemaining,
 }: HeaderProps) => {

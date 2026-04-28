@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { LandingHeader } from "../component/ui/LandingPage/LandingHeader";
 import { LandingFooter } from "../component/ui/LandingPage/LandingFooter";
@@ -23,76 +23,48 @@ import {
 
 const HowItWorks = () => {
   const router = useRouter();
+  const [stepsVisible, setStepsVisible] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setStepsVisible(true), 200);
+    return () => clearTimeout(t);
+  }, []);
 
   const steps = [
     {
       number: 1,
-      title: "Sign Up & Get Started",
+      title: "Sign Up in Seconds",
       description:
-        "Create your free account and start with 2 free conversation sessions to try out all features.",
+        "Create your account with email or Google — no credit card required. You get 3 free conversation sessions to start.",
       icon: UserPlus,
-      details: [
-        "Quick signup with email",
-        "2 free trial conversations",
-        "No credit card required",
-        "Access to all difficulty levels",
-      ],
     },
     {
       number: 2,
-      title: "Choose Your Settings",
+      title: "Set Up Your Session",
       description:
-        "Customize your conversation experience by selecting your Japanese level, conversation theme, speaking style, and more.",
+        "Pick your difficulty (Easy / Medium / Hard), a conversation theme, your AI character, politeness style, and how long you want to talk.",
       icon: Settings,
-      details: [
-        "Japanese Level: Easy (初級), Medium (中級), or Hard (上級)",
-        "Conversation Theme: Daily Life (all users), other themes require Pro",
-        "Speaking Style: Polite (です/ます) or Casual (だ/である)",
-        "Grammar Correction: Real-time feedback during conversation (Pro feature)",
-        "Custom Themes: Create your own conversation scenarios (Pro feature)",
-        "Voice Gender: Choose male or female AI voice",
-      ],
     },
     {
       number: 3,
-      title: "Start Your Conversation",
+      title: "Have a Real Conversation",
       description:
-        "Have a natural 3-5 minute conversation with our AI teacher in Japanese using voice input.",
+        "Speak naturally in Japanese using your microphone. Your AI partner responds in real-time, keeping the conversation going at your level.",
       icon: Mic,
-      details: [
-        "Press and hold the microphone button to speak",
-        "Speak naturally in Japanese",
-        "AI responds with appropriate difficulty level",
-        "Conversations typically last 3-5 minutes",
-        "Real-time transcription of your speech",
-      ],
     },
     {
       number: 4,
-      title: "Get Detailed Feedback",
+      title: "Get Scored Feedback",
       description:
-        "After each conversation, receive comprehensive analysis including grammar corrections, vocabulary suggestions, and conversation insights.",
+        "After each session, receive a personalized summary with a skill score, grammar corrections, vocabulary tips, and next steps.",
       icon: BarChart3,
-      details: [
-        "Grammar Analysis: Corrections and explanations",
-        "Conversation Skills: Fluency, accuracy, and engagement",
-        "Vocabulary Usage: Words you used and suggestions",
-        "Milestones: Track your progress over time",
-      ],
     },
     {
       number: 5,
-      title: "Review & Practice",
+      title: "Track & Keep Practicing",
       description:
-        "Access your conversation history anytime to review past conversations, summaries, and track your improvement.",
+        "Check your dashboard for streaks and progress. Review past conversation summaries, practice with flashcards, and build vocabulary.",
       icon: History,
-      details: [
-        "View all past conversations",
-        "Re-read summaries and feedback",
-        "Track progress over time",
-        "Search conversations by title",
-        "Edit conversation titles",
-      ],
     },
   ];
 
@@ -144,11 +116,11 @@ const HowItWorks = () => {
 
       {/* Hero Section */}
       <section className="pt-24 pb-16 bg-white">
-        <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
+        <div className="font-quicksand max-w-4xl mx-auto px-6 lg:px-8 text-center">
           <h1 className="text-5xl lg:text-6xl font-bold mb-6 text-gray-900">
             How <span className="text-green-600">Kaiwa Kun</span> Works
           </h1>
-          <p className="text-lg text-gray-600 mb-8 leading-relaxed">
+          <p className="text-md text-gray-500 mb-8 leading-relaxed">
             Learn Japanese naturally through conversations. Follow these simple
             steps to start improving your Japanese skills today.
           </p>
@@ -157,48 +129,53 @@ const HowItWorks = () => {
 
       {/* Steps Section */}
       <section className="py-20 bg-white border-t border-gray-200">
-        <div className="max-w-4xl mx-auto px-6 lg:px-8">
-          <div className="space-y-16">
-            {steps.map((step) => {
-              const Icon = step.icon;
-              return (
-                <div key={step.number} className="flex gap-8">
-                  {/* Number Badge */}
-                  <div className="flex-shrink-0">
-                    <div className="w-16 h-16 bg-white border-2 border-gray-900 rounded-full flex items-center justify-center">
-                      <span className="text-xl font-bold text-gray-900">
-                        {step.number}
-                      </span>
-                    </div>
-                  </div>
+        <div className="max-w-5xl mx-auto px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold mb-3 text-gray-900">Five Simple Steps</h2>
+            <p className="text-gray-500">From your first word to fluent conversation</p>
+          </div>
 
-                  {/* Content */}
-                  <div className="flex-1">
-                    <div className="flex items-center gap-4 mb-4">
-                      <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
-                        <Icon className="w-6 h-6 text-gray-900" />
+          <div className="relative">
+            {/* Vertical connecting line — desktop only */}
+            <div className="hidden lg:block absolute left-1/2 -translate-x-1/2 top-5 bottom-5 w-px bg-gray-200" />
+
+            <div className="flex flex-col gap-8">
+              {steps.map((step, idx) => {
+                const Icon = step.icon;
+                const isLeft = idx % 2 === 0;
+                return (
+                  <div
+                    key={step.number}
+                    style={{ transitionDelay: `${idx * 120}ms` }}
+                    className={`block lg:flex lg:items-center transition-all duration-700 ease-out ${stepsVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
+                  >
+                    {/* Card */}
+                    <div className={`w-full lg:flex-1 ${isLeft ? "lg:order-1 lg:pr-10" : "lg:order-3 lg:pl-10"}`}>
+                      <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group cursor-default">
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className="w-9 h-9 bg-green-50 rounded-lg flex items-center justify-center group-hover:bg-green-100 transition-colors">
+                            <Icon className="w-4 h-4 text-green-600" />
+                          </div>
+                          <span className="text-xs font-bold text-green-500 uppercase tracking-widest">Step {step.number}</span>
+                        </div>
+                        <h3 className="font-bold text-gray-900 mb-2">{step.title}</h3>
+                        <p className="text-sm text-gray-500 leading-relaxed">{step.description}</p>
                       </div>
-                      <h2 className="text-2xl font-bold text-gray-900">
-                        {step.title}
-                      </h2>
                     </div>
-                    <p className="text-base text-gray-600 mb-6 leading-relaxed">
-                      {step.description}
-                    </p>
-                    <ul className="space-y-2">
-                      {step.details.map((detail, idx) => (
-                        <li key={idx} className="flex items-start gap-3">
-                          <div className="w-1.5 h-1.5 bg-gray-900 rounded-full mt-2 flex-shrink-0" />
-                          <span className="text-base text-gray-600">
-                            {detail}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
+
+                    {/* Center dot — desktop only */}
+                    <div className="hidden lg:flex lg:order-2 w-20 justify-center flex-shrink-0 z-10">
+                      <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center shadow-md ring-4 ring-white">
+                        <span className="text-white text-sm font-bold">{step.number}</span>
+                      </div>
+                    </div>
+
+                    {/* Spacer — desktop only */}
+                    <div className={`hidden lg:block lg:flex-1 ${isLeft ? "lg:order-3" : "lg:order-1"}`} />
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         </div>
       </section>
@@ -239,70 +216,6 @@ const HowItWorks = () => {
         </div>
       </section>
 
-      {/* Trial Limitations */}
-      <section className="py-20 bg-white border-t border-gray-200">
-        <div className="max-w-4xl mx-auto px-6 lg:px-8">
-          <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 lg:p-10">
-            <h2 className="text-2xl font-bold mb-6 text-gray-900">
-              Free Trial Limitations
-            </h2>
-            <p className="text-base text-gray-600 mb-6">
-              The free trial includes 2 conversation sessions with access to
-              core features. Some features are available only with a Pro
-              subscription:
-            </p>
-            <ul className="space-y-3 mb-8">
-              <li className="flex items-start gap-3">
-                <div className="w-1.5 h-1.5 bg-gray-900 rounded-full mt-2 flex-shrink-0" />
-                <span className="text-base text-gray-600">
-                  <strong className="text-gray-900">
-                    Limited to 2 conversations
-                  </strong>{" "}
-                  - Free trial allows 2 complete conversation sessions
-                </span>
-              </li>
-              <li className="flex items-start gap-3">
-                <div className="w-1.5 h-1.5 bg-gray-900 rounded-full mt-2 flex-shrink-0" />
-                <span className="text-base text-gray-600">
-                  <strong className="text-gray-900">
-                    Only Daily Life theme
-                  </strong>{" "}
-                  - Other themes (Business, Travel, Culture, Social) require Pro
-                </span>
-              </li>
-              <li className="flex items-start gap-3">
-                <div className="w-1.5 h-1.5 bg-gray-900 rounded-full mt-2 flex-shrink-0" />
-                <span className="text-base text-gray-600">
-                  <strong className="text-gray-900">No custom themes</strong> -
-                  Create your own conversation scenarios with Pro
-                </span>
-              </li>
-              <li className="flex items-start gap-3">
-                <div className="w-1.5 h-1.5 bg-gray-900 rounded-full mt-2 flex-shrink-0" />
-                <span className="text-base text-gray-600">
-                  <strong className="text-gray-900">
-                    Grammar correction during conversations
-                  </strong>{" "}
-                  - Real-time feedback is a Pro feature
-                </span>
-              </li>
-            </ul>
-            <div className="pt-6 border-t border-gray-200">
-              <p className="text-base text-gray-600 mb-4">
-                Ready to unlock all features? Upgrade to Pro for unlimited
-                conversations and advanced learning tools.
-              </p>
-              <RoundedButton
-                onClick={() => router.push("/pricing")}
-                className="bg-gray-900 text-white px-6 py-3 rounded-lg font-semibold hover:bg-black transition-colors inline-block"
-              >
-                View Pricing Plans
-              </RoundedButton>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Conversation Themes */}
       <section className="py-20 bg-gray-50 border-t border-gray-200">
         <div className="max-w-6xl mx-auto px-6 lg:px-8">
@@ -332,103 +245,6 @@ const HowItWorks = () => {
                 </div>
               );
             })}
-          </div>
-        </div>
-      </section>
-
-      {/* Tips Section */}
-      <section className="py-20 bg-gray-50 border-t border-gray-200">
-        <div className="max-w-4xl mx-auto px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4 text-gray-900">
-              Tips for Success
-            </h2>
-            <p className="text-lg text-gray-600">
-              Get the most out of your Japanese learning experience
-            </p>
-          </div>
-
-          <div className="bg-white rounded-lg border border-gray-200 p-8 lg:p-12">
-            <ul className="space-y-8">
-              <li className="flex gap-4">
-                <div className="flex-shrink-0 w-8 h-8 bg-white border-2 border-gray-900 rounded-full flex items-center justify-center">
-                  <span className="text-gray-900 font-bold text-sm">1</span>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-lg mb-2 text-gray-900">
-                    Start with Easy Level
-                  </h3>
-                  <p className="text-base text-gray-600">
-                    Even if you&apos;re intermediate, starting with Easy helps
-                    you get comfortable with the interface and build confidence.
-                  </p>
-                </div>
-              </li>
-
-              <li className="flex gap-4">
-                <div className="flex-shrink-0 w-8 h-8 bg-white border-2 border-gray-900 rounded-full flex items-center justify-center">
-                  <span className="text-gray-900 font-bold text-sm">2</span>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-lg mb-2 text-gray-900">
-                    Speak Naturally
-                  </h3>
-                  <p className="text-base text-gray-600">
-                    Don&apos;t worry about making mistakes. The AI will
-                    understand you, and you&apos;ll get feedback to improve.
-                    Focus on communicating your thoughts naturally.
-                  </p>
-                </div>
-              </li>
-
-              <li className="flex gap-4">
-                <div className="flex-shrink-0 w-8 h-8 bg-white border-2 border-gray-900 rounded-full flex items-center justify-center">
-                  <span className="text-gray-900 font-bold text-sm">3</span>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-lg mb-2 text-gray-900">
-                    Review Your Feedback
-                  </h3>
-                  <p className="text-base text-gray-600">
-                    After each conversation, take time to read the summary and
-                    grammar corrections. This helps you learn from your mistakes
-                    and improve faster.
-                  </p>
-                </div>
-              </li>
-
-              <li className="flex gap-4">
-                <div className="flex-shrink-0 w-8 h-8 bg-white border-2 border-gray-900 rounded-full flex items-center justify-center">
-                  <span className="text-gray-900 font-bold text-sm">4</span>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-lg mb-2 text-gray-900">
-                    Practice Regularly
-                  </h3>
-                  <p className="text-base text-gray-600">
-                    Consistency is key. Try to have at least 2-3 conversations
-                    per week to see significant improvement in your Japanese
-                    skills.
-                  </p>
-                </div>
-              </li>
-
-              <li className="flex gap-4">
-                <div className="flex-shrink-0 w-8 h-8 bg-white border-2 border-gray-900 rounded-full flex items-center justify-center">
-                  <span className="text-gray-900 font-bold text-sm">5</span>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-lg mb-2 text-gray-900">
-                    Try Different Themes
-                  </h3>
-                  <p className="text-base text-gray-600">
-                    Experiment with various conversation themes to expand your
-                    vocabulary and practice different types of scenarios you
-                    might encounter in real life.
-                  </p>
-                </div>
-              </li>
-            </ul>
           </div>
         </div>
       </section>
