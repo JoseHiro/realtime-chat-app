@@ -110,15 +110,7 @@ async function generateSamples() {
                 console.log(`⚠️  ElevenLabs error for ${character.characterName} (voice: ${elevenLabsVoiceId}):`, errorStatus);
 
                 // If custom voice limit reached, fallback to Azure TTS
-                // Exception: For Aiko, if the voice is set, try to use it even if there's an error (user may have added it)
-                if (character.characterName === "Aiko" && elevenLabsVoiceId === "WQz3clzUdMqvBf0jswZQ") {
-                  // Check if it's a different error (not voice_limit_reached) - if so, throw it
-                  if (errorData.detail?.status !== "voice_limit_reached" && errorData.detail?.status !== "subscription_voice_limit_reached") {
-                    throw new Error(`ElevenLabs TTS failed for Aiko: ${elevenLabsResponse.status} ${errorText}`);
-                  }
-                  // If it's voice_limit_reached, still try fallback but warn user
-                  console.log(`⚠️  Voice limit reached for Aiko. Make sure voice ${elevenLabsVoiceId} is added to your ElevenLabs account. Using Azure TTS fallback...`);
-                } else if (errorData.detail?.status === "voice_limit_reached" || errorData.detail?.status === "subscription_voice_limit_reached") {
+                if (errorData.detail?.status === "voice_limit_reached" || errorData.detail?.status === "subscription_voice_limit_reached") {
                   console.log(`⚠️  Custom voice limit reached for ${character.characterName}, using Azure TTS fallback...`);
                 } else {
                   throw new Error(`ElevenLabs TTS failed: ${elevenLabsResponse.status} ${errorText}`);
@@ -159,11 +151,13 @@ async function generateSamples() {
 
             const accessToken = await tokenResponse.text();
 
-            // Create SSML with appropriate style based on character
-            const style = character.characterName === "Chica" ? "cheerful"
-              : character.characterName === "Ryo" ? "energetic"
-              : character.characterName === "Aiko" ? "gentle"
-              : "friendly";
+            // Create SSML with appropriate style based on current character set
+            const style =
+              character.characterName === "Sakura"
+                ? "cheerful"
+                : character.characterName === "Ken"
+                  ? "friendly"
+                  : "gentle"; // Haruki
 
             const ssml = `
               <speak version='1.0' xml:lang='ja-JP' xmlns:mstts="http://www.w3.org/2001/mstts">
